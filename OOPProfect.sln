@@ -3,14 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29424.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "Bot\Bot.csproj", "{3DAE2861-90F9-4429-BF85-CCB947A3E599}"
-	ProjectSection(ProjectDependencies) = postProject
-		{3E806ECC-314A-4425-8936-D0BA1B87A316} = {3E806ECC-314A-4425-8936-D0BA1B87A316}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Bot\Bot.csproj", "{3DAE2861-90F9-4429-BF85-CCB947A3E599}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BotApp", "BotApp\BotApp.csproj", "{3E806ECC-314A-4425-8936-D0BA1B87A316}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{8F0D8247-99EE-4547-9E1A-73882910D50E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8F0D8247-99EE-4547-9E1A-73882910D50E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotApplication", "BotApplication\BotApplication.csproj", "{FDC68AD3-2FF3-4E33-BD56-95FA816F0455}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BotApp", "TelegramBotApplication\BotApp.csproj", "{BD2B5118-8204-4428-910F-1FAB80F53E57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,14 +21,18 @@ Global
 		{3DAE2861-90F9-4429-BF85-CCB947A3E599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3DAE2861-90F9-4429-BF85-CCB947A3E599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3DAE2861-90F9-4429-BF85-CCB947A3E599}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3E806ECC-314A-4425-8936-D0BA1B87A316}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3E806ECC-314A-4425-8936-D0BA1B87A316}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3E806ECC-314A-4425-8936-D0BA1B87A316}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3E806ECC-314A-4425-8936-D0BA1B87A316}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F0D8247-99EE-4547-9E1A-73882910D50E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8F0D8247-99EE-4547-9E1A-73882910D50E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F0D8247-99EE-4547-9E1A-73882910D50E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F0D8247-99EE-4547-9E1A-73882910D50E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDC68AD3-2FF3-4E33-BD56-95FA816F0455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDC68AD3-2FF3-4E33-BD56-95FA816F0455}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDC68AD3-2FF3-4E33-BD56-95FA816F0455}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDC68AD3-2FF3-4E33-BD56-95FA816F0455}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD2B5118-8204-4428-910F-1FAB80F53E57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD2B5118-8204-4428-910F-1FAB80F53E57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD2B5118-8204-4428-910F-1FAB80F53E57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD2B5118-8204-4428-910F-1FAB80F53E57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

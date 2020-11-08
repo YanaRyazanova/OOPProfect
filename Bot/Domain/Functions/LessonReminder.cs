@@ -6,7 +6,7 @@ namespace Bot.Domain.Functions
 {
     public class LessonReminder: IBotFunction
     {
-        static public string Do(DateTime lessonStartTime)
+        public static string Do(DateTime lessonStartTime)
         {
             while (true)
             {
