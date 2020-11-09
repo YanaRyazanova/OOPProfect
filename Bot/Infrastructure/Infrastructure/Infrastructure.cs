@@ -55,5 +55,22 @@ namespace Infrastructure
             }
             return result;
         }
+        public static string GetNearestLesson(string groupName)
+        {
+            var timeTable = ParseTimeTable(groupName);
+            var now = DateTime.Now;
+            var nearestTime = new DateTime();
+            var minDif = long.MaxValue;
+            foreach (var time in timeTable.Keys)
+            {
+                var dif = time.Hour * 60 + time.Minute - now.Hour * 60 - now.Minute;
+                if (dif < minDif && dif > 0)
+                {
+                    minDif = dif;
+                    nearestTime = time;
+                }
+            }
+            return timeTable[nearestTime];
+        }
     }
 }
