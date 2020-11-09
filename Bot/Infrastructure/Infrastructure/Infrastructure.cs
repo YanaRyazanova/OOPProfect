@@ -70,7 +70,14 @@ namespace Infrastructure
                     nearestTime = time;
                 }
             }
-            return timeTable[nearestTime];
+            try
+            {
+                return timeTable[nearestTime];
+            }
+            catch
+            {
+                return "";
+            }
         }
     }
 }
