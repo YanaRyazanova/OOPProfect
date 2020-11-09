@@ -55,7 +55,7 @@ namespace Bot
             }
             return result;
         }
-        public static string GetNearestLesson(string groupName)
+        public static Tuple<DateTime, string> GetNearestLesson(string groupName)
         {
             var timeTable = ParseTimeTable(groupName);
             var now = DateTime.Now;
@@ -72,11 +72,11 @@ namespace Bot
             }
             try
             {
-                return timeTable[nearestTime];
+                return Tuple.Create(nearestTime, timeTable[nearestTime]);
             }
             catch
             {
-                return "Сегодня пар больше нет ^-^";
+                return Tuple.Create(nearestTime, "Сегодня пар больше нет ^-^");
             }
         }
     }
