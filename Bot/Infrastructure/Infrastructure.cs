@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Infrastructure
+namespace Bot
 {
     public class DataBase
     {
@@ -76,7 +76,7 @@ namespace Infrastructure
             }
             catch
             {
-                return "";
+                return "Сегодня пар больше нет ^-^";
             }
         }
     }
