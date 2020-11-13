@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Telegram.Bot.Args;
 
-namespace Bot.Domain
+namespace BotApp
 {
-    public interface IBotFunction
+    interface IMessageSender
     {
 
     }

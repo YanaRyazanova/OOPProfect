@@ -10,10 +10,15 @@ namespace Tests
     public class DomainTest
     {
         [Test]
-        public void LessonReminder()
+        public void TestLessonReminder()
         {
-            Assert.AreEqual("Пара сейчас начнется",
-                Bot.Domain.Functions.LessonReminder.Do(DateTime.Now.AddMinutes(11)));
+            while (true)
+            {
+                var actual = new LessonReminder("ФТ-201").Do();
+                if (actual == null) continue;
+                Assert.NotNull(actual);
+                break;
+            }
         }
     }
 }
