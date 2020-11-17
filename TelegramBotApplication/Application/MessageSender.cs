@@ -9,16 +9,16 @@ namespace BotApp
 {
     class MessageSender
     {
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
-        {
-            var message = messageEventArgs.Message;
-            var chatId = message.Chat.Id;
-            if (!usersList.Contains(chatId))
-                usersList.Add(chatId);
-            if (message.Type == MessageType.Text)
-            {
-                await client.SendTextMessageAsync(chatId, message.Text);
-            }
-        }
+        //private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        //{
+        //    var message = messageEventArgs.Message;
+        //    var chatId = message.Chat.Id;
+        //    if (!usersList.Contains(chatId))
+        //        usersList.Add(chatId);
+        //    if (message.Type == MessageType.Text)
+        //    {
+        //        await client.SendTextMessageAsync(chatId, message.Text);
+        //    }
+        //}
     }
 }
