@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Bot.Domain.Functions;
+using Domain.Functions;
 
 namespace Tests
 {
@@ -12,13 +12,28 @@ namespace Tests
         [Test]
         public void TestLessonReminder()
         {
-            while (true)
-            {
-                var actual = new LessonReminder("ФТ-201").Do();
-                if (actual == null) continue;
-                Assert.NotNull(actual);
-                break;
-            }
+            //while (true)
+            //{
+            //    var actual = new LessonReminder("ФТ-202").Do();
+            //    if (actual == null) continue;
+            //    Assert.NotNull(actual);
+            //    break;
+            //}
+        }
+
+        [Test]
+        public void TestScheduleSender()
+        {
+            //var actual = new ScheduleSender("ФТ-202").Do();
+            //Assert.NotNull(actual);
+        }
+
+        [Test]
+        public void TestDiningRoomIndicator()
+        {
+            var actual = new DiningRoomIndicator();
+            actual.Increment();
+            Assert.AreEqual(1, actual.VisitorsCount);
         }
     }
 }

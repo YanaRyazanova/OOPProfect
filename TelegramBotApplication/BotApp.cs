@@ -4,18 +4,19 @@ using System.Text;
 using System.Threading;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using Domain.Functions;
 
 namespace OOPProject
 {
     class BotApp
     {
-        private static readonly List<long> UsersList = new List<long>();
+        private static List<long> usersList = new List<long>();
         private static TelegramBotClient client;
-        private const string token = "1443567108:AAEh-njifk9sV2UAASpPJeNF2Jbu8zZ6nUs"; // token, который вернул BotFather
-
         static void Main(string[] args)
         {
+            var token = "1443567108:AAEh-njifk9sV2UAASpPJeNF2Jbu8zZ6nUs"; // token, который вернул BotFather
             client = new TelegramBotClient(token);
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
@@ -29,21 +30,26 @@ namespace OOPProject
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
-            if (!UsersList.Contains(chatId))
-                UsersList.Add(chatId);
-            if (message.Type == MessageType.Text)
+            if (!usersList.Contains(chatId))
+                usersList.Add(chatId);
+            if (message?.Type == MessageType.Text)
             {
                 await client.SendTextMessageAsync(chatId, message.Text);
             }
+
+            //foreach (var id in usersList)
+            //{
+            //    var notification = Domain.Functions.LessonReminder.Do(DateTime.Now.AddMinutes(11));
+            //    await client.SendTextMessageAsync(id, notification);
+            //}
         }
 
         private static async void BotNotificationsSender(object sender, MessageEventArgs messageEventArgs)
         {
-            foreach (var id in UsersList)
+            foreach (var id in usersList)
             {
-                var message = new Bot.Domain.Functions.LessonReminder("ФТ-201").Do();
-                if (message != null)
-                    await client.SendTextMessageAsync(id, message);
+                //var message = new LessonReminder("ФТ-201").Do();
+                //await client.SendTextMessageAsync(id, message);
             }
         }
     }

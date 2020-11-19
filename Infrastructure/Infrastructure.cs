@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Bot
+namespace Infrastructure
 {
     public class DataBase
     {
