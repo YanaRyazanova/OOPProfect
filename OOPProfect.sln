@@ -8,6 +8,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{8F0D8247-99EE-4547-9E1A-73882910D50E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BD2B5118-8204-4428-910F-1FAB80F53E57} = {BD2B5118-8204-4428-910F-1FAB80F53E57}
+		{74A98F23-B11E-4CBD-BB26-D38514A43547} = {74A98F23-B11E-4CBD-BB26-D38514A43547}
 		{FD9DD290-33E9-48DD-BE29-6B6885175675} = {FD9DD290-33E9-48DD-BE29-6B6885175675}
 	EndProjectSection
 EndProject
@@ -18,7 +19,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "View", "TelegramBotApplicat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{FD9DD290-33E9-48DD-BE29-6B6885175675}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{74A98F23-B11E-4CBD-BB26-D38514A43547}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{74A98F23-B11E-4CBD-BB26-D38514A43547}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3DAE2861-90F9-4429-BF85-CCB947A3E599} = {3DAE2861-90F9-4429-BF85-CCB947A3E599}
+		{FD9DD290-33E9-48DD-BE29-6B6885175675} = {FD9DD290-33E9-48DD-BE29-6B6885175675}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

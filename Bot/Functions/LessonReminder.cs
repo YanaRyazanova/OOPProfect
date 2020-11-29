@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Domain.Functions
 {
-    public class LessonReminder : BotFunction
+    public class LessonReminder<TLesson> : BotFunction
     {
         private readonly DateTime nearestLessonTime;
         private readonly string nearestLessonName;
@@ -14,7 +14,7 @@ namespace Domain.Functions
             nearestLessonTime = time;
             nearestLessonName = name;
         }
-        public string Do()
+        private string GetInformationString()
         {
             var lessonStartTime = nearestLessonTime;
             var lessonName = nearestLessonName;
@@ -22,6 +22,15 @@ namespace Domain.Functions
                              - DateTime.Now.Minute - DateTime.Now.Hour * 60;
 
             return difference <= 10 ? "Через " + difference + " минут начнется пара:" + lessonName : null;
+        }
+        public string Do(TLesson nearestLesson)
+        {
+            while (true)
+            {
+                var res = GetInformationString();
+                if (res != null)
+                    return res;
+            }
         }
     }
 }

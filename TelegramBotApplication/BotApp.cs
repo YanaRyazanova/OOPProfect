@@ -1,56 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using Telegram.Bot;
-using Telegram.Bot.Args;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
+using Application;
 using Domain.Functions;
+using Infrastructure;
+using Ninject;
+using Ninject.Parameters;
+using Telegram.Bot;
 
-namespace OOPProject
+namespace View
 {
     class BotApp
     {
-        private static List<long> usersList = new List<long>();
-        private static TelegramBotClient client;
+        //private static List<long> usersList = new List<long>();
         static void Main(string[] args)
         {
             var token = "1443567108:AAEh-njifk9sV2UAASpPJeNF2Jbu8zZ6nUs"; // token, который вернул BotFather
-            client = new TelegramBotClient(token);
-            client.OnMessage += BotOnMessageReceived;
-            client.OnMessageEdited += BotOnMessageReceived;
-            client.OnMessage += BotNotificationsSender;
-            client.OnMessageEdited += BotNotificationsSender;
-            client.StartReceiving();
+            var container = AddBindings(new StandardKernel());
+            
+            //var bot = new TelegramBotUI(client);
+            var client = new TelegramBotClient(token);
+            var bot = container.Get<TelegramBotUI>(new ConstructorArgument("newClient", client));
+            bot.Run();
             Console.ReadLine();
-            client.StopReceiving();
-        }
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
-        {
-            var message = messageEventArgs.Message;
-            var chatId = message.Chat.Id;
-            if (!usersList.Contains(chatId))
-                usersList.Add(chatId);
-            if (message?.Type == MessageType.Text)
-            {
-                await client.SendTextMessageAsync(chatId, message.Text);
-            }
-
-            //foreach (var id in usersList)
-            //{
-            //    var notification = Domain.Functions.LessonReminder.Do(DateTime.Now.AddMinutes(11));
-            //    await client.SendTextMessageAsync(id, notification);
-            //}
+            bot.Stop();
         }
 
-        private static async void BotNotificationsSender(object sender, MessageEventArgs messageEventArgs)
+        private static StandardKernel AddBindings(StandardKernel container)
         {
-            foreach (var id in usersList)
-            {
-                //var message = new LessonReminder("ФТ-201").Do();
-                //await client.SendTextMessageAsync(id, message);
-            }
+            container.Bind<TelegramBotUI>().ToSelf();
+            container.Bind<MessageHandler>().ToSelf();
+            container.Bind<LessonReminder<Lesson>>().ToSelf();
+            container.Bind<DiningRoomIndicator>().ToSelf();
+            container.Bind<ScheduleSender<Lesson>>().ToSelf();
+            container.Bind<DataBaseParser>().ToSelf();
+            container.Bind<DataBase>().ToSelf();
+            return container;
         }
     }
 }
