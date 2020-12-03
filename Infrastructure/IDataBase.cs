@@ -6,6 +6,6 @@ namespace Infrastructure
 {
     interface IDataBase
     {
-        Lesson[] ParseTimeTable(string groupName);
+        Lesson[] ParseTimeTable(string groupName, DateTime day);
     }
 }
