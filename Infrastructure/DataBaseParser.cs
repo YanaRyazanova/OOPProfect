@@ -10,17 +10,14 @@ namespace Infrastructure
     {
         private readonly DBNameProvider dbNameProvider;
 
-        //public DataBaseParser(DBNameProvider dbNameProvider)
-        //{
-        //    this.dbNameProvider = dbNameProvider;
-        //}
+        public DataBaseParser(DBNameProvider dbNameProvider)
+        {
+            this.dbNameProvider = dbNameProvider;
+        }
 
         public string GetTimetableForGroupForCurrentDay(string groupName, DateTime day)
         {
-            //var dbName = dbNameProvider.GetDBName("TimeTable");
-            var path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            path = path.Remove(path.Length - 28);
-            var dbName = "PeopleAndGroup.db";
+            var dbName = dbNameProvider.GetDBName("TimeTable");
             var days = new Dictionary<string, string>
             {
                 ["Monday"] = "Понедельник",

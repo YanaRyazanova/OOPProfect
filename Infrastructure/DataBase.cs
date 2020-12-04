@@ -8,7 +8,8 @@ namespace Infrastructure
         public Lesson[] ParseTimeTable(string groupName)
         {
             var now = DateTime.Now;
-            var parser = new DataBaseParser();
+            var provider = new DBNameProvider();
+            var parser = new DataBaseParser(provider);
             var timetable = parser.GetTimetableForGroupForCurrentDay(groupName, now);
             var result = new List<Lesson>();
             if (timetable.Length > 1)

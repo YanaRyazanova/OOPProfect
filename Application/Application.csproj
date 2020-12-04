@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bot\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+    <ProjectReference Include="..\MyDomain\MyDomain.csproj" />
   </ItemGroup>
 
 </Project>

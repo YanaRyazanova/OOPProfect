@@ -13,21 +13,24 @@ namespace Application
         private readonly DataBase dataBase;
         private readonly DiningRoomIndicator diningRoom;
         private readonly DataBaseParser dataBaseParser;
-        private readonly ScheduleSender<Lesson> scheduleSender;
+        //private readonly LessonReminder<Lesson> lessonReminder;
         private readonly string groupName;
 
         public MessageHandler(DataBase dataBase, DiningRoomIndicator diningRoom,
-            DataBaseParser dataBaseParser, ScheduleSender<Lesson> scheduleSender)
+            DataBaseParser dataBaseParser,
+            //LessonReminder<Lesson> lessonReminder,
+            string groupName)
         {
             this.dataBase = dataBase;
             this.diningRoom = diningRoom;
             this.dataBaseParser = dataBaseParser;
-            this.scheduleSender = scheduleSender;
+            //this.lessonReminder = lessonReminder;
+            this.groupName = groupName;
         }
 
-        private void LessonReminderHandlerHandler(Func<string, string> schedule)
+        private void LessonReminderHandler(Func<string, string> schedule)
         {
-            var lessonReminderMessage = Task.Run(() => schedule);
+            //??????????????var lessonReminderMessage = Task.Run(() => lessonReminder.Do());
         }
 
         public string GetResponse(string message)
@@ -35,18 +38,21 @@ namespace Application
             string result = null;
             switch (message)
             {
+                case "/start":
+                    result = "Hello";
+                    break;
                 case "расписание на сегодня":
                     var schedule = dataBaseParser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Today);
-                    result = scheduleSender.Do().ToString();
+                    result = new ScheduleSender(schedule).Do();
                     break;
                 case "help":
                     result = "Бот умеет вот это";
                     break;
                 case "расписание на завтра":
-                    //var scheduleNextDay =
-                    //    dataBaseParser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(1));
-                    //result = scheduleSender.Do().ToString();
-                    result = "Hello everyone";
+                    var scheduleNextDay =
+                        dataBaseParser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(1));
+                    result = new ScheduleSender(scheduleNextDay).Do();
+                    //result = "Hello everyone";
                     break;
                 case "я в столовой":
                     diningRoom.Increment();
@@ -56,7 +62,6 @@ namespace Application
                     result = "К сожалению, бот не обрабатывает такую команду :-(";
                     break;
             }
-
             return result;
         }
     }

@@ -5,15 +5,15 @@ using Domain;
 
 namespace Domain.Functions
 {
-    public class ScheduleSender<TLesson> : BotFunction
+    public class ScheduleSender : BotFunction
     {
-        private readonly TLesson[] schedule; 
-        public ScheduleSender(TLesson[] schedule)
+        private readonly string schedule; 
+        public ScheduleSender(string schedule)
         {
             this.schedule = schedule;
         }
 
-        public TLesson[] Do()
+        public string Do()
         {
             return schedule;
         }

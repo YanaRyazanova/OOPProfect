@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Domain.Functions;
+using MyDomain.Functions;
 
 namespace Tests
 {

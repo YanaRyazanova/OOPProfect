@@ -10,8 +10,8 @@ namespace Infrastructure
         public string GetDBName(string fileName)
         {
             var path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            path = path.Remove(path.Length - 28);
-            var dbName = $"{path}\\{fileName}.db";
+            path = path.Remove(path.Length - 24);
+            var dbName = $"{path}\\{"Infrastructure"}\\{fileName}.db";
             return dbName;
         }
     }
