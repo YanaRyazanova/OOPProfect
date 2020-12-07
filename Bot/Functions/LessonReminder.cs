@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 
 
 namespace Domain.Functions
@@ -14,20 +15,22 @@ namespace Domain.Functions
         {
             this.nearestLesson = lesson;
         }
-        private string GetInformationString()
+        private int GetDifference()
         {
             var lessonStartTime = (DateTime)nearestLesson[0];
             var difference = lessonStartTime.Minute + lessonStartTime.Hour * 60
                              - DateTime.Now.Minute - DateTime.Now.Hour * 60;
-            return difference <= 10 ? $"Через {difference} начнется пара {nearestLesson[1]}": null;
+            return difference;
         }
+
         public string Do()
         {
             while (true)
             {
-                var res = GetInformationString();
-                if (res != null)
-                    return res;
+                var difference = GetDifference();
+                if (difference <= 10) return $"Через {difference} начнется пара {nearestLesson[1]}";
+                var sleepTime = difference - 10;
+                Thread.Sleep(sleepTime);
             }
         }
     }

@@ -16,8 +16,7 @@
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\Bot\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-    <ProjectReference Include="..\MyDomain\MyDomain.csproj" />
-    <ProjectReference Include="..\MyView\MyView.csproj" />
+    <ProjectReference Include="..\TelegramBotApplication\View.csproj" />
   </ItemGroup>
 
 </Project>

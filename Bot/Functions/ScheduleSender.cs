@@ -15,7 +15,9 @@ namespace Domain.Functions
 
         public string Do()
         {
-            return schedule;
+            var result = new StringBuilder();
+            result.Append(schedule);
+            return result.ToString();
         }
     }
 }

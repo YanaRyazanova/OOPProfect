@@ -16,7 +16,7 @@ namespace Infrastructure
             name = name_;
         }
 
-        public object? this[int index]
+        public object this[int index]
         {
             get
             {
@@ -30,5 +30,10 @@ namespace Infrastructure
         }
 
         public int Length { get => 2; }
+
+        public override string ToString()
+        {
+            return $"{time} {name}";
+        }
     }
 }

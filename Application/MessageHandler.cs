@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Domain;
 using Domain.Functions;
 using Infrastructure;
 using Ninject;
@@ -42,15 +43,14 @@ namespace Application
                     result = "Hello";
                     break;
                 case "расписание на сегодня":
-                    var schedule = dataBaseParser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Today);
+                    var schedule = SheduleModify(0);
                     result = new ScheduleSender(schedule).Do();
                     break;
                 case "help":
                     result = "Бот умеет вот это";
                     break;
                 case "расписание на завтра":
-                    var scheduleNextDay =
-                        dataBaseParser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(1));
+                    var scheduleNextDay = SheduleModify(1);
                     result = new ScheduleSender(scheduleNextDay).Do();
                     //result = "Hello everyone";
                     break;
@@ -63,6 +63,20 @@ namespace Application
                     break;
             }
             return result;
+        }
+
+        private string SheduleModify(int days)
+        {
+            var scheduleArray = dataBaseParser
+                .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
+            var scheduleNextDay = new StringBuilder();
+            foreach (var item in scheduleArray)
+            {
+                scheduleNextDay.Append(item.ToString());
+                scheduleNextDay.Append("\n");
+            }
+
+            return scheduleNextDay.ToString();
         }
     }
 }
