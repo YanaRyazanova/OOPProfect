@@ -37,6 +37,7 @@ namespace Infrastructure.SQL
             connection.Open();
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
             command.ExecuteNonQuery();
+            connection.Close();
         }
 
         public string[] GetAllUsers()
@@ -50,8 +51,8 @@ namespace Infrastructure.SQL
             foreach (DbDataRecord record in reader)
             {
                 users.Add((string)record["ChatID"]);
-                connection.Close();
             }
+            connection.Close();
             return users.ToArray();
         }
     }
