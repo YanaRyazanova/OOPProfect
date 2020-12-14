@@ -52,21 +52,8 @@ namespace Infrastructure
 
         public Lesson GetNearestLesson(string groupName)
         {
-            var now = DateTime.Now;
-            var timeTable = GetTimetableForGroupForCurrentDay(groupName, now);
-            var nearestLesson = new Lesson(DateTime.Now, "Сегодня пар больше нет ^-^");
-            var minDif = long.MaxValue;
-            foreach (var el in timeTable)
-            {
-                var time = el.time;
-                var dif = time.Hour * 60 + time.Minute - now.Hour * 60 - now.Minute;
-                if (dif < minDif && dif > 0)
-                {
-                    minDif = dif;
-                    nearestLesson = el;
-                }
-            }
-            return nearestLesson;
+            var timeTable = GetTimetableForGroupForCurrentDay(groupName, DateTime.Now);
+            return new ParseMethods().GetNearestLesson(timeTable);
         }
     }
 }
