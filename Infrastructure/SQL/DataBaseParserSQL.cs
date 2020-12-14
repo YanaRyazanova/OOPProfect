@@ -4,14 +4,14 @@ using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
 
-namespace Infrastructure
+namespace Infrastructure.SQL
 {
-    public class DataBaseParser : IDataBase
+    public class DataBaseParserSQL : IDataBase
     {
         private readonly DBNameProvider dbNameProvider;
         public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);
 
-        public DataBaseParser(DBNameProvider dbNameProvider)
+        public DataBaseParserSQL(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }

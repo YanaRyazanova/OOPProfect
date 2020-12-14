@@ -5,12 +5,12 @@ using System.Data.SQLite;
 using System.Reflection;
 using System.Text;
 
-namespace Infrastructure
+namespace Infrastructure.SQL
 {
-    class PeopleParser
+    class PeopleParserSQL
     {
         private readonly DBNameProvider dbNameProvider;
-        public PeopleParser(DBNameProvider dbNameProvider)
+        public PeopleParserSQL(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }
