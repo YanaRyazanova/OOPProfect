@@ -6,12 +6,12 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace Infrastructure.CSV
+namespace Infrastructure.Csv
 {
-    class CSVPeopleParser
+    class PeopleParserCsv
     {
         private readonly DBNameProvider dbNameProvider;
-        public CSVPeopleParser(DBNameProvider dbNameProvider)
+        public PeopleParserCsv(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }

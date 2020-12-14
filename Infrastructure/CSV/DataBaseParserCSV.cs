@@ -5,15 +5,15 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.VisualBasic.FileIO;
 
-namespace Infrastructure.CSV
+namespace Infrastructure.Csv
 {
-    class DataBaseParserCSV : IDataBase
+    class DataBaseParserCsv : IDataBase
     {
         private readonly DBNameProvider dbNameProvider;
         private readonly string extension;
         public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);
 
-        public DataBaseParserCSV(DBNameProvider dbNameProvider, string extension = "csv")
+        public DataBaseParserCsv(DBNameProvider dbNameProvider, string extension = "csv")
         {
             this.dbNameProvider = dbNameProvider;
             this.extension = extension;
