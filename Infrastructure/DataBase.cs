@@ -5,7 +5,7 @@ namespace Infrastructure
 {
     public class DataBase
     {
-        public Lesson GetNearestLesson(string groupName)
+        public static Lesson GetNearestLesson(string groupName)
         {
             var parser = new DataBaseParser(new DBNameProvider());
             var now = DateTime.Now;

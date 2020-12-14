@@ -7,28 +7,28 @@ using System.Threading;
 
 namespace Domain.Functions
 {
-    public class LessonReminder<TDataBase> : BotFunction
-    where TDataBase : ITuple
+    public class LessonReminder: BotFunction
     {
-        private readonly TDataBase nearestLesson;
-        public LessonReminder(TDataBase lesson)
+        //private readonly TDataBase nearestLesson;
+        public LessonReminder(
+            //TDataBase lesson
+            )
         {
-            this.nearestLesson = lesson;
+            //this.nearestLesson = lesson;
         }
-        private int GetDifference()
+        private int GetDifference(DateTime startTime)
         {
-            var lessonStartTime = (DateTime)nearestLesson[0];
-            var difference = lessonStartTime.Minute + lessonStartTime.Hour * 60
+            var difference = startTime.Minute + startTime.Hour * 60
                              - DateTime.Now.Minute - DateTime.Now.Hour * 60;
             return difference;
         }
 
-        public string Do()
+        public string Do(DateTime startTime, string name)
         {
             while (true)
             {
-                var difference = GetDifference();
-                if (difference <= 10) return $"Через {difference} начнется пара {nearestLesson[1]}";
+                var difference = GetDifference(startTime);
+                if (difference <= 10) return $"Через {difference} начнется пара {name}";
                 var sleepTime = difference - 10;
                 Thread.Sleep(sleepTime);
             }

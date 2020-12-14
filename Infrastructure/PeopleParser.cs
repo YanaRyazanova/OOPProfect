@@ -7,13 +7,29 @@ using System.Text;
 
 namespace Infrastructure
 {
-    class PeopleParser
+    public class PeopleParser
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParser(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }
+        public string[] GetAllUsers()
+        {
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
+            connection.Open();
+            var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection);
+            var reader = command.ExecuteReader();
+            var users = new List<string>();
+            foreach (DbDataRecord record in reader)
+            {
+                users.Add((string)record["ChatID"]);
+                connection.Close();
+            }
+            return users.ToArray();
+        }
+
         public string GetGroupFromId(string id)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");

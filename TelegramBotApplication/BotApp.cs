@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Application;
 using Domain.Functions;
 using Infrastructure;
@@ -13,7 +14,7 @@ namespace View
         //private static List<long> usersList = new List<long>();
         static void Main(string[] args)
         {
-            var token = "1443567108:AAEh-njifk9sV2UAASpPJeNF2Jbu8zZ6nUs"; // token, который вернул BotFather
+            var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
             var container = AddBindings(new StandardKernel());
             
             var client = new TelegramBotClient(token);
@@ -27,12 +28,15 @@ namespace View
 
         private static StandardKernel AddBindings(StandardKernel container)
         {
+
             container.Bind<TelegramBotUI>().ToSelf();
-            container.Bind<MessageHandler>().ToSelf().WithConstructorArgument("groupName", "ФТ-201");
             container.Bind<DiningRoomIndicator>().ToSelf();
             container.Bind<DataBaseParser>().ToSelf();
             container.Bind<DataBase>().ToSelf();
-            //container.Bind<LessonReminder<DataBaseParser>>().ToSelf();
+            container.Bind<PeopleParser>().ToSelf();
+            //var group = container.Get<PeopleParser>().GetGroupFromId()
+            container.Bind<MessageHandler>().ToSelf();
+            container.Bind<LessonReminder>().ToSelf();
             return container;
         }
     }

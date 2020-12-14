@@ -6,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Application;
+using Domain;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
@@ -16,11 +17,17 @@ namespace View
     {
         private static TelegramBotClient client;
         private static MessageHandler messageHandler;
+        //public delegate string MessageHandler(Messages message);
+        //public event MessageHandler messageHandlerEvent;
+        private static PeopleParser peopleParser;
 
-        public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler)
+        public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler,
+                                                          PeopleParser newPeopleParser)
         {
             client = newClient;
             messageHandler = newMessageHandler;
+            //messageHandlerEvent += Application.MessageHandler.GetResponse;
+            peopleParser = newPeopleParser;
         }
 
         public void Run()
@@ -55,31 +62,57 @@ namespace View
             return keyboard;
         }
 
-        private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private static ReplyKeyboardMarkup CreateStartKeyboard()
+        {
+            var keyboard = new ReplyKeyboardMarkup(new[]
+            {
+                new []
+                {
+                    new KeyboardButton("ФТ-201"),
+                    new KeyboardButton("ФТ-202")
+                }
+            });
+            return keyboard;
+        }
+
+        private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
             var messageText = message.Text;
-            //if (!usersList.Contains(chatId))
-            //    usersList.Add(chatId);
             if (message?.Type != MessageType.Text) return;
             if (messageText == "/keyboard" || messageText == "/start")
             {
-                var keyboard = CreateKeyboard();
-                await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboard);
+                var keyboardStart = CreateStartKeyboard();
+                await client.SendTextMessageAsync(chatId, "Добро пожаловать! Мы рады, что вы используете нашего бота! Выберите свою группу:", replyMarkup: keyboardStart);
             }
-
-            var text = messageHandler.GetResponse(messageText);
-            await client.SendTextMessageAsync(chatId, text);
+            else if (messageText == "ФТ-201" || messageText == "ФТ-202")
+            {
+                peopleParser.AddNewUser(chatId.ToString(), messageText);
+                var keyboardMenu = CreateKeyboard();
+                await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
+            }
+            else
+            {
+                var keyboardMenu = CreateKeyboard();
+                await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
+                var text = messageHandler.GetResponse(new Messages(messageText, chatId));
+                //var text = messageHandlerEvent?.Invoke(new Messages(messageText, chatId));
+                await client.SendTextMessageAsync(chatId, text);
+            }
         }
 
         private static async void BotNotificationsSender()
         {
-            //foreach (var id in usersList)
-            //{
-            //var message = new Domain.Functions.LessonReminder(DateTime.Now, "ФТ-201").Do();
-            //await client.SendTextMessageAsync(id, message);
-            //}
+            var usersList = peopleParser.GetAllUsers();
+            foreach (var id in usersList)
+            {
+                var group = peopleParser.GetGroupFromId(id);
+                var message = messageHandler.LessonReminderHandler(group);
+                if (message == null)
+                    continue;
+                await client.SendTextMessageAsync(id, message);
+            }
         }
     }
 }

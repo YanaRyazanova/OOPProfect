@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Domain;
 using Domain.Functions;
 using Infrastructure;
 using Ninject;
@@ -14,47 +15,54 @@ namespace Application
         private readonly DataBase dataBase;
         private readonly DiningRoomIndicator diningRoom;
         private readonly DataBaseParser dataBaseParser;
-        //private readonly LessonReminder<Lesson> lessonReminder;
-        private readonly string groupName;
+
+        private readonly PeopleParser peopleParser;
+        private readonly LessonReminder lessonReminder;
+        private string groupName;
 
         public MessageHandler(DataBase dataBase, DiningRoomIndicator diningRoom,
             DataBaseParser dataBaseParser,
-            //LessonReminder<Lesson> lessonReminder,
-            string groupName)
+            LessonReminder lessonReminder,
+            PeopleParser peopleParser)
         {
             this.dataBase = dataBase;
             this.diningRoom = diningRoom;
             this.dataBaseParser = dataBaseParser;
-            //this.lessonReminder = lessonReminder;
-            this.groupName = groupName;
+            this.peopleParser = peopleParser;
+            this.lessonReminder = lessonReminder;
+            
         }
 
-        private void LessonReminderHandler(Func<string, string> schedule)
+        public string LessonReminderHandler(string group)
         {
-            //??????????????var lessonReminderMessage = Task.Run(() => lessonReminder.Do());
+            group = groupName;
+            if (groupName == null)
+                return null;
+            //var startTime = DataBase.GetNearestLesson(group);
+            //var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(3), "Самая лучшая пара в твоей жизни"));
+            return result.Result;
         }
 
-        public string GetResponse(string message)
+        public string GetResponse(Messages message)
         {
             string result = null;
-            switch (message)
+            groupName = peopleParser.GetGroupFromId(message.userId.ToString());
+            switch (message.type)
             {
-                case "/start":
-                    result = "Hello";
-                    break;
-                case "расписание на сегодня":
+                case MessagesType.ScheduleForToday:
                     var schedule = SheduleModify(0);
                     result = new ScheduleSender(schedule).Do();
                     break;
-                case "help":
+                case MessagesType.Help:
                     result = "Бот умеет вот это";
                     break;
-                case "расписание на завтра":
+                case MessagesType.ScheduleForTomorrow:
                     var scheduleNextDay = SheduleModify(1);
                     result = new ScheduleSender(scheduleNextDay).Do();
                     //result = "Hello everyone";
                     break;
-                case "я в столовой":
+                case MessagesType.DiningRoom:
                     diningRoom.Increment();
                     result = $"Сейчас в столовой {diningRoom.VisitorsCount} посетителей :-)";
                     break;
