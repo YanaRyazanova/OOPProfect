@@ -7,7 +7,7 @@ namespace Infrastructure
 {
     public class DBNameProvider
     {
-        public string GetDBName(string fileName)
+        public string GetDBName(string fileName, string extension = "db")
         {
             var path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             var catalogs = path.Split('\\');
@@ -19,7 +19,7 @@ namespace Infrastructure
                     break;
             }
             dbName = dbName.Remove(0, 1);
-            return dbName.Append($"/{fileName}.db").ToString();
+            return dbName.Append($"/{fileName}.{extension}").ToString();
         }
     }
 }

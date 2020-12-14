@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Text.Json;
+using Microsoft.VisualBasic.FileIO;
+
+namespace Infrastructure
+{
+    class CSVParser : IDataBase
+    {
+        private readonly DBNameProvider dbNameProvider;
+        private readonly string extension;
+        public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);
+
+        public CSVParser(DBNameProvider dbNameProvider, string extension)
+        {
+            this.dbNameProvider = dbNameProvider;
+            this.extension = extension;
+        }
+
+        public string GetTimetableForGroupForCurrentDay(string group, DateTime day)
+        {
+            var dbName = dbNameProvider.GetDBName("TimeTable", extension);
+            var days = new Dictionary<string, string>
+            {
+                ["Monday"] = "Понедельник",
+                ["Tuesday"] = "Вторник",
+                ["Wednesday"] = "Среда",
+                ["Thursday"] = "Четверг",
+                ["Friday"] = "Пятница",
+                ["Saturday"] = "Суббота"
+            };
+
+            using (TextFieldParser parser = new TextFieldParser(dbName))
+            {
+                parser.SetDelimiters(";");
+                while (!parser.EndOfData)
+                {
+                    var fields = parser.ReadFields();
+                    for (var i = 3; i < fields.Length - 2; i += 3)
+                    {
+                        if (fields[i] == days[day.DayOfWeek.ToString()] && fields[i + 1] == group)
+                            return fields[i + 2];
+                    }
+
+                }
+            }
+            return "";
+        }
+    }
+}
