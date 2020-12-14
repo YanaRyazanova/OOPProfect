@@ -13,13 +13,13 @@ namespace Infrastructure
         private readonly string extension;
         public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);
 
-        public CSVParser(DBNameProvider dbNameProvider, string extension)
+        public CSVParser(DBNameProvider dbNameProvider, string extension = "csv")
         {
             this.dbNameProvider = dbNameProvider;
             this.extension = extension;
         }
 
-        public string GetTimetableForGroupForCurrentDay(string group, DateTime day)
+        public Lesson[] GetTimetableForGroupForCurrentDay(string group, DateTime day)
         {
             var dbName = dbNameProvider.GetDBName("TimeTable", extension);
             var days = new Dictionary<string, string>
@@ -31,7 +31,7 @@ namespace Infrastructure
                 ["Friday"] = "Пятница",
                 ["Saturday"] = "Суббота"
             };
-
+            var lessons = "";
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");
@@ -41,12 +41,19 @@ namespace Infrastructure
                     for (var i = 3; i < fields.Length - 2; i += 3)
                     {
                         if (fields[i] == days[day.DayOfWeek.ToString()] && fields[i + 1] == group)
-                            return fields[i + 2];
+                        {
+                            return ParseTimeTable(fields[i + 2], day);
+                        }
                     }
-
                 }
             }
-            return "";
+            return new Lesson[0];
+        }
+
+        public Lesson GetNearestLesson(string groupName)
+        {
+            var timeTable = GetTimetableForGroupForCurrentDay(groupName, DateTime.Now);
+            return new ParseMethods().GetNearestLesson(timeTable);
         }
     }
 }

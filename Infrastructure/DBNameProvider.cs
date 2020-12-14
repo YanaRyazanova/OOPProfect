@@ -16,7 +16,10 @@ namespace Infrastructure
             {
                 dbName.Append($"/{catalog}");
                 if (catalog == "Infrastructure")
+                {
+                    dbName.Append("/DataBases");
                     break;
+                }    
             }
             dbName = dbName.Remove(0, 1);
             return dbName.Append($"/{fileName}.{extension}").ToString();
