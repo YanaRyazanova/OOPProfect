@@ -4,12 +4,15 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Infrastructure.SQL
 {
     public class PeopleParserSQL
     {
         private readonly DBNameProvider dbNameProvider;
+        private Mutex myMutex = new Mutex();
         public PeopleParserSQL(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
@@ -24,6 +27,7 @@ namespace Infrastructure.SQL
             foreach (DbDataRecord record in reader)
             {
                 var result = record["GROUP_"].ToString();
+                connection.Close();
                 return result;
             }
             connection.Close();
@@ -54,6 +58,7 @@ namespace Infrastructure.SQL
             }
             connection.Close();
             return users.ToArray();
+        
         }
     }
 }

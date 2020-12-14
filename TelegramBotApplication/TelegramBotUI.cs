@@ -35,7 +35,7 @@ namespace View
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
             //BotNotificationsSender();
-            Task.Run(BotNotificationsSender);
+            //Task.Run(BotNotificationsSender);
             client.StartReceiving();
         }
 
@@ -80,7 +80,6 @@ namespace View
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
-            Console.WriteLine(chatId);
             Console.WriteLine(chatId);
             var messageText = message.Text;
             if (message?.Type != MessageType.Text) return;

@@ -14,32 +14,39 @@ namespace Application
 {
     public class MessageHandler
     {
-        private readonly DiningRoomIndicator diningRoom;
-        private readonly DataBaseParserSQL dataBaseParser;
+        private readonly DataBaseParserSQL dataBaseParserSql;
+        private readonly DataBaseParserCSV dataBaseParserCsv;
 
         private readonly PeopleParserSQL peopleParserSql;
+        private readonly PeopleParserCSV peopleParserCsv;
+
         private readonly LessonReminder lessonReminder;
+        private readonly DiningRoomIndicator diningRoom;
         private string groupName;
 
         public MessageHandler(
             DiningRoomIndicator diningRoom,
-            DataBaseParserSQL dataBaseParser,
+            DataBaseParserSQL dataBaseParserSql,
+            DataBaseParserCSV dataBaseParserCsv,
             LessonReminder lessonReminder,
             PeopleParserSQL peopleParserSql,
-            PeopleParserCSV peopleparserCsv )
+            PeopleParserCSV peopleparserCsv)
         {
             this.diningRoom = diningRoom;
-            this.dataBaseParser = dataBaseParser;
+            this.dataBaseParserSql = dataBaseParserSql;
+            this.dataBaseParserCsv = dataBaseParserCsv;
             this.peopleParserSql = peopleParserSql;
+            this.peopleParserCsv = peopleparserCsv;
             this.lessonReminder = lessonReminder;
-            
+
         }
 
         public string LessonReminderHandler(string group)
         {
             if (group == null)
                 return null;
-            var startTime = DataBaseSQL.GetNearestLesson(group);
+            //var startTime = DataBaseSQL.GetNearestLesson(group);
+            var startTime = CSVDataBase.
             var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
             Console.WriteLine(result.Result);
             return result.Result;
@@ -48,7 +55,8 @@ namespace Application
         public string GetResponse(MessageRequest message)
         {
             string result = null;
-            groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
+            //groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
+            groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
             switch (message.type)
             {
                 case MessagesType.ScheduleForToday:
@@ -75,7 +83,9 @@ namespace Application
 
         private string SheduleModify(int days)
         {
-            var scheduleArray = dataBaseParser
+            //var scheduleArray = dataBaseParserSql
+            //    .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
+            var scheduleArray = dataBaseParserCsv
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
