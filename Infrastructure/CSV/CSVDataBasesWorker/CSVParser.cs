@@ -13,13 +13,13 @@ namespace Infrastructure
         private readonly string extension;
         public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);
 
-        public CSVParser(DBNameProvider dbNameProvider, string extension)
+        public CSVParser(DBNameProvider dbNameProvider, string extension = "csv")
         {
             this.dbNameProvider = dbNameProvider;
             this.extension = extension;
         }
 
-        public string GetTimetableForGroupForCurrentDay(string group, DateTime day)
+        public Lesson[] GetTimetableForGroupForCurrentDay(string group, DateTime day)
         {
             var dbName = dbNameProvider.GetDBName("TimeTable", extension);
             var days = new Dictionary<string, string>
@@ -31,7 +31,7 @@ namespace Infrastructure
                 ["Friday"] = "Пятница",
                 ["Saturday"] = "Суббота"
             };
-
+            var lessons = "";
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");
@@ -41,12 +41,32 @@ namespace Infrastructure
                     for (var i = 3; i < fields.Length - 2; i += 3)
                     {
                         if (fields[i] == days[day.DayOfWeek.ToString()] && fields[i + 1] == group)
-                            return fields[i + 2];
+                        {
+                            return ParseTimeTable(fields[i + 2], day);
+                        }
                     }
-
                 }
             }
-            return "";
+            return new Lesson[0];
+        }
+
+        public Lesson GetNearestLesson(string groupName)
+        {
+            var now = DateTime.Now;
+            var timeTable = GetTimetableForGroupForCurrentDay(groupName, now);
+            var nearestLesson = new Lesson(DateTime.Now, "Сегодня пар больше нет ^-^");
+            var minDif = long.MaxValue;
+            foreach (var el in timeTable)
+            {
+                var time = el.time;
+                var dif = time.Hour * 60 + time.Minute - now.Hour * 60 - now.Minute;
+                if (dif < minDif && dif > 0)
+                {
+                    minDif = dif;
+                    nearestLesson = el;
+                }
+            }
+            return nearestLesson;
         }
     }
 }

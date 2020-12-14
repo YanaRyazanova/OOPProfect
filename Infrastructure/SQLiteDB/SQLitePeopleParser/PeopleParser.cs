@@ -38,5 +38,21 @@ namespace Infrastructure
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
             command.ExecuteNonQuery();
         }
+
+        public string[] GetAllUsers()
+        {
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
+            connection.Open();
+            var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection);
+            var reader = command.ExecuteReader();
+            var users = new List<string>();
+            foreach (DbDataRecord record in reader)
+            {
+                users.Add((string)record["ChatID"]);
+                connection.Close();
+            }
+            return users.ToArray();
+        }
     }
 }
