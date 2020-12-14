@@ -5,31 +5,15 @@ using System.Data.SQLite;
 using System.Reflection;
 using System.Text;
 
-namespace Infrastructure
+namespace Infrastructure.SQL
 {
-    public class PeopleParser
+    class PeopleParserSQL
     {
         private readonly DBNameProvider dbNameProvider;
-        public PeopleParser(DBNameProvider dbNameProvider)
+        public PeopleParserSQL(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }
-        public string[] GetAllUsers()
-        {
-            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
-            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
-            connection.Open();
-            var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection);
-            var reader = command.ExecuteReader();
-            var users = new List<string>();
-            foreach (DbDataRecord record in reader)
-            {
-                users.Add((string)record["ChatID"]);
-            }
-            connection.Close();
-            return users.ToArray();
-        }
-
         public string GetGroupFromId(string id)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
@@ -39,11 +23,10 @@ namespace Infrastructure
             var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var result = record["GROUP_"].ToString();
-                
+                var result = record["ChatID"].ToString();
+                connection.Close();
                 return result;
             }
-            connection.Close();
             return "";
         }
 
@@ -54,7 +37,6 @@ namespace Infrastructure
             connection.Open();
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
             command.ExecuteNonQuery();
-            connection.Close();
         }
 
         public string[] GetAllUsers()

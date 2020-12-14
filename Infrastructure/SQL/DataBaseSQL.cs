@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Infrastructure
+namespace Infrastructure.SQL
 {
-    public class DataBase
+    public class DataBaseSQL
     {
         public Lesson GetNearestLesson(string groupName)
         {
-            var parser = new DataBaseParser(new DBNameProvider());
+            var parser = new DataBaseParserSQL(new DBNameProvider());
             var timeTable = parser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Now);
             return new ParseMethods().GetNearestLesson(timeTable);
         }
