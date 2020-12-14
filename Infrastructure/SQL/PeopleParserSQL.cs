@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Infrastructure.SQL
 {
-    class PeopleParserSQL
+    public class PeopleParserSQL
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserSQL(DBNameProvider dbNameProvider)
@@ -23,10 +23,10 @@ namespace Infrastructure.SQL
             var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var result = record["ChatID"].ToString();
-                connection.Close();
+                var result = record["GROUP_"].ToString();
                 return result;
             }
+            connection.Close();
             return "";
         }
 
@@ -37,6 +37,7 @@ namespace Infrastructure.SQL
             connection.Open();
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
             command.ExecuteNonQuery();
+            connection.Close();
         }
 
         public string[] GetAllUsers()
@@ -50,8 +51,8 @@ namespace Infrastructure.SQL
             foreach (DbDataRecord record in reader)
             {
                 users.Add((string)record["ChatID"]);
-                connection.Close();
             }
+            connection.Close();
             return users.ToArray();
         }
     }

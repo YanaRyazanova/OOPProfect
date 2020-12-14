@@ -5,7 +5,7 @@ namespace Infrastructure.SQL
 {
     public class DataBaseSQL
     {
-        public Lesson GetNearestLesson(string groupName)
+        public static Lesson GetNearestLesson(string groupName)
         {
             var parser = new DataBaseParserSQL(new DBNameProvider());
             var timeTable = parser.GetTimetableForGroupForCurrentDay(groupName, DateTime.Now);

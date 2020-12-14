@@ -6,29 +6,31 @@ using System.Threading.Tasks;
 using Domain;
 using Domain.Functions;
 using Infrastructure;
+using Infrastructure.SQL;
+using Infrastructure.CSV;
 using Ninject;
 
 namespace Application
 {
     public class MessageHandler
     {
-        private readonly DataBase dataBase;
         private readonly DiningRoomIndicator diningRoom;
-        private readonly DataBaseParser dataBaseParser;
+        private readonly DataBaseParserSQL dataBaseParser;
 
-        private readonly PeopleParser peopleParser;
+        private readonly PeopleParserSQL peopleParserSql;
         private readonly LessonReminder lessonReminder;
         private string groupName;
 
-        public MessageHandler(DataBase dataBase, DiningRoomIndicator diningRoom,
-            DataBaseParser dataBaseParser,
+        public MessageHandler(
+            DiningRoomIndicator diningRoom,
+            DataBaseParserSQL dataBaseParser,
             LessonReminder lessonReminder,
-            PeopleParser peopleParser)
+            PeopleParserSQL peopleParserSql,
+            PeopleParserCSV peopleparserCsv )
         {
-            this.dataBase = dataBase;
             this.diningRoom = diningRoom;
             this.dataBaseParser = dataBaseParser;
-            this.peopleParser = peopleParser;
+            this.peopleParserSql = peopleParserSql;
             this.lessonReminder = lessonReminder;
             
         }
@@ -37,16 +39,16 @@ namespace Application
         {
             if (group == null)
                 return null;
-            var startTime = DataBase.GetNearestLesson(group);
+            var startTime = DataBaseSQL.GetNearestLesson(group);
             var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
-            //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(3), "Самая лучшая пара в твоей жизни"));
+            Console.WriteLine(result.Result);
             return result.Result;
         }
 
         public string GetResponse(MessageRequest message)
         {
             string result = null;
-            groupName = peopleParser.GetGroupFromId(message.userId.ToString());
+            groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
             switch (message.type)
             {
                 case MessagesType.ScheduleForToday:

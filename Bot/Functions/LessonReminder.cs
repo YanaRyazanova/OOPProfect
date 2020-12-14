@@ -25,13 +25,12 @@ namespace Domain.Functions
 
         public string Do(DateTime startTime, string name)
         {
-            while (true)
-            {
-                var difference = GetDifference(startTime);
-                if (difference <= 10) return $"Через {difference} начнется пара {name}";
-                var sleepTime = difference - 10;
-                Thread.Sleep(sleepTime);
-            }
+            //while (true)
+            var difference = GetDifference(startTime);
+            if (difference <= 10) return $"Через {difference} начнется пара {name}";
+            return null;
+                //var sleepTime = difference - 10;
+                //Thread.Sleep(sleepTime);
         }
     }
 }

@@ -8,10 +8,10 @@ using System.Text;
 
 namespace Infrastructure.CSV
 {
-    class CSVPeopleParser
+    public class PeopleParserCSV
     {
         private readonly DBNameProvider dbNameProvider;
-        public CSVPeopleParser(DBNameProvider dbNameProvider)
+        public PeopleParserCSV(DBNameProvider dbNameProvider)
         {
             this.dbNameProvider = dbNameProvider;
         }

@@ -3,6 +3,8 @@ using System.IO;
 using Application;
 using Domain.Functions;
 using Infrastructure;
+using Infrastructure.CSV;
+using Infrastructure.SQL;
 using Ninject;
 using Ninject.Parameters;
 using Telegram.Bot;
@@ -30,10 +32,11 @@ namespace View
 
             container.Bind<TelegramBotUI>().ToSelf();
             container.Bind<DiningRoomIndicator>().ToSelf();
-            container.Bind<DataBaseParser>().ToSelf();
-            container.Bind<DataBase>().ToSelf();
-            container.Bind<PeopleParser>().ToSelf();
-            //var group = container.Get<PeopleParser>().GetGroupFromId()
+            container.Bind<DataBaseParserSQL>().ToSelf();
+            container.Bind<DataBaseParserCSV>().ToSelf();
+            container.Bind<DataBaseSQL>().ToSelf();
+            container.Bind<PeopleParserSQL>().ToSelf();
+            container.Bind<PeopleParserCSV>().ToSelf();
             container.Bind<MessageHandler>().ToSelf();
             container.Bind<LessonReminder>().ToSelf();
             return container;
