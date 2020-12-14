@@ -25,8 +25,8 @@ namespace Infrastructure
             foreach (DbDataRecord record in reader)
             {
                 users.Add((string)record["ChatID"]);
-                connection.Close();
             }
+            connection.Close();
             return users.ToArray();
         }
 
@@ -39,10 +39,11 @@ namespace Infrastructure
             var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var result = record["ChatID"].ToString();
-                connection.Close();
+                var result = record["GROUP_"].ToString();
+                
                 return result;
             }
+            connection.Close();
             return "";
         }
 
@@ -53,6 +54,7 @@ namespace Infrastructure
             connection.Open();
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
             command.ExecuteNonQuery();
+            connection.Close();
         }
     }
 }

@@ -35,16 +35,15 @@ namespace Application
 
         public string LessonReminderHandler(string group)
         {
-            group = groupName;
-            if (groupName == null)
+            if (group == null)
                 return null;
-            //var startTime = DataBase.GetNearestLesson(group);
-            //var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
-            var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(3), "Самая лучшая пара в твоей жизни"));
+            var startTime = DataBase.GetNearestLesson(group);
+            var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(3), "Самая лучшая пара в твоей жизни"));
             return result.Result;
         }
 
-        public string GetResponse(Messages message)
+        public string GetResponse(MessageRequest message)
         {
             string result = null;
             groupName = peopleParser.GetGroupFromId(message.userId.ToString());
@@ -55,19 +54,18 @@ namespace Application
                     result = new ScheduleSender(schedule).Do();
                     break;
                 case MessagesType.Help:
-                    result = "Бот умеет вот это";
+                    result = new MessageResponse(ResponseType.Help).response;
                     break;
                 case MessagesType.ScheduleForTomorrow:
                     var scheduleNextDay = SheduleModify(1);
                     result = new ScheduleSender(scheduleNextDay).Do();
-                    //result = "Hello everyone";
                     break;
                 case MessagesType.DiningRoom:
-                    diningRoom.Increment();
-                    result = $"Сейчас в столовой {diningRoom.VisitorsCount} посетителей :-)";
+                    diningRoom.Increment(groupName);
+                    result = new MessageResponse(ResponseType.DiningRoom).response + diningRoom.VisitorsCount;
                     break;
                 default:
-                    result = "К сожалению, бот не обрабатывает такую команду :-(";
+                    result = new MessageResponse(ResponseType.Error).response;
                     break;
             }
             return result;
@@ -83,7 +81,8 @@ namespace Application
                 scheduleNextDay.Append(item.ToString());
                 scheduleNextDay.Append("\n");
             }
-
+            if (scheduleNextDay.Length == 0)
+                return "У вас сегодня нет пар в этот день, отдыхайте!";
             return scheduleNextDay.ToString();
         }
     }

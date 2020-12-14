@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -17,16 +18,14 @@ namespace View
     {
         private static TelegramBotClient client;
         private static MessageHandler messageHandler;
-        //public delegate string MessageHandler(Messages message);
-        //public event MessageHandler messageHandlerEvent;
         private static PeopleParser peopleParser;
+        private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
 
         public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler,
                                                           PeopleParser newPeopleParser)
         {
             client = newClient;
             messageHandler = newMessageHandler;
-            //messageHandlerEvent += Application.MessageHandler.GetResponse;
             peopleParser = newPeopleParser;
         }
 
@@ -79,6 +78,7 @@ namespace View
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
+            Console.WriteLine(chatId);
             var messageText = message.Text;
             if (message?.Type != MessageType.Text) return;
             if (messageText == "/keyboard" || messageText == "/start")
@@ -95,23 +95,40 @@ namespace View
             else
             {
                 var keyboardMenu = CreateKeyboard();
-                await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
-                var text = messageHandler.GetResponse(new Messages(messageText, chatId));
+                var text = messageHandler.GetResponse(new MessageRequest(messageText, chatId));
                 //var text = messageHandlerEvent?.Invoke(new Messages(messageText, chatId));
-                await client.SendTextMessageAsync(chatId, text);
+                await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
+                await Task.Run(BotNotificationsSender);
             }
         }
 
-        private static async void BotNotificationsSender()
+        private async void BotNotificationsSender()
         {
+            Console.WriteLine("Hello from BotNotificationSender");
             var usersList = peopleParser.GetAllUsers();
             foreach (var id in usersList)
-            {
+            { 
+                var flag = false;
+                if (!usersLastNotify.ContainsKey(id))
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    flag = true;
+                }
                 var group = peopleParser.GetGroupFromId(id);
                 var message = messageHandler.LessonReminderHandler(group);
-                if (message == null)
+                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < 87  && !flag))
                     continue;
-                await client.SendTextMessageAsync(id, message);
+                if (message.Contains("пар больше нет")) //!!!!!
+                    continue;
+                try
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    await client.SendTextMessageAsync(id, message);
+                }
+                catch
+                {
+                    return;
+                }
             }
         }
     }

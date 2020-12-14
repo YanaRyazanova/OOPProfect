@@ -12,13 +12,13 @@ namespace Domain
         Help,
         DiningRoom
     }
-    public class Messages
+    public class MessageRequest
     {
         public MessagesType type;
         public long userId;
         private Dictionary<string, MessagesType> dict = new Dictionary<string, MessagesType>();
 
-        public Messages(string type, long userId)
+        public MessageRequest(string type, long userId)
         {
             dict.Add("расписание на сегодня", MessagesType.ScheduleForToday);
             dict.Add("расписание на завтра", MessagesType.ScheduleForTomorrow);

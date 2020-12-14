@@ -11,7 +11,6 @@ namespace View
 {
     class BotApp
     {
-        //private static List<long> usersList = new List<long>();
         static void Main(string[] args)
         {
             var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
