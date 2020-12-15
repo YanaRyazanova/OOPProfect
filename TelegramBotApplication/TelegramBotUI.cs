@@ -37,7 +37,7 @@ namespace View
         {
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
-            BotNotificationsSender();
+            Task.Run(BotNotificationsSender);
             client.StartReceiving();
         }
 
@@ -88,7 +88,8 @@ namespace View
             if (messageText == "/keyboard" || messageText == "/start")
             {
                 var keyboardStart = CreateStartKeyboard();
-                await client.SendTextMessageAsync(chatId, "Добро пожаловать! Мы рады, что вы используете нашего бота! Выберите свою группу:", replyMarkup: keyboardStart);
+                var text = new MessageResponse(ResponseType.Start).response;
+                await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardStart);
             }
             else if (messageText == "ФТ-201" || messageText == "ФТ-202")
             {

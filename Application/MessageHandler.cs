@@ -78,7 +78,7 @@ namespace Application
                     result = new MessageResponse(ResponseType.DiningRoom).response + diningRoom.VisitorsCount;
                     break;
                 case MessagesType.Start:
-                    result = File.ReadAllText("welcome.txt");
+                    result = new MessageResponse(ResponseType.Start).response;
                     break;
                 default:
                     result = new MessageResponse(ResponseType.Error).response;

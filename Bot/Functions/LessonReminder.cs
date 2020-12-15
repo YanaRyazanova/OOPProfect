@@ -28,9 +28,11 @@ namespace Domain.Functions
             while (true)
             {
                 var difference = GetDifference(startTime);
-                if (difference <= 10) return $"Через {difference} начнется пара {name}";
+                if ( difference <= 10 && difference >=0) return $"Через {difference} начнется пара {name}";
                 var sleepTime = difference - 10;
-                Thread.Sleep(sleepTime);
+                if (difference < 0)
+                    return null;
+                //Thread.Sleep(sleepTime);
             }
         }
     }

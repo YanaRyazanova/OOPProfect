@@ -21,15 +21,12 @@ namespace Infrastructure.Csv
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(" a");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 0; i < fields.Length - 1; i += 2)
-                    {
-                        if (fields[i] == id)
-                            return fields[i + 1];
-                    }
+                    if (fields[0] == id)
+                        return fields[1];
                 }
             }
             return "ФТ-202";
@@ -38,11 +35,22 @@ namespace Infrastructure.Csv
         public void AddNewUser(string id, string group)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
+            using (TextFieldParser parser = new TextFieldParser(dbName))
+            {
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    var fields = parser.ReadFields();
+                    if (fields[0] == id)
+                        return;
+                }
+            }
             using (var writer = File.AppendText(dbName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csv.WriteField($"{id}");
-                csv.WriteField($"{group} a");
+                csv.WriteField(id);
+                csv.WriteField(group);
+                csv.NextRecord();
             }
         }
 
@@ -52,15 +60,11 @@ namespace Infrastructure.Csv
             var users = new List<string>();
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(" a");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 0; i < fields.Length - 1; i += 2)
-                    {
-                        var field = fields[i].Split(",");
-                        users.Add(field[0]);
-                    }
+                    users.Add(fields[0]);
                 }
             }
             return users.ToArray();
