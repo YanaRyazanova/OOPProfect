@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Infrastructure.SQL
 {
-    class PeopleParserSql
+    public class PeopleParserSql
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserSql(DBNameProvider dbNameProvider)
@@ -23,7 +23,7 @@ namespace Infrastructure.SQL
             var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var result = record["ChatID"].ToString();
+                var result = record["GROUP_"].ToString();
                 connection.Close();
                 return result;
             }

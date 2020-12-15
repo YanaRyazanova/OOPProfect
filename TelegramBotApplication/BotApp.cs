@@ -3,7 +3,7 @@ using System.IO;
 using Application;
 using Domain.Functions;
 using Infrastructure;
-using Infrastructure.CSV;
+using Infrastructure.Csv;
 using Infrastructure.SQL;
 using Ninject;
 using Ninject.Parameters;
@@ -32,11 +32,11 @@ namespace View
 
             container.Bind<TelegramBotUI>().ToSelf();
             container.Bind<DiningRoomIndicator>().ToSelf();
-            container.Bind<DataBaseParserSQL>().ToSelf();
-            container.Bind<DataBaseParserCSV>().ToSelf();
-            container.Bind<DataBaseSQL>().ToSelf();
-            container.Bind<PeopleParserSQL>().ToSelf();
-            container.Bind<PeopleParserCSV>().ToSelf();
+            container.Bind<DataBaseParserSql>().ToSelf();
+            container.Bind<DataBaseParserCsv>().ToSelf();
+            container.Bind<DataBaseSql>().ToSelf();
+            container.Bind<PeopleParserSql>().ToSelf();
+            container.Bind<PeopleParserCsv>().ToSelf();
             container.Bind<MessageHandler>().ToSelf();
             container.Bind<LessonReminder>().ToSelf();
             return container;

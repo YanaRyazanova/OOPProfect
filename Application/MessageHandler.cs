@@ -7,18 +7,18 @@ using Domain;
 using Domain.Functions;
 using Infrastructure;
 using Infrastructure.SQL;
-using Infrastructure.CSV;
+using Infrastructure.Csv;
 using Ninject;
 
 namespace Application
 {
     public class MessageHandler
     {
-        private readonly DataBaseParserSQL dataBaseParserSql;
-        private readonly DataBaseParserCSV dataBaseParserCsv;
+        private readonly DataBaseParserSql dataBaseParserSql;
+        private readonly DataBaseParserCsv dataBaseParserCsv;
 
-        private readonly PeopleParserSQL peopleParserSql;
-        private readonly PeopleParserCSV peopleParserCsv;
+        private readonly DataBaseParserSql peopleParserSql;
+        private readonly PeopleParserCsv peopleParserCsv;
 
         private readonly LessonReminder lessonReminder;
         private readonly DiningRoomIndicator diningRoom;
@@ -26,11 +26,11 @@ namespace Application
 
         public MessageHandler(
             DiningRoomIndicator diningRoom,
-            DataBaseParserSQL dataBaseParserSql,
-            DataBaseParserCSV dataBaseParserCsv,
+            DataBaseParserSql dataBaseParserSql,
+            DataBaseParserCsv dataBaseParserCsv,
             LessonReminder lessonReminder,
-            PeopleParserSQL peopleParserSql,
-            PeopleParserCSV peopleparserCsv)
+            DataBaseParserSql peopleParserSql,
+            PeopleParserCsv peopleparserCsv)
         {
             this.diningRoom = diningRoom;
             this.dataBaseParserSql = dataBaseParserSql;
@@ -46,8 +46,9 @@ namespace Application
             if (group == null)
                 return null;
             //var startTime = DataBaseSQL.GetNearestLesson(group);
-            var startTime = CSVDataBase.
-            var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            var startTime = dataBaseParserCsv.GetNearestLesson(group);
+            //var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
             Console.WriteLine(result.Result);
             return result.Result;
         }

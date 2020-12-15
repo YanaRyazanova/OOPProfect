@@ -8,7 +8,7 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Application;
 using Domain;
-using Infrastructure;
+using Infrastructure.Csv;
 using Infrastructure.SQL;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types;
@@ -19,22 +19,25 @@ namespace View
     {
         private static TelegramBotClient client;
         private static MessageHandler messageHandler;
-        private static PeopleParserSQL peopleParserSql;
+        private static PeopleParserSql peopleParserSql;
+        private static PeopleParserCsv peopleParserCsv;
         private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
 
         public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler,
-                                                          PeopleParserSQL newPeopleParserSql)
+                                                          PeopleParserSql newPeopleParserSql,
+                                                          PeopleParserCsv newPeopleParserCsv)
         {
             client = newClient;
             messageHandler = newMessageHandler;
             peopleParserSql = newPeopleParserSql;
+            peopleParserCsv = newPeopleParserCsv;
         }
 
         public void Run()
         {
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
-            //BotNotificationsSender();
+            BotNotificationsSender();
             //Task.Run(BotNotificationsSender);
             client.StartReceiving();
         }
@@ -90,7 +93,8 @@ namespace View
             }
             else if (messageText == "ФТ-201" || messageText == "ФТ-202")
             {
-                peopleParserSql.AddNewUser(chatId.ToString(), messageText);
+                //peopleParserSql.AddNewUser(chatId.ToString(), messageText);
+                peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
                 var keyboardMenu = CreateKeyboard();
                 await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
             }
@@ -100,14 +104,15 @@ namespace View
                 var text = messageHandler.GetResponse(new MessageRequest(messageText, chatId));
                 //var text = messageHandlerEvent?.Invoke(new Messages(messageText, chatId));
                 await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
-                //await Task.Run(BotNotificationsSender);
+                await Task.Run(BotNotificationsSender);
             }
         }
 
         private async void BotNotificationsSender()
         {
             Console.WriteLine("Hello from BotNotificationSender");
-            var usersList = peopleParserSql.GetAllUsers();
+            //var usersList = peopleParserSql.GetAllUsers();
+            var usersList = peopleParserCsv.GetAllUsers();
             foreach (var id in usersList)
             { 
                 var flag = false;
@@ -116,7 +121,9 @@ namespace View
                     usersLastNotify[id] = DateTime.Now;
                     flag = true;
                 }
-                var group = peopleParserSql.GetGroupFromId(id);
+                //var group = peopleParserSql.GetGroupFromId(id);
+                var group = peopleParserCsv.GetGroupFromId(id);
+                Console.WriteLine(group);
                 var message = messageHandler.LessonReminderHandler(group);
                 if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < 87  && !flag))
                     continue;

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Infrastructure.Csv
 {
-    class PeopleParserCsv
+    public class PeopleParserCsv
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserCsv(DBNameProvider dbNameProvider)
@@ -21,11 +21,11 @@ namespace Infrastructure.Csv
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(";");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 2; i < fields.Length - 1; i += 2)
+                    for (var i = 0; i < fields.Length - 1; i += 2)
                     {
                         if (fields[i] == id)
                             return fields[i + 1];
@@ -38,7 +38,8 @@ namespace Infrastructure.Csv
         public void AddNewUser(string id, string group)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            using (var writer = new StreamWriter("path\\to\\file.csv"))
+            Console.WriteLine(dbName);
+            using (var writer = new StreamWriter(dbName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 csv.WriteField(id);
@@ -49,6 +50,7 @@ namespace Infrastructure.Csv
         public string[] GetAllUsers()
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
+            Console.WriteLine(dbName);
             var users = new List<string>();
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {

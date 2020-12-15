@@ -7,7 +7,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Infrastructure.Csv
 {
-    class DataBaseParserCsv : IDataBase
+    public class DataBaseParserCsv : IDataBase
     {
         private readonly DBNameProvider dbNameProvider;
         private readonly string extension;
@@ -22,6 +22,7 @@ namespace Infrastructure.Csv
         public Lesson[] GetTimetableForGroupForCurrentDay(string group, DateTime day)
         {
             var dbName = dbNameProvider.GetDBName("TimeTable", extension);
+            Console.WriteLine(dbName);
             var days = new Dictionary<string, string>
             {
                 ["Monday"] = "Понедельник",
@@ -38,7 +39,7 @@ namespace Infrastructure.Csv
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 3; i < fields.Length - 2; i += 3)
+                    for (var i = 0; i < fields.Length - 2; i += 3)
                     {
                         if (fields[i] == days[day.DayOfWeek.ToString()] && fields[i + 1] == group)
                         {
