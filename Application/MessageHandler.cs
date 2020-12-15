@@ -1,24 +1,26 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain.Functions;
 using Infrastructure;
+using Infrastructure.SQL;
 using Ninject;
 
 namespace Application
 {
     public class MessageHandler
     {
-        private readonly DataBase dataBase;
+        private readonly DataBaseSql dataBase;
         private readonly DiningRoomIndicator diningRoom;
-        private readonly DataBaseParser dataBaseParser;
+        private readonly DataBaseParserSql dataBaseParser;
         //private readonly LessonReminder<Lesson> lessonReminder;
         private readonly string groupName;
 
-        public MessageHandler(DataBase dataBase, DiningRoomIndicator diningRoom,
-            DataBaseParser dataBaseParser,
+        public MessageHandler(DataBaseSql dataBase, DiningRoomIndicator diningRoom,
+            DataBaseParserSql dataBaseParser,
             //LessonReminder<Lesson> lessonReminder,
             string groupName)
         {
@@ -36,11 +38,12 @@ namespace Application
 
         public string GetResponse(string message)
         {
+            message = message.ToLower();
             string result = null;
             switch (message)
             {
                 case "/start":
-                    result = "Hello";
+                    result = File.ReadAllText("welcome.txt");
                     break;
                 case "расписание на сегодня":
                     var schedule = SheduleModify(0);

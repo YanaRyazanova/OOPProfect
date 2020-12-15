@@ -42,14 +42,14 @@ namespace View
             {
                 new []
                 {
-                    new KeyboardButton("расписание на сегодня"),
-                    new KeyboardButton("расписание на завтра")
+                    new KeyboardButton("Расписание на сегодня"),
+                    new KeyboardButton("Расписание на завтра")
                 },
 
                 new[]
                 {
-                    new KeyboardButton("я в столовой"),
-                    new KeyboardButton("help")
+                    new KeyboardButton("Я в столовой"),
+                    new KeyboardButton("Help")
                 }
             });
             return keyboard;
