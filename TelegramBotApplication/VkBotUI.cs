@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Application;
+using Domain;
 using VkNet;
 using VkNet.Enums;
 using VkNet.Exception;
@@ -67,8 +68,8 @@ namespace View
 
         private static void Answer(string message)
         {
-            message = message.ToLower();
-            var text = messageHandler.GetResponse(message);
+            //message = message.ToLower();
+            var text = messageHandler.GetResponse(new MessageRequest(message, userID));
             vkApi.Messages.Send(new MessagesSendParams
             {
                 UserId = userID,

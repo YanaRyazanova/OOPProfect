@@ -21,7 +21,7 @@ namespace Infrastructure.Csv
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(",");
+                parser.SetDelimiters(" a");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
@@ -32,35 +32,34 @@ namespace Infrastructure.Csv
                     }
                 }
             }
-            return "";
+            return "ФТ-202";
         }
 
         public void AddNewUser(string id, string group)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            Console.WriteLine(dbName);
-            using (var writer = new StreamWriter(dbName))
+            using (var writer = File.AppendText(dbName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csv.WriteField(id);
-                csv.WriteField(group);
+                csv.WriteField($"{id}");
+                csv.WriteField($"{group} a");
             }
         }
 
         public string[] GetAllUsers()
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            Console.WriteLine(dbName);
             var users = new List<string>();
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(";");
+                parser.SetDelimiters(" a");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 2; i < fields.Length - 1; i += 2)
+                    for (var i = 0; i < fields.Length - 1; i += 2)
                     {
-                        users.Add(fields[i]);
+                        var field = fields[i].Split(",");
+                        users.Add(field[0]);
                     }
                 }
             }

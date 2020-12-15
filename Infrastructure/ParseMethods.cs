@@ -11,7 +11,7 @@ namespace Infrastructure
             var result = new List<Lesson>();
             if (timetable.Length > 1)
             {
-                var rows = timetable.Split('\n');
+                var rows = timetable.Split(@"\n");
                 foreach (var row in rows)
                 {
                     var timeAndOtherTimesAndProgram = row.Split(':');

@@ -20,10 +20,11 @@ namespace Domain
 
         public MessageRequest(string type, long userId)
         {
-            dict.Add("расписание на сегодня", MessagesType.ScheduleForToday);
-            dict.Add("расписание на завтра", MessagesType.ScheduleForTomorrow);
-            dict.Add("help", MessagesType.Help);
-            dict.Add("я в столовой", MessagesType.DiningRoom);
+            dict.Add("Расписание на сегодня", MessagesType.ScheduleForToday);
+            dict.Add("Расписание на завтра", MessagesType.ScheduleForTomorrow);
+            dict.Add("Help", MessagesType.Help);
+            dict.Add("Я в столовой", MessagesType.DiningRoom);
+            dict.Add("/start", MessagesType.Start);
             this.type = dict[type];
             this.userId = userId;
         }

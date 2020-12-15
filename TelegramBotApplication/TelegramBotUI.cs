@@ -38,7 +38,6 @@ namespace View
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
             BotNotificationsSender();
-            //Task.Run(BotNotificationsSender);
             client.StartReceiving();
         }
 
@@ -93,8 +92,8 @@ namespace View
             }
             else if (messageText == "ФТ-201" || messageText == "ФТ-202")
             {
-                //peopleParserSql.AddNewUser(chatId.ToString(), messageText);
-                peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
+                peopleParserSql.AddNewUser(chatId.ToString(), messageText);
+                //peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
                 var keyboardMenu = CreateKeyboard();
                 await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
             }
@@ -102,7 +101,6 @@ namespace View
             {
                 var keyboardMenu = CreateKeyboard();
                 var text = messageHandler.GetResponse(new MessageRequest(messageText, chatId));
-                //var text = messageHandlerEvent?.Invoke(new Messages(messageText, chatId));
                 await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
                 await Task.Run(BotNotificationsSender);
             }
@@ -111,8 +109,8 @@ namespace View
         private async void BotNotificationsSender()
         {
             Console.WriteLine("Hello from BotNotificationSender");
-            //var usersList = peopleParserSql.GetAllUsers();
-            var usersList = peopleParserCsv.GetAllUsers();
+            var usersList = peopleParserSql.GetAllUsers();
+            //var usersList = peopleParserCsv.GetAllUsers();
             foreach (var id in usersList)
             { 
                 var flag = false;
@@ -121,9 +119,8 @@ namespace View
                     usersLastNotify[id] = DateTime.Now;
                     flag = true;
                 }
-                //var group = peopleParserSql.GetGroupFromId(id);
-                var group = peopleParserCsv.GetGroupFromId(id);
-                Console.WriteLine(group);
+                var group = peopleParserSql.GetGroupFromId(id);
+                //var group = peopleParserCsv.GetGroupFromId(id);
                 var message = messageHandler.LessonReminderHandler(group);
                 if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < 87  && !flag))
                     continue;

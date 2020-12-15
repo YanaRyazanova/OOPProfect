@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace Application
         private readonly DataBaseParserSql dataBaseParserSql;
         private readonly DataBaseParserCsv dataBaseParserCsv;
 
-        private readonly DataBaseParserSql peopleParserSql;
+        private readonly PeopleParserSql peopleParserSql;
         private readonly PeopleParserCsv peopleParserCsv;
 
         private readonly LessonReminder lessonReminder;
@@ -29,16 +30,15 @@ namespace Application
             DataBaseParserSql dataBaseParserSql,
             DataBaseParserCsv dataBaseParserCsv,
             LessonReminder lessonReminder,
-            DataBaseParserSql peopleParserSql,
-            PeopleParserCsv peopleparserCsv)
+            PeopleParserSql peopleParserSql,
+            PeopleParserCsv peopleParserCsv)
         {
             this.diningRoom = diningRoom;
             this.dataBaseParserSql = dataBaseParserSql;
             this.dataBaseParserCsv = dataBaseParserCsv;
             this.peopleParserSql = peopleParserSql;
-            this.peopleParserCsv = peopleparserCsv;
+            this.peopleParserCsv = peopleParserCsv;
             this.lessonReminder = lessonReminder;
-
         }
 
         public string LessonReminderHandler(string group)
@@ -47,8 +47,8 @@ namespace Application
                 return null;
             //var startTime = DataBaseSQL.GetNearestLesson(group);
             var startTime = dataBaseParserCsv.GetNearestLesson(group);
-            //var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
-            var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
+            var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
             Console.WriteLine(result.Result);
             return result.Result;
         }
@@ -56,8 +56,10 @@ namespace Application
         public string GetResponse(MessageRequest message)
         {
             string result = null;
-            //groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
-            groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
+            groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
+            //groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
+            if (groupName == "")
+                return new MessageResponse(ResponseType.StartError).response;
             switch (message.type)
             {
                 case MessagesType.ScheduleForToday:
@@ -72,8 +74,11 @@ namespace Application
                     result = new ScheduleSender(scheduleNextDay).Do();
                     break;
                 case MessagesType.DiningRoom:
-                    diningRoom.Increment(groupName);
+                    diningRoom.Increment(message.userId.ToString());
                     result = new MessageResponse(ResponseType.DiningRoom).response + diningRoom.VisitorsCount;
+                    break;
+                case MessagesType.Start:
+                    result = File.ReadAllText("welcome.txt");
                     break;
                 default:
                     result = new MessageResponse(ResponseType.Error).response;
@@ -84,10 +89,10 @@ namespace Application
 
         private string SheduleModify(int days)
         {
-            //var scheduleArray = dataBaseParserSql
-            //    .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
-            var scheduleArray = dataBaseParserCsv
+            var scheduleArray = dataBaseParserSql
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
+            //var scheduleArray = dataBaseParserCsv
+            //    .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
