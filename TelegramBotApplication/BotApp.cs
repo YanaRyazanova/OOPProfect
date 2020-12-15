@@ -3,42 +3,46 @@ using System.IO;
 using Application;
 using Domain.Functions;
 using Infrastructure;
-using Infrastructure.Csv;
 using Infrastructure.SQL;
 using Ninject;
 using Ninject.Parameters;
 using Telegram.Bot;
+using VkNet;
 
 namespace View
 {
     class BotApp
     {
+        //private static List<long> usersList = new List<long>();
         static void Main(string[] args)
         {
-            var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
+            var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
             var container = AddBindings(new StandardKernel());
-            
-            var client = new TelegramBotClient(token);
+            var vkToken = File.ReadAllText("vkToken.txt");
+            var vkApi = new VkApi();
+            var client = new TelegramBotClient(telegramToken);
             var messageHandler = container.Get<MessageHandler>();
-            var bot = container.Get<TelegramBotUI>(new ConstructorArgument("newClient", client),
+            var telegramBot = container.Get<TelegramBotUI>(new ConstructorArgument("newClient", client),
                 new ConstructorArgument("newMessageHandler", messageHandler));
-            bot.Run();
+            //var vkBot = container.Get<VkBotUI>(new ConstructorArgument("newVkApi", vkApi),
+            //    new ConstructorArgument("newToken", vkToken),
+            //    new ConstructorArgument("NewVkMessageHandler", messageHandler));
+            var vkBot = new VkBotUI(vkApi, vkToken, messageHandler);
+            vkBot.Run();
+            telegramBot.Run();
             Console.ReadLine();
-            bot.Stop();
+            telegramBot.Stop();
         }
 
         private static StandardKernel AddBindings(StandardKernel container)
         {
-
             container.Bind<TelegramBotUI>().ToSelf();
+            //container.Bind<VkBotUI>().ToSelf();
+            container.Bind<MessageHandler>().ToSelf().WithConstructorArgument("groupName", "ФТ-201");
             container.Bind<DiningRoomIndicator>().ToSelf();
             container.Bind<DataBaseParserSql>().ToSelf();
-            container.Bind<DataBaseParserCsv>().ToSelf();
             container.Bind<DataBaseSql>().ToSelf();
-            container.Bind<PeopleParserSql>().ToSelf();
-            container.Bind<PeopleParserCsv>().ToSelf();
-            container.Bind<MessageHandler>().ToSelf();
-            container.Bind<LessonReminder>().ToSelf();
+            //container.Bind<LessonReminder<DataBaseParser>>().ToSelf();
             return container;
         }
     }
