@@ -50,7 +50,7 @@ namespace Application
                     result = new ScheduleSender(schedule).Do();
                     break;
                 case "help":
-                    result = "Бот умеет вот это";
+                    result = File.ReadAllText("help.txt");
                     break;
                 case "расписание на завтра":
                     var scheduleNextDay = SheduleModify(1);
