@@ -41,6 +41,8 @@ namespace Application
             this.lessonReminder = lessonReminder;
         }
 
+        public event Action<long, string> OnReply; 
+
         public string LessonReminderHandler(string group)
         {
             if (group == null)
@@ -52,13 +54,18 @@ namespace Application
             return result.Result;
         }
 
-        public string GetResponse(MessageRequest message)
+        public void GetResponse(MessageRequest message)
         {
             string result = null;
             groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
             //groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
             if (groupName == "")
-                return new MessageResponse(ResponseType.StartError).response;
+                //return new MessageResponse(ResponseType.StartError).response;
+            {
+                OnReply(message.userId, new MessageResponse(ResponseType.StartError).response); 
+                return;
+            }
+            
             switch (message.type)
             {
                 case MessagesType.ScheduleForToday:
@@ -83,7 +90,7 @@ namespace Application
                     result = new MessageResponse(ResponseType.Error).response;
                     break;
             }
-            return result;
+            OnReply(message.userId, result);
         }
 
         private string SheduleModify(int days)

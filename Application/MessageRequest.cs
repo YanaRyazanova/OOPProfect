@@ -13,6 +13,7 @@ namespace Domain
         DiningRoom,
         Error
     }
+
     public class MessageRequest
     {
         public MessagesType type;
@@ -25,10 +26,6 @@ namespace Domain
             dict["pасписание на завтра"] = MessagesType.ScheduleForTomorrow;
             dict["help"] = MessagesType.Help;
             dict["я в столовой"] = MessagesType.DiningRoom;
-            foreach (var key in dict.Keys)
-            {
-                
-            }
             if (curTtype == "pасписание на завтра")
                 Console.WriteLine("ok");
             try

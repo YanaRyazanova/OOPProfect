@@ -29,7 +29,6 @@ namespace View
 
         static void Main(string[] args)
         {
-            var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
             var container = AddBindings(new StandardKernel());
             var vkToken = File.ReadAllText("vkToken.txt");
@@ -42,6 +41,7 @@ namespace View
                     "api", vkApi),
                 new ConstructorArgument("keyVkToken", vkToken),
                 new ConstructorArgument("handler", messageHandler));
+            messageHandler.OnReply += telegramBot.SendNotification;
             vkBot.Run();
             telegramBot.Run();
             while (true)
@@ -50,14 +50,13 @@ namespace View
                 foreach (var time in times)
                 {
                     var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
-                    if (difference < 2 && difference >= 0)
-                    {
-                        telegramBot.BotNotificationsSender();
-                    }
+                    if (difference >= 2 || difference < 0) continue;
+                    telegramBot.BotNotificationsSender();
+                    vkBot.BotNotificationSender();
                 }
             }
             //Console.ReadLine();
-            telegramBot.Stop();
+            //telegramBot.Stop();
         }
 
         private static StandardKernel AddBindings(StandardKernel container)

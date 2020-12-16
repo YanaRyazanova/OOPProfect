@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Application;
 using Domain;
+using Infrastructure.Csv;
+using Infrastructure.SQL;
 using VkNet;
 using VkNet.Enums;
 using VkNet.Exception;
@@ -27,12 +30,18 @@ namespace View
         private delegate void MessagesRecievedDelegate(VkApi owner, ReadOnlyCollection<Message> messages);
         private static event MessagesRecievedDelegate NewMessages;
         private static MessageHandler messageHandler;
+        private static PeopleParserSql peopleParserSql;
+        private static PeopleParserCsv peopleParserCsv;
+        private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
+        private static Random rnd = new Random();
 
-        public VkBotUI(VkApi api, string keyVkToken, MessageHandler handler)
+        public VkBotUI(VkApi api, string keyVkToken, MessageHandler handler, PeopleParserSql newPeopleParserSql, PeopleParserCsv newPeopleParserCsv)
         {
             vkApi = api;
             vkToken = keyVkToken;
             messageHandler = handler;
+            peopleParserSql = newPeopleParserSql;
+            peopleParserCsv = newPeopleParserCsv;
         }
 
         public void Run()
@@ -49,7 +58,6 @@ namespace View
             }
 
             Console.WriteLine("Нажмите ENTER чтобы выйти...");
-            //Console.ReadLine();
         }
 
         private static bool Auth(string token)
@@ -68,14 +76,80 @@ namespace View
 
         private static void Answer(string message)
         {
-            //message = message.ToLower();
-            var text = messageHandler.GetResponse(new MessageRequest(message, userID));
+            string text;
+            try
+            {
+                switch (message)
+                {
+                    case "/start":
+                    case "Начать":
+                        text = new MessageResponse(ResponseType.Start).response;
+                        break;
+                    case "ФТ-201":
+                    case "ФТ-202":
+                        peopleParserSql.AddNewUser(userID.ToString(), message);
+                        text = "Выберите пункт меню";
+                        break;
+                    default:
+                        //text = messageHandler.GetResponse(new MessageRequest(message.ToLower(), userID));
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
+                {
+                    text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
+                }
+                else
+                {
+                    text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                    Console.WriteLine(e);
+                }
+            }
+            //SendMessage(userID, text);
+        }
+
+        public static void SendMessage(long id, string text)
+        {
             vkApi.Messages.Send(new MessagesSendParams
             {
-                UserId = userID,
+                UserId = id,
                 Message = text,
-                RandomId = text.GetHashCode()
+                RandomId = rnd.Next()
             });
+        }
+
+        public void BotNotificationSender()
+        {
+            var usersList = peopleParserSql.GetAllUsers();
+            //var usersList = peopleParserCsv.GetAllUsers();
+            foreach (var id in usersList)
+            {
+                var flag = false;
+                if (!usersLastNotify.ContainsKey(id))
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    flag = true;
+                }
+                var group = peopleParserSql.GetGroupFromId(id);
+                //var group = peopleParserCsv.GetGroupFromId(id);
+                var message = messageHandler.LessonReminderHandler(group);
+                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
+                    5 && !flag))
+                    continue;
+                if (message.Contains("пар больше нет"))
+                    continue;
+                try
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    SendMessage(long.Parse(id), message);
+                }
+                catch
+                {
+                    return;
+                }
+            }
         }
 
         private static void Eye()
