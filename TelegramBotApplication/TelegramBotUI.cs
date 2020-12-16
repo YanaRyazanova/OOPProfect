@@ -37,7 +37,7 @@ namespace View
         {
             client.OnMessage += BotOnMessageReceived;
             client.OnMessageEdited += BotOnMessageReceived;
-            Task.Run(BotNotificationsSender);
+            //Task.Run(BotNotificationsSender);
             client.StartReceiving();
         }
 
@@ -82,34 +82,50 @@ namespace View
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
-            Console.WriteLine(chatId);
             var messageText = message.Text;
-            if (message?.Type != MessageType.Text) return;
-            if (messageText == "/keyboard" || messageText == "/start")
+            try
             {
-                var keyboardStart = CreateStartKeyboard();
-                var text = new MessageResponse(ResponseType.Start).response;
-                await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardStart);
+                if (message?.Type != MessageType.Text) return;
+                if (messageText == "/keyboard" || messageText == "/start")
+                {
+                    var keyboardStart = CreateStartKeyboard();
+                    var text = new MessageResponse(ResponseType.Start).response;
+                    await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardStart);
+                }
+                else if (messageText == "ФТ-201" || messageText == "ФТ-202")
+                {
+                    peopleParserSql.AddNewUser(chatId.ToString(), messageText);
+                    //peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
+                    var keyboardMenu = CreateKeyboard();
+                    await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
+                }
+                else
+                {
+                    var keyboardMenu = CreateKeyboard();
+                    var text = messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
+                    await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
+                    //await Task.Run(BotNotificationsSender);
+                }
             }
-            else if (messageText == "ФТ-201" || messageText == "ФТ-202")
+            catch (Exception e)
             {
-                peopleParserSql.AddNewUser(chatId.ToString(), messageText);
-                //peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
-                var keyboardMenu = CreateKeyboard();
-                await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
-            }
-            else
-            {
-                var keyboardMenu = CreateKeyboard();
-                var text = messageHandler.GetResponse(new MessageRequest(messageText, chatId));
-                await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
-                await Task.Run(BotNotificationsSender);
+                if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
+                {
+                    var text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
+                    await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateKeyboard());
+                }
+                else
+                {
+                    var text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                    Console.WriteLine(e);
+                    await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateStartKeyboard());
+                }
             }
         }
 
-        private async void BotNotificationsSender()
+        public async void BotNotificationsSender()
         {
-            Console.WriteLine("Hello from BotNotificationSender");
+            Console.WriteLine("Hello from BotNotification");
             var usersList = peopleParserSql.GetAllUsers();
             //var usersList = peopleParserCsv.GetAllUsers();
             foreach (var id in usersList)
@@ -123,9 +139,10 @@ namespace View
                 var group = peopleParserSql.GetGroupFromId(id);
                 //var group = peopleParserCsv.GetGroupFromId(id);
                 var message = messageHandler.LessonReminderHandler(group);
-                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < 87  && !flag))
+                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
+                                                                                           1 && !flag))
                     continue;
-                if (message.Contains("пар больше нет")) //!!!!!
+                if (message.Contains("пар больше нет"))
                     continue;
                 try
                 {

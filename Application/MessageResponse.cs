@@ -26,7 +26,6 @@ namespace Application
             dict.Add(ResponseType.StartError, "Начните с команды: \"/start\" ");
             dict.Add(ResponseType.Start, File.ReadAllText("welcome.txt"));
             response = dict[type];
-
         }
     }
 }

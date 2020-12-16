@@ -45,11 +45,10 @@ namespace Application
         {
             if (group == null)
                 return null;
-            //var startTime = DataBaseSQL.GetNearestLesson(group);
-            var startTime = dataBaseParserCsv.GetNearestLesson(group);
+            var startTime = DataBaseSql.GetNearestLesson(group);
+            //var startTime = dataBaseParserCsv.GetNearestLesson(group);
             var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
             //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
-            Console.WriteLine(result.Result);
             return result.Result;
         }
 

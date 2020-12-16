@@ -28,7 +28,7 @@ namespace Domain.Functions
             while (true)
             {
                 var difference = GetDifference(startTime);
-                if ( difference <= 10 && difference >=0) return $"Через {difference} начнется пара {name}";
+                if ( difference <= 10 && difference >=0) return $"Пара {name} начнется через столько минут: {difference}";
                 var sleepTime = difference - 10;
                 if (difference < 0)
                     return null;

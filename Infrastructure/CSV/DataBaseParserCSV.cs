@@ -22,7 +22,6 @@ namespace Infrastructure.Csv
         public Lesson[] GetTimetableForGroupForCurrentDay(string group, DateTime day)
         {
             var dbName = dbNameProvider.GetDBName("TimeTable", extension);
-            Console.WriteLine(dbName);
             var days = new Dictionary<string, string>
             {
                 ["Monday"] = "Понедельник",
