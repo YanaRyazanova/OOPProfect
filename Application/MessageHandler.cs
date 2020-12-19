@@ -41,7 +41,7 @@ namespace Application
             this.lessonReminder = lessonReminder;
         }
 
-        public event Action<long, string> OnReply; 
+        //public event Action<long, string> OnReply; 
 
         public string LessonReminderHandler(string group)
         {
@@ -54,17 +54,17 @@ namespace Application
             return result.Result;
         }
 
-        public void GetResponse(MessageRequest message)
+        public string GetResponse(MessageRequest message)
         {
-            string result = null;
+            string result;
             groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
             //groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
             if (groupName == "")
-                //return new MessageResponse(ResponseType.StartError).response;
-            {
-                OnReply(message.userId, new MessageResponse(ResponseType.StartError).response); 
-                return;
-            }
+                return new MessageResponse(ResponseType.StartError).response;
+            //{
+            //    //OnReply(message.userId, new MessageResponse(ResponseType.StartError).response); 
+            //    return;
+            //}
             
             switch (message.type)
             {
@@ -90,7 +90,8 @@ namespace Application
                     result = new MessageResponse(ResponseType.Error).response;
                     break;
             }
-            OnReply(message.userId, result);
+            //OnReply(message.userId, result);
+            return result;
         }
 
         private string SheduleModify(int days)
@@ -102,12 +103,10 @@ namespace Application
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
-                scheduleNextDay.Append(item.ToString());
+                scheduleNextDay.Append(item);
                 scheduleNextDay.Append("\n");
             }
-            if (scheduleNextDay.Length == 0)
-                return "У вас сегодня нет пар в этот день, отдыхайте!";
-            return scheduleNextDay.ToString();
+            return scheduleNextDay.Length == 0 ? "У вас сегодня нет пар в этот день, отдыхайте!" : scheduleNextDay.ToString();
         }
     }
 }

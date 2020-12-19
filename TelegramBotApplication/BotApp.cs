@@ -41,22 +41,22 @@ namespace View
                     "api", vkApi),
                 new ConstructorArgument("keyVkToken", vkToken),
                 new ConstructorArgument("handler", messageHandler));
-            messageHandler.OnReply += telegramBot.SendNotification;
+            //messageHandler.OnReply += telegramBot.SendNotification;
             vkBot.Run();
             telegramBot.Run();
-            while (true)
-            {
-                var currentTime = DateTime.Now;
-                foreach (var time in times)
-                {
-                    var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
-                    if (difference >= 2 || difference < 0) continue;
-                    telegramBot.BotNotificationsSender();
-                    vkBot.BotNotificationSender();
-                }
-            }
-            //Console.ReadLine();
-            //telegramBot.Stop();
+            //while (true)
+            //{
+            //    var currentTime = DateTime.Now;
+            //    foreach (var time in times)
+            //    {
+            //        var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
+            //        if (difference >= 2 || difference < 0) continue;
+            //        telegramBot.BotNotificationsSender();
+            //        vkBot.BotNotificationSender();
+            //    }
+            //}
+            Console.ReadLine();
+            telegramBot.Stop();
         }
 
         private static StandardKernel AddBindings(StandardKernel container)

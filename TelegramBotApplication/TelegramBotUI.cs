@@ -107,9 +107,9 @@ namespace View
                     default:
                     {
                         var keyboardMenu = CreateKeyboard();
-                            //var text = messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
-                        messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
-                            //await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
+                        var text = messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
+                        //messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
+                        await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
                         break;
                     }
                 }
