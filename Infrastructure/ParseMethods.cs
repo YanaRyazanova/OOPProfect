@@ -11,7 +11,8 @@ namespace Infrastructure
             var result = new List<Lesson>();
             if (timetable.Length > 1)
             {
-                var rows = timetable.Split(@"\n");
+                timetable = timetable.Replace(@"\n", "\n");
+                var rows = timetable.Split('\n');
                 foreach (var row in rows)
                 {
                     var timeAndOtherTimesAndProgram = row.Split(':');
@@ -40,6 +41,18 @@ namespace Infrastructure
                 }
             }
             return nearestLesson;
+        }
+
+        public Link[] ParseLinks(string notParsedLinks)
+        {
+            var links = new List<Link>();
+            var splitedLinks = notParsedLinks.Split('\n');
+            foreach (var link in splitedLinks)
+            {
+                var nameAndLink = link.Split("$$$");
+                links.Add(new Link(nameAndLink[0], nameAndLink[1]));
+            }
+            return links.ToArray();
         }
     }
 }

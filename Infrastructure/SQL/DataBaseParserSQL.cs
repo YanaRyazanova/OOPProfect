@@ -26,7 +26,8 @@ namespace Infrastructure.SQL
                 ["Wednesday"] = "Среда",
                 ["Thursday"] = "Четверг",
                 ["Friday"] = "Пятница",
-                ["Saturday"] = "Суббота"
+                ["Saturday"] = "Суббота",
+                ["Sunday"] = "Воскресенье"
             };
 
             var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));

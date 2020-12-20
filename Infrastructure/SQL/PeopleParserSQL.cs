@@ -14,28 +14,31 @@ namespace Infrastructure.SQL
         {
             this.dbNameProvider = dbNameProvider;
         }
-        public string GetGroupFromId(string id)
+        public string GetGroupFromId(string id) => GetThingFromId(id, "GROUP_");
+        public string GetStateFromId(string id) => GetThingFromId(id, "State");
+        private string GetThingFromId(string id, string thingToGet)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
             connection.Open();
-            var command = new SQLiteCommand(string.Format("SELECT GROUP_ FROM PeopleAndGroups WHERE ChatID='{0}'", id), connection);
+            var command = new SQLiteCommand(string.Format("SELECT {0} FROM PeopleAndGroups WHERE ChatID='{1}'", thingToGet, id), connection);
             var reader = command.ExecuteReader();
             foreach (DbDataRecord record in reader)
             {
-                var result = record["GROUP_"].ToString();
+                var result = record[thingToGet].ToString();
                 connection.Close();
                 return result;
             }
             return "";
         }
 
-        public void AddNewUser(string id, string group)
+        public void AddNewUser(string id, string group, string state="not_register")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
             connection.Open();
-            var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_') VALUES ('{0}', '{1}')", id, group), connection);
+            var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_', 'State') VALUES ('{0}', '{1}', '{2}')",
+                                            id, group, state), connection);
             command.ExecuteNonQuery();
             connection.Close();
         }
@@ -55,5 +58,7 @@ namespace Infrastructure.SQL
             connection.Close();
             return users.ToArray();
         }
+
+
     }
 }

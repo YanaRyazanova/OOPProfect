@@ -16,7 +16,7 @@ namespace View
     {
         static void Main(string[] args)
         {
-            var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
+            //var token = File.ReadAllText("token.txt"); // token, который вернул BotFather
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
             var container = AddBindings(new StandardKernel());
             var vkToken = File.ReadAllText("vkToken.txt");

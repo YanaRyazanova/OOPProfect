@@ -30,9 +30,9 @@ namespace Infrastructure.Csv
                 ["Wednesday"] = "Среда",
                 ["Thursday"] = "Четверг",
                 ["Friday"] = "Пятница",
-                ["Saturday"] = "Суббота"
+                ["Saturday"] = "Суббота",
+                ["Sunday"] = "Воскресенье"
             };
-            var lessons = "";
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");

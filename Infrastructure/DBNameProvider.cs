@@ -15,9 +15,9 @@ namespace Infrastructure
             foreach (var catalog in catalogs)
             {
                 dbName.Append($"/{catalog}");
-                if (catalog == "Infrastructure")
+                if (catalog == "OOPProfect")
                 {
-                    dbName.Append("/DataBases");
+                    dbName.Append("/Infrastructure/DataBases");
                     break;
                 }    
             }

@@ -16,33 +16,48 @@ namespace Infrastructure.Csv
             this.dbNameProvider = dbNameProvider;
         }
 
-        public string GetGroupFromId(string id)
+        public string GetGroupFromId(string id) => GetThingFromId(id, "group");
+        public string GetStateFromId(string id) => GetThingFromId(id, "state");
+        private string GetThingFromId(string id, string thingToGet)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(" a");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 0; i < fields.Length - 1; i += 2)
+                    if (fields[0] == id)
                     {
-                        if (fields[i] == id)
-                            return fields[i + 1];
+                        if (thingToGet == "group")
+                            return fields[1];
+                        return fields[2];
                     }
                 }
             }
             return "ФТ-202";
         }
 
-        public void AddNewUser(string id, string group)
+        public void AddNewUser(string id, string group, string state)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
+            using (TextFieldParser parser = new TextFieldParser(dbName))
+            {
+                parser.SetDelimiters(",");
+                while (!parser.EndOfData)
+                {
+                    var fields = parser.ReadFields();
+                    if (fields[0] == id)
+                        return;
+                }
+            }
             using (var writer = File.AppendText(dbName))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                csv.WriteField($"{id}");
-                csv.WriteField($"{group} a");
+                csv.WriteField(id);
+                csv.WriteField(group);
+                csv.WriteField(state);
+                csv.NextRecord();
             }
         }
 
@@ -52,15 +67,11 @@ namespace Infrastructure.Csv
             var users = new List<string>();
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(" a");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    for (var i = 0; i < fields.Length - 1; i += 2)
-                    {
-                        var field = fields[i].Split(",");
-                        users.Add(field[0]);
-                    }
+                    users.Add(fields[0]);
                 }
             }
             return users.ToArray();
