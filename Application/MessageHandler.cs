@@ -41,25 +41,31 @@ namespace Application
             this.lessonReminder = lessonReminder;
         }
 
+        //public event Action<long, string> OnReply; 
+
         public string LessonReminderHandler(string group)
         {
             if (group == null)
                 return null;
-            //var startTime = DataBaseSQL.GetNearestLesson(group);
-            var startTime = dataBaseParserCsv.GetNearestLesson(group);
+            var startTime = DataBaseSql.GetNearestLesson(group);
+            //var startTime = dataBaseParserCsv.GetNearestLesson(group);
             var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
             //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
-            Console.WriteLine(result.Result);
             return result.Result;
         }
 
         public string GetResponse(MessageRequest message)
         {
-            string result = null;
+            string result;
             groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
             //groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
             if (groupName == "")
                 return new MessageResponse(ResponseType.StartError).response;
+            //{
+            //    //OnReply(message.userId, new MessageResponse(ResponseType.StartError).response); 
+            //    return;
+            //}
+
             switch (message.type)
             {
                 case MessagesType.ScheduleForToday:
@@ -78,12 +84,13 @@ namespace Application
                     result = new MessageResponse(ResponseType.DiningRoom).response + diningRoom.VisitorsCount;
                     break;
                 case MessagesType.Start:
-                    result = File.ReadAllText("welcome.txt");
+                    result = new MessageResponse(ResponseType.Start).response;
                     break;
                 default:
                     result = new MessageResponse(ResponseType.Error).response;
                     break;
             }
+            //OnReply(message.userId, result);
             return result;
         }
 
@@ -96,13 +103,10 @@ namespace Application
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
-                scheduleNextDay.Append(item.ToString());
+                scheduleNextDay.Append(item);
                 scheduleNextDay.Append("\n");
             }
-            if (scheduleNextDay.Length == 0)
-                return "У вас сегодня нет пар в этот день, отдыхайте!";
-            return scheduleNextDay.ToString();
+            return scheduleNextDay.Length == 0 ? "У вас сегодня нет пар в этот день, отдыхайте!" : scheduleNextDay.ToString();
         }
     }
 }
-

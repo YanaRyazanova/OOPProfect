@@ -10,7 +10,8 @@ namespace Application
         Help,
         DiningRoom,
         Error,
-        StartError
+        StartError,
+        Start
     }
     public class MessageResponse
     {
@@ -23,8 +24,8 @@ namespace Application
             dict.Add(ResponseType.DiningRoom, "Сейчас в столовой находится вот столько посетителей: ");
             dict.Add(ResponseType.Help, File.ReadAllText("help.txt"));
             dict.Add(ResponseType.StartError, "Начните с команды: \"/start\" ");
+            dict.Add(ResponseType.Start, File.ReadAllText("welcome.txt"));
             response = dict[type];
-
         }
     }
 }
