@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Infrastructure
 {
-    class ParseMethods
+    public class ParseMethods
     {
         public Lesson[] ParseTimeTable(string timetable, DateTime day)
         {
@@ -17,8 +17,8 @@ namespace Infrastructure
                 {
                     var timeAndOtherTimesAndProgram = row.Split(':');
                     result.Add(new Lesson(new DateTime(day.Year, day.Month, day.Day,
-                            int.Parse(timeAndOtherTimesAndProgram[0]),
-                            int.Parse(timeAndOtherTimesAndProgram[1].Split()[0]), 0),
+                        int.Parse(timeAndOtherTimesAndProgram[0]),
+                        int.Parse(timeAndOtherTimesAndProgram[1].Split()[0]), 0),
                         timeAndOtherTimesAndProgram[timeAndOtherTimesAndProgram.Length - 1].Trim()));
                 }
             }
@@ -41,6 +41,18 @@ namespace Infrastructure
                 }
             }
             return nearestLesson;
+        }
+
+        public Link[] ParseLinks(string notParsedLinks)
+        {
+            var links = new List<Link>();
+            var splitedLinks = notParsedLinks.Split('\n');
+            foreach (var link in splitedLinks)
+            {
+                var nameAndLink = link.Split("$$$");
+                links.Add(new Link(nameAndLink[0], nameAndLink[1]));
+            }
+            return links.ToArray();
         }
     }
 }

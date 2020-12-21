@@ -22,6 +22,7 @@ namespace Infrastructure.Csv
         public Lesson[] GetTimetableForGroupForCurrentDay(string group, DateTime day)
         {
             var dbName = dbNameProvider.GetDBName("TimeTable", extension);
+            Console.WriteLine(dbName);
             var days = new Dictionary<string, string>
             {
                 ["Monday"] = "Понедельник",
@@ -29,9 +30,9 @@ namespace Infrastructure.Csv
                 ["Wednesday"] = "Среда",
                 ["Thursday"] = "Четверг",
                 ["Friday"] = "Пятница",
-                ["Saturday"] = "Суббота"
+                ["Saturday"] = "Суббота",
+                ["Sunday"] = "Воскресенье"
             };
-            var lessons = "";
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");

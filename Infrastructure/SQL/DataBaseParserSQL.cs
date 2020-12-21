@@ -3,7 +3,6 @@ using System.Data.SQLite;
 using System.Data.Common;
 using System.Reflection;
 using System.Collections.Generic;
-using Infrastructure;
 
 namespace Infrastructure.SQL
 {
@@ -27,29 +26,22 @@ namespace Infrastructure.SQL
                 ["Wednesday"] = "Среда",
                 ["Thursday"] = "Четверг",
                 ["Friday"] = "Пятница",
-                ["Saturday"] = "Суббота"
+                ["Saturday"] = "Суббота",
+                ["Sunday"] = "Воскресенье"
             };
 
             var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
             connection.Open();
-            try
+            var command = new SQLiteCommand(string.Format("SELECT timetable FROM TimeTable WHERE group_='{0}' AND dayOfWeek='{1}'",
+                groupName, days[day.DayOfWeek.ToString()]), connection);
+            var reader = command.ExecuteReader();
+            foreach (DbDataRecord record in reader)
             {
-                var command = new SQLiteCommand(string.Format(
-                    "SELECT timetable FROM TimeTable WHERE group_='{0}' AND dayOfWeek='{1}'",
-                    groupName, days[day.DayOfWeek.ToString()]), connection);
-                var reader = command.ExecuteReader();
-                foreach (DbDataRecord record in reader)
-                {
-                    var timetableString = record["timetable"].ToString();
-                    connection.Close();
-                    return ParseTimeTable(timetableString, day);
-                }
-                return new Lesson[0];
+                var timetableString = record["timetable"].ToString();
+                connection.Close();
+                return ParseTimeTable(timetableString, day);
             }
-            catch (KeyNotFoundException e)
-            {
-                return new Lesson[0];
-            }
+            return new Lesson[0];
         }
     }
 }

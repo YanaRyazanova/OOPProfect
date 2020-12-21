@@ -49,8 +49,8 @@ namespace Application
                 if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute  //40
                                        < 3 && !flag))
                     continue;
-                //if (message.Contains("пар больше нет"))
-                //    continue;
+                if (message.Contains("пар больше нет"))
+                    continue;
                 try
                 {
                     usersLastNotify[id] = DateTime.Now;

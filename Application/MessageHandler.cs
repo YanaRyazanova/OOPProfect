@@ -18,20 +18,21 @@ namespace Application
     {
         private readonly SenderNotify senderNotify;
 
-        private static List<DateTime> times = new List<DateTime>
-        {
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 50, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 30, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 40, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 20, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 0),
-            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 40, 0),
-        };
+        //private static List<DateTime> times = new List<DateTime>
+        //{
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 50, 0),
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 30, 0),
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 40, 0),
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 20, 0),
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 0),
+        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 40, 0),
+        //};
 
         private readonly IDataBaseParser dataBaseParser;
         private readonly DataBaseParserCsv dataBaseParserCsv;
 
         private readonly IPeopleParser peopleParser;
+        private readonly ILinkParser linkParser;
 
         private readonly DiningRoomIndicator diningRoom;
         //private string groupName;
@@ -40,30 +41,27 @@ namespace Application
             DiningRoomIndicator diningRoom,
             IDataBaseParser dataBaseParser,
             IPeopleParser peopleParser,
-            SenderNotify senderNotify)
+            SenderNotify senderNotify,
+            ILinkParser linkParser)
         {
             this.senderNotify = senderNotify;
             this.diningRoom = diningRoom;
             this.dataBaseParser = dataBaseParser;
             this.peopleParser = peopleParser;
+            this.linkParser = linkParser;
         }
 
         public event Action<string, string> OnReply;
 
         public void Run()
         {
-            while (true)
-            {
-                times.Add(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0));
-                var currentTime = DateTime.Now;
-                foreach (var time in times)
-                {
-                    var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
-                    if (difference >= 2 || difference < 0) continue;
-                    senderNotify.Do();
-                    //vkBot.BotNotificationSender();
-                }
-            }
+            var tm = new TimerCallback(Method);
+            var timer = new Timer(tm, null, 0, 120000);
+        }
+
+        private void Method(object obj)
+        {
+            senderNotify.Do();
         }
 
         public void GetScheduleForToday(string userId)
@@ -87,9 +85,15 @@ namespace Application
 
         public void GetGroup(string group, long userId)
         {
-            peopleParser.AddNewUser(userId.ToString(), group);
+            peopleParser.AddNewUser(userId.ToString(), group, "0");
         }
 
+        public void GetLinks(string userId)
+        {
+            var group = peopleParser.GetGroupFromId(userId);
+            var result = linkParser.GetActualLinksForGroup(group);
+            OnReply(userId, result.ToString());
+        }
 
         private string SheduleModify(int days, string userId)
         {

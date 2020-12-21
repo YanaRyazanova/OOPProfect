@@ -48,26 +48,26 @@ namespace View
             return keyboard;
         }
 
-        public Command(UsersStates userState)
+        public Command(int userState)
         {
             switch (userState)
             {
-                case UsersStates.NotRegister:
-                    availableСommands = new List<string> {"/start", "help"};
+                case 0:
+                    availableСommands = new List<string> {"/start", "start", "help", "/help", "помощь", "помоги" };
                     keyboard = CreateStartKeyboard();
                     break;
-                case UsersStates.RegisterInProcess:
-                    availableСommands = new List<string> {"ФТ-201", "ФТ-202", "help"};
+                case 1:
+                    this.userState = UsersStates.RegisterInProcess;
+                    availableСommands = new List<string> {"фт-201", "фт-202", "help", "/help", "помощь", "помоги" };
                     keyboard = CreateStartKeyboard();
                     break;
-                case UsersStates.Register:
+                case 2:
+                    this.userState = UsersStates.Register;
                     availableСommands = new List<string>
-                        {"расписание на сегодня", "расписание на завтра", "я в столовой", "help"};
+                        {"расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки", "help", "/help", "помощь", "помоги"};
                     keyboard = CreateKeyboard();
                     break;
             }
-
-            this.userState = userState;
         }
 
         public void RaiseState()
