@@ -33,8 +33,6 @@ namespace View
             messageHandler = newMessageHandler;
             peopleParserSql = newPeopleParserSql;
             peopleParserCsv = newPeopleParserCsv;
-            keyboardStart = CreateStartKeyboard();
-            keyboardMenu = CreateKeyboard();
         }
 
         public void Run()
@@ -43,43 +41,6 @@ namespace View
             client.OnMessageEdited += BotOnMessageReceived;
             //Task.Run(BotNotificationsSender);
             client.StartReceiving();
-        }
-
-        public void Stop()
-        {
-            client.StopReceiving();
-        }
-
-        private static ReplyKeyboardMarkup CreateKeyboard()
-        {
-            var keyboard = new ReplyKeyboardMarkup(new[]
-            {
-                new []
-                {
-                    new KeyboardButton("Расписание на сегодня"),
-                    new KeyboardButton("Расписание на завтра")
-                },
-
-                new[]
-                {
-                    new KeyboardButton("Я в столовой"),
-                    new KeyboardButton("Help")
-                }
-            });
-            return keyboard;
-        }
-
-        private static ReplyKeyboardMarkup CreateStartKeyboard()
-        {
-            var keyboard = new ReplyKeyboardMarkup(new[]
-            {
-                new []
-                {
-                    new KeyboardButton("ФТ-201"),
-                    new KeyboardButton("ФТ-202")
-                }
-            });
-            return keyboard;
         }
 
         private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
@@ -134,8 +95,6 @@ namespace View
                     {
                         var text = new MessageResponse(ResponseType.Error).response;
                         SendNotification(chatId.ToString(), text);
-                       // messageHandler.GetResponse(new MessageRequest(messageText, chatId));
-                            //await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
                         break;
                     }
                 }
