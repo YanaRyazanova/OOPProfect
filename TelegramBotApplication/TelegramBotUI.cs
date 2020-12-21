@@ -59,17 +59,24 @@ namespace View
 
         private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
+            peopleParser.AddNewUser("23");
+            peopleParser.ChangeStateForUser("23");
+            peopleParser.ChangeStateForUser("1");
+            peopleParser.ChangeGroup("23", "52");
+            peopleParser.ChangeGroup("1", "54");
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
+            
             var userState = peopleParser.GetStateFromId(chatId.ToString());
             if (userState == "")
+            {
                 userState = "0";
+            }
             var currentCommand = new Command(int.Parse(userState));
             try
             {
-                
                 CorrectnessCheck(currentCommand, messageText, chatId);
                 switch (currentCommand.userState)
                 {
@@ -83,6 +90,9 @@ namespace View
                                 var text = new MessageResponse(ResponseType.Start).response;
                                 SendSubsidiaryNotification(chatId, text, currentCommand.keyboard);
                                 currentCommand.RaiseState();
+                                peopleParser.AddNewUser(chatId.ToString());
+                                peopleParser.ChangeStateForUser(chatId.ToString());
+                                Console.WriteLine(peopleParser.GetStateFromId(chatId.ToString()));
                                 break;
                             }
                             case "help":
@@ -102,6 +112,8 @@ namespace View
                         messageHandler.GetGroup(messageText.ToUpper(), chatId);
                         SendSubsidiaryNotification(chatId, "Выберите пункт меню", currentCommand.keyboard);
                         currentCommand.RaiseState();
+                        peopleParser.ChangeStateForUser(chatId.ToString());
+                        Console.WriteLine(peopleParser.GetStateFromId(chatId.ToString()));
                         break;
                     }
 
@@ -181,19 +193,14 @@ namespace View
             }
             catch (Exception e)
             {
-                var text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
+                {
+                    var text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
+                    await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateKeyboard());
+                }
+                var textt = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
                 Console.WriteLine(e);
-                SendSubsidiaryNotification(chatId, text, currentCommand.keyboard);
-                //await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateStartKeyboard());
-                //if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
-                //{
-                //    var text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
-                //    await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateKeyboard());
-                //}
-                //else
-                //{
-                    
-                //}
+                SendSubsidiaryNotification(chatId, textt, currentCommand.keyboard);
             }
         }
 

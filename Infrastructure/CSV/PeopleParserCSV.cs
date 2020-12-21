@@ -16,6 +16,20 @@ namespace Infrastructure.Csv
             this.dbNameProvider = dbNameProvider;
         }
 
+        public void ChangeStateForUser(string id)
+        {
+            return;
+        }
+
+        public void AddNewUser(string id, string state = "0")
+        {
+            return;
+        }
+
+        public void ChangeGroup(string id, string group)
+        {
+            return;
+        }
         public string GetGroupFromId(string id) => GetThingFromId(id, "group");
         public string GetStateFromId(string id) => GetThingFromId(id, "state");
         private string GetThingFromId(string id, string thingToGet)

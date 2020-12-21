@@ -18,16 +18,6 @@ namespace Application
     {
         private readonly SenderNotify senderNotify;
 
-        //private static List<DateTime> times = new List<DateTime>
-        //{
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 50, 0),
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 30, 0),
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 40, 0),
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 20, 0),
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 0),
-        //    new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 40, 0),
-        //};
-
         private readonly IDataBaseParser dataBaseParser;
         private readonly DataBaseParserCsv dataBaseParserCsv;
 
@@ -35,7 +25,7 @@ namespace Application
         private readonly ILinkParser linkParser;
 
         private readonly DiningRoomIndicator diningRoom;
-        //private string groupName;
+        
 
         public MessageHandler(
             DiningRoomIndicator diningRoom,
@@ -52,6 +42,7 @@ namespace Application
         }
 
         public event Action<string, string> OnReply;
+        public event Action<long, string> OnReplyVK;
 
         public void Run()
         {
@@ -85,7 +76,8 @@ namespace Application
 
         public void GetGroup(string group, long userId)
         {
-            peopleParser.AddNewUser(userId.ToString(), group, "0");
+            //peopleParser.AddNewUser(userId.ToString(), group, "0");
+            peopleParser.ChangeGroup(userId.ToString(), group);
         }
 
         public void GetLinks(string userId)

@@ -19,6 +19,7 @@ namespace Application
         private readonly LessonReminder lessonReminder;
 
         public event Action<string, string> OnReply;
+        public event Action<long, string> OnReplyVK;
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -32,38 +33,40 @@ namespace Application
 
         public void Do()
         {
-            Console.WriteLine("Hello from BotNotification");
-            var usersList = peopleParserSql.GetAllUsers();
-            //var usersList = peopleParserCsv.GetAllUsers();
-            foreach (var id in usersList)
+            try
             {
-                var flag = false;
-                if (!usersLastNotify.ContainsKey(id))
+                Console.WriteLine("Hello from BotNotification");
+                var usersList = peopleParserSql.GetAllUsers();
+                //var usersList = peopleParserCsv.GetAllUsers();
+                foreach (var id in usersList)
                 {
-                    usersLastNotify[id] = DateTime.Now;
-                    flag = true;
-                }
-                var group = peopleParserSql.GetGroupFromId(id);
-                //var group = peopleParserCsv.GetGroupFromId(id);
-                var message = LessonReminderHandler(group);
-                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute  //40
-                                       < 3 && !flag))
-                    continue;
-                if (message.Contains("пар больше нет"))
-                    continue;
-                try
-                {
+                    var flag = false;
+                    if (!usersLastNotify.ContainsKey(id))
+                    {
+                        usersLastNotify[id] = DateTime.Now;
+                        flag = true;
+                    }
+
+                    var group = peopleParserSql.GetGroupFromId(id);
+                    //var group = peopleParserCsv.GetGroupFromId(id);
+                    var message = LessonReminderHandler(group);
+                    if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute //40
+                        < 3 && !flag))
+                        continue;
+                    if (message.Contains("пар больше нет"))
+                        continue;
                     usersLastNotify[id] = DateTime.Now;
                     Console.Write(message, id);
                     OnReply(id, message);
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    return;
-                }
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
+
         public string LessonReminderHandler(string group)
         {
             if (group == null)

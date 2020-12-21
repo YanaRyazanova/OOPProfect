@@ -23,19 +23,21 @@ namespace View
         {
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
             var container = AddBindings(new StandardKernel());
-            //var vkToken = File.ReadAllText("vkToken.txt");
-            //var vkApi = new VkApi();
+            var vkToken = File.ReadAllText("vkToken.txt");
+            var vkApi = new VkApi();
             var client = new TelegramBotClient(telegramToken);
             var senderNotify = container.Get<SenderNotify>();
             var messageHandler = container.Get<MessageHandler>(new ConstructorArgument("senderNotify", senderNotify));
             var telegramBot = container.Get<TelegramBotUI>(new ConstructorArgument("newClient", client),
                 new ConstructorArgument("newMessageHandler", messageHandler));
-            //var vkBot = container.Get<VkBotUI>(new ConstructorArgument(
-            //        "api", vkApi),
-            //    new ConstructorArgument("keyVkToken", vkToken),
-            //    new ConstructorArgument("handler", messageHandler));
+            var vkBot = container.Get<VkBotUI>(new ConstructorArgument(
+                    "api", vkApi),
+                new ConstructorArgument("keyVkToken", vkToken),
+                new ConstructorArgument("handler", messageHandler));
             senderNotify.OnReply += telegramBot.SendNotificationLesson;
             messageHandler.OnReply += telegramBot.SendNotification;
+            //senderNotify.OnReplyVK += vkBot.SendMessage;
+            //messageHandler.OnReplyVK += vkBot.SendMessage;
             //vkBot.Run();
             telegramBot.Run();
             Task.Run(messageHandler.Run);
@@ -68,6 +70,7 @@ namespace View
             
             container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
             container.Bind<IPeopleParser>().To<PeopleParserSql>();
+            container.Bind<ILinkParser>().To<LinkParserSQL>();
             return container;
         }
     }

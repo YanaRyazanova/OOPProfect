@@ -16,6 +16,25 @@ namespace Infrastructure.SQL
         }
         public string GetGroupFromId(string id) => GetThingFromId(id, "GROUP_");
         public string GetStateFromId(string id) => GetThingFromId(id, "State");
+        public void ChangeStateForUser(string id)
+        {
+            var currentState = GetStateFromId(id);
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
+            var statesChanges = new Dictionary<string, string>
+            {
+                [""] = "0",
+                ["0"] = "1",
+                ["1"] = "2",
+                ["2"] = "2",
+            };
+            connection.Open();
+            var command = new SQLiteCommand(string.Format("UPDATE PeopleAndGroups SET State='{0}' WHERE ChatID='{1}'", statesChanges[currentState], id), connection);
+            command.ExecuteNonQuery();
+            connection.Close();
+            Console.WriteLine("Hello from ChangeStateForUser");
+        }
+
         private string GetThingFromId(string id, string thingToGet)
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
@@ -29,18 +48,30 @@ namespace Infrastructure.SQL
                 connection.Close();
                 return result;
             }
+            connection.Close();
             return "";
         }
 
-        public void AddNewUser(string id, string group, string state = "not_register")
+        public void ChangeGroup(string id, string group)
+        {
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
+            connection.Open();
+            var command = new SQLiteCommand(string.Format("UPDATE PeopleAndGroups SET GROUP_='{0}' WHERE ChatID='{1}'", group, id), connection);
+            command.ExecuteNonQuery();
+            connection.Close();
+        }
+
+        public void AddNewUser(string id, string state = "0")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
             connection.Open();
             var command = new SQLiteCommand(string.Format("INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_', 'State') VALUES ('{0}', '{1}', '{2}')",
-                                            id, group, state), connection);
+                id, " ", state), connection);
             command.ExecuteNonQuery();
             connection.Close();
+            Console.WriteLine("Hello from AddNewUser");
         }
 
         public string[] GetAllUsers()
