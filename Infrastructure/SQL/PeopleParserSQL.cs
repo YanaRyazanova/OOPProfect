@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Infrastructure.SQL
 {
-    public class PeopleParserSql
+    public class PeopleParserSql : IPeopleParser
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserSql(DBNameProvider dbNameProvider)

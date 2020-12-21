@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,99 +16,94 @@ namespace Application
 {
     public class MessageHandler
     {
-        private readonly DataBaseParserSql dataBaseParserSql;
+        private readonly SenderNotify senderNotify;
+
+        private static List<DateTime> times = new List<DateTime>
+        {
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 8, 50, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 10, 30, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 12, 40, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 14, 20, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 16, 00, 0),
+            new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 40, 0),
+        };
+
+        private readonly IDataBaseParser dataBaseParser;
         private readonly DataBaseParserCsv dataBaseParserCsv;
 
-        private readonly PeopleParserSql peopleParserSql;
-        private readonly PeopleParserCsv peopleParserCsv;
+        private readonly IPeopleParser peopleParser;
 
-        private readonly LessonReminder lessonReminder;
         private readonly DiningRoomIndicator diningRoom;
-        private string groupName;
+        //private string groupName;
 
         public MessageHandler(
             DiningRoomIndicator diningRoom,
-            DataBaseParserSql dataBaseParserSql,
-            DataBaseParserCsv dataBaseParserCsv,
-            LessonReminder lessonReminder,
-            PeopleParserSql peopleParserSql,
-            PeopleParserCsv peopleParserCsv)
+            IDataBaseParser dataBaseParser,
+            IPeopleParser peopleParser,
+            SenderNotify senderNotify)
         {
+            this.senderNotify = senderNotify;
             this.diningRoom = diningRoom;
-            this.dataBaseParserSql = dataBaseParserSql;
-            this.dataBaseParserCsv = dataBaseParserCsv;
-            this.peopleParserSql = peopleParserSql;
-            this.peopleParserCsv = peopleParserCsv;
-            this.lessonReminder = lessonReminder;
+            this.dataBaseParser = dataBaseParser;
+            this.peopleParser = peopleParser;
         }
 
-        public event Action<long, string> OnReply; 
+        public event Action<string, string> OnReply;
 
-        public string LessonReminderHandler(string group)
+        public void Run()
         {
-            if (group == null)
-                return null;
-            var startTime = DataBaseSql.GetNearestLesson(group);
-            //var startTime = dataBaseParserCsv.GetNearestLesson(group);
-            var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
-            //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
-            return result.Result;
-        }
-
-        public void GetResponse(MessageRequest message)
-        {
-            string result = null;
-            groupName = peopleParserSql.GetGroupFromId(message.userId.ToString());
-            //groupName = peopleParserCsv.GetGroupFromId(message.userId.ToString());
-            if (groupName == "")
-                //return new MessageResponse(ResponseType.StartError).response;
+            while (true)
             {
-                OnReply(message.userId, new MessageResponse(ResponseType.StartError).response); 
-                return;
+                times.Add(new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, 0));
+                var currentTime = DateTime.Now;
+                foreach (var time in times)
+                {
+                    var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
+                    if (difference >= 2 || difference < 0) continue;
+                    senderNotify.Do();
+                    //vkBot.BotNotificationSender();
+                }
             }
-            
-            switch (message.type)
-            {
-                case MessagesType.ScheduleForToday:
-                    var schedule = SheduleModify(0);
-                    result = new ScheduleSender(schedule).Do();
-                    break;
-                case MessagesType.Help:
-                    result = new MessageResponse(ResponseType.Help).response;
-                    break;
-                case MessagesType.ScheduleForTomorrow:
-                    var scheduleNextDay = SheduleModify(1);
-                    result = new ScheduleSender(scheduleNextDay).Do();
-                    break;
-                case MessagesType.DiningRoom:
-                    diningRoom.Increment(message.userId.ToString());
-                    result = new MessageResponse(ResponseType.DiningRoom).response + diningRoom.VisitorsCount;
-                    break;
-                case MessagesType.Start:
-                    result = new MessageResponse(ResponseType.Start).response;
-                    break;
-                default:
-                    result = new MessageResponse(ResponseType.Error).response;
-                    break;
-            }
-            OnReply(message.userId, result);
         }
 
-        private string SheduleModify(int days)
+        public void GetScheduleForToday(string userId)
         {
-            var scheduleArray = dataBaseParserSql
+            var schedule = SheduleModify(0, userId);
+            OnReply(userId, schedule);
+        }
+
+        public void GetScheduleForNextDay(string userId)
+        {
+            var scheduleNextDay = SheduleModify(1, userId);
+            var result = new ScheduleSender(scheduleNextDay).Do();
+            OnReply(userId, result);
+        }
+
+        public void GetDinigRoom(string userId)
+        {
+            diningRoom.Increment(userId);
+            OnReply(userId, diningRoom.VisitorsCount.ToString());
+        }
+
+        public void GetGroup(string group, long userId)
+        {
+            peopleParser.AddNewUser(userId.ToString(), group);
+        }
+
+
+        private string SheduleModify(int days, string userId)
+        {
+            var groupName = peopleParser.GetGroupFromId(userId);
+            var scheduleArray = dataBaseParser
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
-            //var scheduleArray = dataBaseParserCsv
-            //    .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
                 scheduleNextDay.Append(item.ToString());
                 scheduleNextDay.Append("\n");
             }
-            if (scheduleNextDay.Length == 0)
-                return "У вас сегодня нет пар в этот день, отдыхайте!";
-            return scheduleNextDay.ToString();
+
+            return scheduleNextDay.Length == 0 ? null : scheduleNextDay.ToString();
         }
     }
 }

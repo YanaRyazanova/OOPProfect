@@ -120,37 +120,37 @@ namespace View
             });
         }
 
-        public void BotNotificationSender()
-        {
-            var usersList = peopleParserSql.GetAllUsers();
-            //var usersList = peopleParserCsv.GetAllUsers();
-            foreach (var id in usersList)
-            {
-                var flag = false;
-                if (!usersLastNotify.ContainsKey(id))
-                {
-                    usersLastNotify[id] = DateTime.Now;
-                    flag = true;
-                }
-                var group = peopleParserSql.GetGroupFromId(id);
-                //var group = peopleParserCsv.GetGroupFromId(id);
-                var message = messageHandler.LessonReminderHandler(group);
-                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
-                    5 && !flag))
-                    continue;
-                if (message.Contains("пар больше нет"))
-                    continue;
-                try
-                {
-                    usersLastNotify[id] = DateTime.Now;
-                    SendMessage(long.Parse(id), message);
-                }
-                catch
-                {
-                    return;
-                }
-            }
-        }
+        //public void BotNotificationSender()
+        //{
+        //    var usersList = peopleParserSql.GetAllUsers();
+        //    //var usersList = peopleParserCsv.GetAllUsers();
+        //    foreach (var id in usersList)
+        //    {
+        //        var flag = false;
+        //        if (!usersLastNotify.ContainsKey(id))
+        //        {
+        //            usersLastNotify[id] = DateTime.Now;
+        //            flag = true;
+        //        }
+        //        var group = peopleParserSql.GetGroupFromId(id);
+        //        //var group = peopleParserCsv.GetGroupFromId(id);
+        //        var message = messageHandler.LessonReminderHandler(group);
+        //        if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
+        //            5 && !flag))
+        //            continue;
+        //        if (message.Contains("пар больше нет"))
+        //            continue;
+        //        try
+        //        {
+        //            usersLastNotify[id] = DateTime.Now;
+        //            SendMessage(long.Parse(id), message);
+        //        }
+        //        catch
+        //        {
+        //            return;
+        //        }
+        //    }
+        //}
 
         private static void Eye()
         {

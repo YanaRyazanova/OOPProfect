@@ -7,7 +7,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Infrastructure.Csv
 {
-    public class DataBaseParserCsv : IDataBase
+    public class DataBaseParserCsv : IDataBase, IDataBaseParser
     {
         private readonly DBNameProvider dbNameProvider;
         private readonly string extension;

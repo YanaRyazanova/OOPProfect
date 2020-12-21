@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Infrastructure.Csv
 {
-    public class PeopleParserCsv
+    public class PeopleParserCsv : IPeopleParser
     {
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserCsv(DBNameProvider dbNameProvider)
@@ -21,7 +21,7 @@ namespace Infrastructure.Csv
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(",");
+                parser.SetDelimiters(" a");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();

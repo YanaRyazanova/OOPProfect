@@ -21,7 +21,9 @@ namespace View
         private static MessageHandler messageHandler;
         private static PeopleParserSql peopleParserSql;
         private static PeopleParserCsv peopleParserCsv;
-        private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
+        
+        private ReplyKeyboardMarkup keyboardStart;
+        private ReplyKeyboardMarkup keyboardMenu;
 
         public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler,
                                                           PeopleParserSql newPeopleParserSql,
@@ -31,6 +33,8 @@ namespace View
             messageHandler = newMessageHandler;
             peopleParserSql = newPeopleParserSql;
             peopleParserCsv = newPeopleParserCsv;
+            keyboardStart = CreateStartKeyboard();
+            keyboardMenu = CreateKeyboard();
         }
 
         public void Run()
@@ -82,33 +86,55 @@ namespace View
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
-            var messageText = message.Text;
+            var messageText = message.Text.ToLower();
             try
             {
+                
                 if (message?.Type != MessageType.Text) return;
                 switch (messageText)
                 {
                     case "/start":
                     {
-                        var keyboardStart = CreateStartKeyboard();
                         var text = new MessageResponse(ResponseType.Start).response;
-                        await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardStart);
+                        SendSubsidiaryNotification(chatId, text, keyboardStart);
                         break;
                     }
-                    case "ФТ-201":
-                    case "ФТ-202":
+                    case "help":
+                    case "/help":
+                    case "помощь":
+                    case "помоги":
                     {
-                        peopleParserSql.AddNewUser(chatId.ToString(), messageText);
-                        //peopleParserCsv.AddNewUser(chatId.ToString(), messageText);
-                        var keyboardMenu = CreateKeyboard();
-                        await client.SendTextMessageAsync(chatId, "Выберите пункт меню", replyMarkup: keyboardMenu);
+                        var text = new MessageResponse(ResponseType.Help).response;
+                        SendSubsidiaryNotification(chatId, text, keyboardMenu);
+                        break;
+                    }
+                    case "расписание на сегодня":
+                    {
+                        messageHandler.GetScheduleForToday(chatId.ToString());
+                        break;
+                    }
+                    case "расписание на завтра":
+                    {
+                        messageHandler.GetScheduleForNextDay(chatId.ToString());
+                        break;
+                    }
+                    case "я в столовой":
+                    {
+                        messageHandler.GetDinigRoom(chatId.ToString());
+                        break;
+                    }
+                    case "фт-201":
+                    case "фт-202":
+                    {
+                        messageHandler.GetGroup(messageText.ToUpper(), chatId);
+                        SendSubsidiaryNotification(chatId, "Выберите пункт меню", keyboardMenu);
                         break;
                     }
                     default:
                     {
-                        var keyboardMenu = CreateKeyboard();
-                            //var text = messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
-                        messageHandler.GetResponse(new MessageRequest(messageText.ToLower(), chatId));
+                        var text = new MessageResponse(ResponseType.Error).response;
+                        SendNotification(chatId.ToString(), text);
+                       // messageHandler.GetResponse(new MessageRequest(messageText, chatId));
                             //await client.SendTextMessageAsync(chatId, text, replyMarkup: keyboardMenu);
                         break;
                     }
@@ -130,42 +156,21 @@ namespace View
             }
         }
 
-        public async void BotNotificationsSender()
+        public async void SendNotification(string chatID, string message)
         {
-            //Console.WriteLine("Hello from BotNotification");
-            var usersList = peopleParserSql.GetAllUsers();
-            //var usersList = peopleParserCsv.GetAllUsers();
-            foreach (var id in usersList)
-            { 
-                var flag = false;
-                if (!usersLastNotify.ContainsKey(id))
-                {
-                    usersLastNotify[id] = DateTime.Now;
-                    flag = true;
-                }
-                var group = peopleParserSql.GetGroupFromId(id);
-                //var group = peopleParserCsv.GetGroupFromId(id);
-                var message = messageHandler.LessonReminderHandler(group);
-                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
-                                                                                           5 && !flag))
-                    continue;
-                if (message.Contains("пар больше нет"))
-                    continue;
-                try
-                {
-                    usersLastNotify[id] = DateTime.Now;
-                    await client.SendTextMessageAsync(id, message);
-                }
-                catch
-                {
-                    return;
-                }
-            }
+            if (message is null)
+                message = "У вас сегодня нет пар, отдыхайте!";
+            await client.SendTextMessageAsync(chatID, message, replyMarkup: keyboardMenu);
         }
 
-        public void SendNotification(long chatID, string message)
+        private async void SendSubsidiaryNotification(long chatID, string text, ReplyKeyboardMarkup keyboard)
         {
-            client.SendTextMessageAsync(chatID, message).Wait();
+            await client.SendTextMessageAsync(chatID, text, replyMarkup: keyboard);
+        }
+
+        public async void SendNotificationLesson(string chatID, string message)
+        {
+            await client.SendTextMessageAsync(chatID, message, replyMarkup: keyboardMenu);
         }
     }
 }
