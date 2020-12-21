@@ -9,10 +9,12 @@ using Infrastructure.Csv;
 using Infrastructure.SQL;
 using VkNet;
 using VkNet.Enums;
+using VkNet.Enums.SafetyEnums;
 using VkNet.Exception;
 using VkNet.Model;
 using VkNet.Model.Keyboard;
 using VkNet.Model.RequestParams;
+using ResponseType = Application.ResponseType;
 
 namespace View
 {
@@ -77,21 +79,26 @@ namespace View
         private static void Answer(string message)
         {
             string text;
+            MessageKeyboard keyboard;
             try
             {
                 switch (message)
                 {
                     case "/start":
                     case "Начать":
+                    case "Start":
                         text = new MessageResponse(ResponseType.Start).response;
+                        keyboard = CreateGroupKeyboard();
                         break;
                     case "ФТ-201":
                     case "ФТ-202":
                         peopleParserSql.AddNewUser(userID.ToString(), message);
                         text = "Выберите пункт меню";
+                        keyboard = CreateMenuKeyboard();
                         break;
                     default:
-                        //text = messageHandler.GetResponse(new MessageRequest(message.ToLower(), userID));
+                        text = messageHandler.GetResponse(new MessageRequest(message.ToLower(), userID));
+                        keyboard = CreateMenuKeyboard();
                         break;
                 }
             }
@@ -100,57 +107,162 @@ namespace View
                 if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
                 {
                     text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
+                    keyboard = CreateMenuKeyboard();
                 }
                 else
                 {
                     text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                    keyboard = CreateStartKeyboard();
                     Console.WriteLine(e);
                 }
             }
-            //SendMessage(userID, text);
+            SendMessage(userID, text, keyboard);
         }
 
-        public static void SendMessage(long id, string text)
+        public static void SendMessage(long id, string text, MessageKeyboard keyboard)
         {
             vkApi.Messages.Send(new MessagesSendParams
             {
                 UserId = id,
                 Message = text,
-                RandomId = rnd.Next()
+                RandomId = rnd.Next(),
+                Keyboard = keyboard
             });
         }
 
-        //public void BotNotificationSender()
-        //{
-        //    var usersList = peopleParserSql.GetAllUsers();
-        //    //var usersList = peopleParserCsv.GetAllUsers();
-        //    foreach (var id in usersList)
-        //    {
-        //        var flag = false;
-        //        if (!usersLastNotify.ContainsKey(id))
-        //        {
-        //            usersLastNotify[id] = DateTime.Now;
-        //            flag = true;
-        //        }
-        //        var group = peopleParserSql.GetGroupFromId(id);
-        //        //var group = peopleParserCsv.GetGroupFromId(id);
-        //        var message = messageHandler.LessonReminderHandler(group);
-        //        if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
-        //            5 && !flag))
-        //            continue;
-        //        if (message.Contains("пар больше нет"))
-        //            continue;
-        //        try
-        //        {
-        //            usersLastNotify[id] = DateTime.Now;
-        //            SendMessage(long.Parse(id), message);
-        //        }
-        //        catch
-        //        {
-        //            return;
-        //        }
-        //    }
-        //}
+        private static MessageKeyboard CreateStartKeyboard()
+        {
+            var keyboard = new MessageKeyboard();
+            var buttonsList = new List<List<MessageKeyboardButton>>();
+            var line1 = new List<MessageKeyboardButton>
+            {
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
+                        Label = "Начать", Type = KeyboardButtonActionType.Text
+                    },
+                    Color = KeyboardButtonColor.Primary
+                }
+            };
+            buttonsList.Add(line1);
+            keyboard.Buttons = buttonsList;
+            return keyboard;
+        }
+
+        private static MessageKeyboard CreateGroupKeyboard()
+        {
+            var keyboard = new MessageKeyboard();
+            var buttonsList = new List<List<MessageKeyboardButton>>();
+            var line1 = new List<MessageKeyboardButton>
+            {
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
+                        Label = "ФТ-201",
+                        Type = KeyboardButtonActionType.Text
+                    },
+
+                    Color = KeyboardButtonColor.Primary
+                },
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
+                        Label = "ФТ-202",
+                        Type = KeyboardButtonActionType.Text
+                    },
+
+                    Color = KeyboardButtonColor.Primary
+                }
+            };
+            buttonsList.Add(line1);
+            keyboard.Buttons = buttonsList;
+            return keyboard;
+        }
+
+        private static MessageKeyboard CreateMenuKeyboard()
+        {
+            var keyboard = new MessageKeyboard();
+            var buttonsList = new List<List<MessageKeyboardButton>>();
+            var line1 = new List<MessageKeyboardButton>
+            {
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
+                        Label = "Расписание на сегодня", Type = KeyboardButtonActionType.Text
+                    },
+                    Color = KeyboardButtonColor.Positive
+                },
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
+                        Label = "Расписание на завтра", Type = KeyboardButtonActionType.Text
+                    },
+                    Color = KeyboardButtonColor.Primary
+                }
+            };
+            var line2 = new List<MessageKeyboardButton>();
+            line2.Add(new MessageKeyboardButton
+            {
+                Action = new MessageKeyboardButtonAction
+                {
+                    Label = "Я в столовой",
+                    Type = KeyboardButtonActionType.Text
+                },
+
+                Color = KeyboardButtonColor.Primary
+            });
+            line2.Add(new MessageKeyboardButton
+            {
+                Action = new MessageKeyboardButtonAction
+                {
+                    Label = "Help",
+                    Type = KeyboardButtonActionType.Text
+                },
+
+                Color = KeyboardButtonColor.Primary
+            });
+            buttonsList.Add(line1);
+            buttonsList.Add(line2);
+            keyboard.Buttons = buttonsList;
+            return keyboard;
+        }
+
+        public void BotNotificationSender()
+        {
+            var usersList = peopleParserSql.GetAllUsers();
+            //var usersList = peopleParserCsv.GetAllUsers();
+            foreach (var id in usersList)
+            {
+                var flag = false;
+                if (!usersLastNotify.ContainsKey(id))
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    flag = true;
+                }
+                var group = peopleParserSql.GetGroupFromId(id);
+                //var group = peopleParserCsv.GetGroupFromId(id);
+                var message = messageHandler.LessonReminderHandler(group);
+                if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
+                    5 && !flag))
+                    continue;
+                if (message.Contains("пар больше нет"))
+                    continue;
+                try
+                {
+                    usersLastNotify[id] = DateTime.Now;
+                    SendMessage(long.Parse(id), message, CreateMenuKeyboard());
+                }
+                catch
+                {
+                    return;
+                }
+            }
+        }
 
         private static void Eye()
         {
@@ -165,7 +277,7 @@ namespace View
             {
                 if (message.Type == MessageType.Sended) continue;
                 userID = message.FromId.Value;
-                //Console.Beep();
+                Console.Beep();
                 Answer(message.Text);
             }
         }
