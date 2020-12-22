@@ -41,6 +41,7 @@ namespace View
             //vkBot.Run();
             telegramBot.Run();
             Task.Run(messageHandler.Run);
+            //messageHandler.Run();
             //while (true)
             //{
             //    var currentTime = DateTime.Now;

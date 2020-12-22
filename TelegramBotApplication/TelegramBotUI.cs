@@ -59,22 +59,11 @@ namespace View
 
         private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
-            peopleParser.AddNewUser("23");
-            peopleParser.ChangeStateForUser("23");
-            peopleParser.ChangeStateForUser("1");
-            peopleParser.ChangeGroup("23", "52");
-            peopleParser.ChangeGroup("1", "54");
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
-            
-            var userState = peopleParser.GetStateFromId(chatId.ToString());
-            if (userState == "")
-            {
-                userState = "0";
-            }
-            var currentCommand = new Command(int.Parse(userState));
+            var currentCommand = DefineCommand(chatId.ToString());
             try
             {
                 CorrectnessCheck(currentCommand, messageText, chatId);
@@ -88,11 +77,10 @@ namespace View
                             case "start":
                             {
                                 var text = new MessageResponse(ResponseType.Start).response;
-                                SendSubsidiaryNotification(chatId, text, currentCommand.keyboard);
                                 currentCommand.RaiseState();
                                 peopleParser.AddNewUser(chatId.ToString());
                                 peopleParser.ChangeStateForUser(chatId.ToString());
-                                Console.WriteLine(peopleParser.GetStateFromId(chatId.ToString()));
+                                SendNotification(chatId.ToString(), text);
                                 break;
                             }
                             case "help":
@@ -100,23 +88,35 @@ namespace View
                             case "помощь":
                             case "помоги":
                             {
-                                HandleHelpMessage(chatId, currentCommand.keyboard);
+                                HandleHelpMessage(chatId.ToString(), currentCommand.keyboard);
                                 break;
                             }
                         }
                         break;
                     }
-
                     case UsersStates.RegisterInProcess:
                     {
-                        messageHandler.GetGroup(messageText.ToUpper(), chatId);
-                        SendSubsidiaryNotification(chatId, "Выберите пункт меню", currentCommand.keyboard);
-                        currentCommand.RaiseState();
-                        peopleParser.ChangeStateForUser(chatId.ToString());
-                        Console.WriteLine(peopleParser.GetStateFromId(chatId.ToString()));
+                        switch (messageText)
+                        {
+                            case "help":
+                            case "/help":
+                            case "помощь":
+                            case "помоги":
+                            {
+                                HandleHelpMessage(chatId.ToString(), currentCommand.keyboard);
+                                break;
+                            }
+                            default:
+                            {
+                                messageHandler.GetGroup(messageText.ToUpper(), chatId);
+                                currentCommand.RaiseState();
+                                peopleParser.ChangeStateForUser(chatId.ToString());
+                                SendNotification(chatId.ToString(), "Вы успешно зарегистрированы! Выберите пункт меню");
+                                break;
+                            }
+                        }
                         break;
                     }
-
                     case UsersStates.Register:
                     {
                         switch (messageText)
@@ -141,97 +141,59 @@ namespace View
                                 messageHandler.GetLinks(chatId.ToString());
                                 break;
                             }
-                        }
+                            case "help":
+                            case "/help":
+                            case "помощь":
+                            case "помоги":
+                            {
+                                HandleHelpMessage(chatId.ToString(), currentCommand.keyboard);
+                                break;
+                            }
+                            }
                         break;
                     }
                 }
-                //switch (messageText)
-                //{
-                //    case "/start":
-                //    {
-                //        var text = new MessageResponse(ResponseType.Start).response;
-                //        SendSubsidiaryNotification(chatId, text, keyboardStart);
-                //        break;
-                //    }
-                //    case "help":
-                //    case "/help":
-                //    case "помощь":
-                //    case "помоги":
-                //    {
-                //        HandleHelpMessage(chatId);
-                //        break;
-                //    }
-                //    case "расписание на сегодня":
-                //    {
-                //        messageHandler.GetScheduleForToday(chatId.ToString());
-                //        break;
-                //    }
-                //    case "расписание на завтра":
-                //    {
-                //        messageHandler.GetScheduleForNextDay(chatId.ToString());
-                //        break;
-                //    }
-                //    case "я в столовой":
-                //    {
-                //        messageHandler.GetDinigRoom(chatId.ToString());
-                //        break;
-                //    }
-                //    case "фт-201":
-                //    case "фт-202":
-                //    {
-                //        messageHandler.GetGroup(messageText.ToUpper(), chatId);
-                //        SendSubsidiaryNotification(chatId, "Выберите пункт меню", keyboardMenu);
-                //        break;
-                //    }
-                //    default:
-                //    {
-                //        var text = new MessageResponse(ResponseType.Error).response;
-                //        SendNotification(chatId.ToString(), text);
-                //        break;
-                //    }
-                //}
             }
             catch (Exception e)
             {
-                if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
-                {
-                    var text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
-                    await client.SendTextMessageAsync(chatId, text, replyMarkup: CreateKeyboard());
-                }
-                var textt = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                var text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
                 Console.WriteLine(e);
-                SendSubsidiaryNotification(chatId, textt, currentCommand.keyboard);
+                SendNotification(chatId.ToString(), text);
             }
         }
 
         private void CorrectnessCheck(Command currentCommand, string messageText, long chatId)
         {
             if (!currentCommand.availableСommands.Contains(messageText))
-                HandleErrorMessage(chatId, currentCommand.keyboard);
+                HandleErrorMessage(chatId.ToString());
         }
 
-        private void HandleErrorMessage(long chatId, ReplyKeyboardMarkup keyboard)
+        private void HandleErrorMessage(string chatId)
         {
-            SendSubsidiaryNotification(chatId, 
-                "К сожалению, бот не умеет обрабатывать такую команду :-( Отправьте сообщение 'help' или 'помощь', чтобы увидеть все команды бота.",
-                keyboard);
+            SendNotification(chatId, 
+                "К сожалению, бот не умеет обрабатывать такую команду :-( Отправьте сообщение 'help' или 'помощь', чтобы увидеть все команды бота.");
         }
-        private void HandleHelpMessage(long chatId, ReplyKeyboardMarkup keyboard)
+        private void HandleHelpMessage(string chatId, ReplyKeyboardMarkup keyboard)
         {
             var text = new MessageResponse(ResponseType.Help).response;
-            SendSubsidiaryNotification(chatId, text, keyboard);
+            SendNotification(chatId, text);
         }
 
+        private Command DefineCommand(string chatID)
+        {
+            var userState = peopleParser.GetStateFromId(chatID);
+            if (userState == "")
+            {
+                userState = "0";
+            }
+            return new Command(int.Parse(userState));
+        }
         public void SendNotification(string chatID, string message)
         {
             if (message is null)
                 message = "У вас сегодня нет пар, отдыхайте!";
-            client.SendTextMessageAsync(chatID, message, replyMarkup: keyboardMenu).Wait();
-        }
-
-        private void SendSubsidiaryNotification(long chatID, string text, ReplyKeyboardMarkup keyboard)
-        {
-            client.SendTextMessageAsync(chatID, text, replyMarkup: keyboard).Wait();
+            var currentCommand = DefineCommand(chatID);
+            client.SendTextMessageAsync(chatID, message, replyMarkup: currentCommand.keyboard).Wait();
         }
 
         public void SendNotificationLesson(string chatID, string message)

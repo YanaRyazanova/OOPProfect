@@ -41,6 +41,7 @@ namespace Infrastructure.SQL
                 connection.Close();
                 return ParseTimeTable(timetableString, day);
             }
+            connection.Close();
             return new Lesson[0];
         }
     }
