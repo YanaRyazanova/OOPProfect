@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot;
@@ -21,33 +22,13 @@ namespace View
         private static TelegramBotClient client;
         private static MessageHandler messageHandler;
         private static IPeopleParser peopleParser;
-
-
-        private ReplyKeyboardMarkup keyboardMenu;
+        private static List<string> availableСommands = new List<string>{ "/start", "start", "начать", "help", "/help", "помощь", "помоги", "фт-201", "фт-202", "расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты"};
 
         public TelegramBotUI(TelegramBotClient newClient, MessageHandler newMessageHandler, IPeopleParser newPeopleParser)
         {
             client = newClient;
             messageHandler = newMessageHandler;
             peopleParser = newPeopleParser;
-        }
-        private static ReplyKeyboardMarkup CreateKeyboard()
-        {
-            var keyboard = new ReplyKeyboardMarkup(new[]
-            {
-                new []
-                {
-                    new KeyboardButton("Расписание на сегодня"),
-                    new KeyboardButton("Расписание на завтра")
-                },
-
-                new[]
-                {
-                    new KeyboardButton("Я в столовой"),
-                    new KeyboardButton("Help")
-                }
-            });
-            return keyboard;
         }
 
         public void Run()
@@ -57,7 +38,7 @@ namespace View
             client.StartReceiving();
         }
 
-        private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
             var chatId = message.Chat.Id;
@@ -66,7 +47,8 @@ namespace View
             var currentCommand = DefineCommand(chatId.ToString());
             try
             {
-                CorrectnessCheck(currentCommand, messageText, chatId);
+                if (!IsCorrectCommand(currentCommand, messageText, chatId.ToString()))
+                    return;
                 switch (currentCommand.userState)
                 {
                     case UsersStates.NotRegister:
@@ -75,6 +57,7 @@ namespace View
                         {
                             case "/start":
                             case "start":
+                            case "начать":
                             {
                                 var text = new MessageResponse(ResponseType.Start).response;
                                 currentCommand.RaiseState();
@@ -108,10 +91,16 @@ namespace View
                             }
                             default:
                             {
-                                messageHandler.GetGroup(messageText.ToUpper(), chatId);
-                                currentCommand.RaiseState();
-                                peopleParser.ChangeStateForUser(chatId.ToString());
-                                SendNotification(chatId.ToString(), "Вы успешно зарегистрированы! Выберите пункт меню");
+                                if (messageHandler.GetGroup(messageText.ToUpper(), chatId.ToString()))
+                                {
+                                    currentCommand.RaiseState();
+                                    peopleParser.ChangeStateForUser(chatId.ToString());
+                                    SendNotification(chatId.ToString(), new MessageResponse(ResponseType.SucceessfulRegistration).response);
+                                }
+                                else
+                                {
+                                    SendNotification(chatId.ToString(), new MessageResponse(ResponseType.GroupError).response);
+                                }
                                 break;
                             }
                         }
@@ -133,10 +122,12 @@ namespace View
                             }
                             case "я в столовой":
                             {
-                                messageHandler.GetDinigRoom(chatId.ToString());
+                                var visitorsCount = messageHandler.GetDinigRoom(chatId.ToString());
+                                var text = new MessageResponse(ResponseType.DiningRoom).response;
+                                SendNotification(chatId.ToString(), text + visitorsCount);
                                 break;
                             }
-                            case "ссылки":
+                            case "ссылки на учебные чаты":
                             {
                                 messageHandler.GetLinks(chatId.ToString());
                                 break;
@@ -156,49 +147,79 @@ namespace View
             }
             catch (Exception e)
             {
-                var text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
+                var text = new MessageResponse(ResponseType.CatchError).response;
                 Console.WriteLine(e);
                 SendNotification(chatId.ToString(), text);
             }
         }
 
-        private void CorrectnessCheck(Command currentCommand, string messageText, long chatId)
+        private bool IsCorrectCommand(CommandTG currentCommand, string messageText, string chatId)
         {
-            if (!currentCommand.availableСommands.Contains(messageText))
-                HandleErrorMessage(chatId.ToString());
+            if (availableСommands.Contains(messageText))
+            {
+                if (currentCommand.userState == UsersStates.NotRegister &&
+                    !currentCommand.availableСommands.Contains(messageText))
+                {
+                    SendNotification(chatId, new MessageResponse(ResponseType.NotRegisterError).response);
+                    return false;
+                }
+                if (currentCommand.userState == UsersStates.RegisterInProcess &&
+                         !currentCommand.availableСommands.Contains(messageText))
+                {
+                    SendNotification(chatId, new MessageResponse(ResponseType.RegisterInProgressError).response);
+                    return false;
+                }
+
+                if (currentCommand.userState == UsersStates.Register &&
+                    !currentCommand.availableСommands.Contains(messageText))
+                {
+                    SendNotification(chatId, new MessageResponse(ResponseType.RegisterError).response);
+                    return false;
+                }
+
+                return true;
+            }
+
+            SendNotification(chatId, new MessageResponse(ResponseType.Error).response);
+            return false;
         }
 
-        private void HandleErrorMessage(string chatId)
-        {
-            SendNotification(chatId, 
-                "К сожалению, бот не умеет обрабатывать такую команду :-( Отправьте сообщение 'help' или 'помощь', чтобы увидеть все команды бота.");
-        }
         private void HandleHelpMessage(string chatId, ReplyKeyboardMarkup keyboard)
         {
             var text = new MessageResponse(ResponseType.Help).response;
             SendNotification(chatId, text);
         }
 
-        private Command DefineCommand(string chatID)
+        private CommandTG DefineCommand(string chatID)
         {
             var userState = peopleParser.GetStateFromId(chatID);
             if (userState == "")
             {
                 userState = "0";
             }
-            return new Command(int.Parse(userState));
+            return new CommandTG(int.Parse(userState));
         }
         public void SendNotification(string chatID, string message)
         {
             if (message is null)
                 message = "У вас сегодня нет пар, отдыхайте!";
             var currentCommand = DefineCommand(chatID);
-            client.SendTextMessageAsync(chatID, message, replyMarkup: currentCommand.keyboard).Wait();
+            try
+            {
+                client.SendTextMessageAsync(chatID, message, replyMarkup: currentCommand.keyboard).Wait();
+            }
+            catch (AggregateException)
+            {
+                return;
+            }
         }
 
         public void SendNotificationLesson(string chatID, string message)
         {
-            client.SendTextMessageAsync(chatID, message, replyMarkup: keyboardMenu).Wait();
+            if (message is null)
+                message = "У вас сегодня нет пар, отдыхайте!";
+            var currentCommand = DefineCommand(chatID);
+            client.SendTextMessageAsync(chatID, message, replyMarkup: currentCommand.keyboard).Wait();
         }
     }
 }

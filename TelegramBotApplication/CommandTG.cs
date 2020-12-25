@@ -11,7 +11,8 @@ namespace View
         Register,
         RegisterInProcess
     }
-    public class Command
+
+    public class CommandTG
     {
         public UsersStates userState;
         public ReplyKeyboardMarkup keyboard;
@@ -29,6 +30,11 @@ namespace View
                 new[]
                 {
                     new KeyboardButton("Я в столовой"),
+                    new KeyboardButton("Ссылки на учебные чаты")
+                },
+
+                new []
+                {
                     new KeyboardButton("Help")
                 }
             });
@@ -47,14 +53,25 @@ namespace View
             });
             return keyboard;
         }
+        private static ReplyKeyboardMarkup CreatePreStartKeyboard()
+        {
+            var keyboard = new ReplyKeyboardMarkup(new[]
+            {
+                new []
+                {
+                    new KeyboardButton("Начать")
+                }
+            });
+            return keyboard;
+        }
 
-        public Command(int userState)
+        public CommandTG(int userState)
         {
             switch (userState)
             {
                 case 0:
-                    availableСommands = new List<string> {"/start", "start", "help", "/help", "помощь", "помоги" };
-                    keyboard = CreateStartKeyboard();
+                    availableСommands = new List<string> {"/start", "start", "начать", "help", "/help", "помощь", "помоги" };
+                    keyboard = CreatePreStartKeyboard();
                     break;
                 case 1:
                     this.userState = UsersStates.RegisterInProcess;
@@ -64,7 +81,7 @@ namespace View
                 case 2:
                     this.userState = UsersStates.Register;
                     availableСommands = new List<string>
-                        {"расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки", "help", "/help", "помощь", "помоги"};
+                        {"расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты", "help", "/help", "помощь", "помоги"};
                     keyboard = CreateKeyboard();
                     break;
             }

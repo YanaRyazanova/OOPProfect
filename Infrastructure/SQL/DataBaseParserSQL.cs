@@ -30,19 +30,25 @@ namespace Infrastructure.SQL
                 ["Sunday"] = "Воскресенье"
             };
 
-            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
-            connection.Open();
-            var command = new SQLiteCommand(string.Format("SELECT timetable FROM TimeTable WHERE group_='{0}' AND dayOfWeek='{1}'",
-                groupName, days[day.DayOfWeek.ToString()]), connection);
-            var reader = command.ExecuteReader();
-            foreach (DbDataRecord record in reader)
+            using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
-                var timetableString = record["timetable"].ToString();
-                connection.Close();
-                return ParseTimeTable(timetableString, day);
+                connection.Open();
+                var command = new SQLiteCommand(string.Format("SELECT timetable FROM TimeTable WHERE group_='{0}' AND dayOfWeek='{1}'",
+                    groupName, days[day.DayOfWeek.ToString()]), connection);
+                var reader = command.ExecuteReader();
+                foreach (DbDataRecord record in reader)
+                {
+                    var timetableString = record["timetable"].ToString();
+                    return ParseTimeTable(timetableString, day);
+                }
+                return new Lesson[0];
             }
-            connection.Close();
-            return new Lesson[0];
+        }
+
+        public Lesson GetNearestLesson(string groupName)
+        {
+            var timeTable = GetTimetableForGroupForCurrentDay(groupName, DateTime.Now);
+            return new ParseMethods().GetNearestLesson(timeTable);
         }
     }
 }

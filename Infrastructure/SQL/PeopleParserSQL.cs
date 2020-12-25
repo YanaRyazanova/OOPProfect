@@ -126,7 +126,7 @@ namespace Infrastructure.SQL
                 var users = new List<string>();
                 foreach (DbDataRecord record in reader)
                 {
-                    users.Add((string) record["ChatID"]);
+                    users.Add((string)record["ChatID"]);
                 }
                 return users.ToArray();
             }

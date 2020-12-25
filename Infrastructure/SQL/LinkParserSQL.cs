@@ -18,19 +18,19 @@ namespace Infrastructure.SQL
         public Link[] GetActualLinksForGroup(string group)
         {
             var dbName = dbNameProvider.GetDBName("link");
-            var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName));
-            connection.Open();
-            var command = new SQLiteCommand(string.Format("SELECT links FROM TimeTable WHERE GROUP_='{0}'", group), connection);
-            var reader = command.ExecuteReader();
-            var emptyLinks = new Link[0];
-            foreach (DbDataRecord record in reader)
+            using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
-                var notParsedLinks = record["links"].ToString();
-                connection.Close();
-                return new ParseMethods().ParseLinks(notParsedLinks);
+                connection.Open();
+                var command = new SQLiteCommand(string.Format("SELECT links FROM Links WHERE GROUP_='{0}'", group), connection);
+                var reader = command.ExecuteReader();
+                var emptyLinks = new Link[0];
+                foreach (DbDataRecord record in reader) 
+                {
+                    var notParsedLinks = record["links"].ToString();
+                    return new ParseMethods().ParseLinks(notParsedLinks);
+                }
+                return emptyLinks;
             }
-            connection.Close();
-            return emptyLinks;
         }
     }
 }

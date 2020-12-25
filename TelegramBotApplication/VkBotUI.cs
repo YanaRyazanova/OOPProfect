@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Application;
 using Domain;
+using Infrastructure;
 using Infrastructure.Csv;
 using Infrastructure.SQL;
 using VkNet;
@@ -14,7 +15,6 @@ using VkNet.Exception;
 using VkNet.Model;
 using VkNet.Model.Keyboard;
 using VkNet.Model.RequestParams;
-using ResponseType = Application.ResponseType;
 
 namespace View
 {
@@ -32,18 +32,16 @@ namespace View
         private delegate void MessagesRecievedDelegate(VkApi owner, ReadOnlyCollection<Message> messages);
         private static event MessagesRecievedDelegate NewMessages;
         private static MessageHandler messageHandler;
-        private static PeopleParserSql peopleParserSql;
-        private static PeopleParserCsv peopleParserCsv;
         private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
         private static Random rnd = new Random();
-
-        public VkBotUI(VkApi api, string keyVkToken, MessageHandler handler, PeopleParserSql newPeopleParserSql, PeopleParserCsv newPeopleParserCsv)
+        private static List<string> availableСommands = new List<string> { "/start", "start", "начать", "help", "/help", "помощь", "помоги", "фт-201", "фт-202", "расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты" };
+        private static IPeopleParser peopleParser;
+        public VkBotUI(VkApi api, string keyVkToken, MessageHandler handler, IPeopleParser newPeopleParser)
         {
             vkApi = api;
             vkToken = keyVkToken;
             messageHandler = handler;
-            peopleParserSql = newPeopleParserSql;
-            peopleParserCsv = newPeopleParserCsv;
+            peopleParser = newPeopleParser;
         }
 
         public void Run()
@@ -76,202 +74,185 @@ namespace View
             }
         }
 
-        private static void Answer(string message)
+        private void Answer(string message)
         {
-            string text;
-            MessageKeyboard keyboard;
+            var messageText = message.ToLower();
+            var currentCommand = DefineCommand(userID.ToString());
             try
             {
-                switch (message)
+                if (!IsCorrectCommand(currentCommand, messageText))
+                    return;
+                switch (currentCommand.userState)
                 {
-                    case "/start":
-                    case "Начать":
-                    case "Start":
-                        text = new MessageResponse(ResponseType.Start).response;
-                        keyboard = CreateGroupKeyboard();
-                        break;
-                    case "ФТ-201":
-                    case "ФТ-202":
-                        peopleParserSql.AddNewUser(userID.ToString(), message);
-                        text = "Выберите пункт меню";
-                        keyboard = CreateMenuKeyboard();
-                        break;
-                    default:
-                        //text = messageHandler.GetResponse(new MessageRequest(message.ToLower(), userID));
-                        keyboard = CreateMenuKeyboard();
-                        break;
+                    case UsersStates.NotRegister:
+                        {
+                            switch (messageText)
+                            {
+                                case "/start":
+                                case "start":
+                                case "начать":
+                                    {
+                                        var text = new MessageResponse(ResponseType.Start).response;
+                                        currentCommand.RaiseState();
+                                        peopleParser.AddNewUser(userID.ToString());
+                                        peopleParser.ChangeStateForUser(userID.ToString());
+                                        SendMessage(userID, text);
+                                        break;
+                                    }
+                                case "help":
+                                case "/help":
+                                case "помощь":
+                                case "помоги":
+                                    {
+                                        HandleHelpMessage(userID.ToString(), currentCommand.keyboard);
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
+                    case UsersStates.RegisterInProcess:
+                        {
+                            switch (messageText)
+                            {
+                                case "help":
+                                case "/help":
+                                case "помощь":
+                                case "помоги":
+                                    {
+                                        HandleHelpMessage(userID.ToString(), currentCommand.keyboard);
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        if (messageHandler.GetGroup(messageText.ToUpper(), userID.ToString()))
+                                        {
+                                            currentCommand.RaiseState();
+                                            peopleParser.ChangeStateForUser(userID.ToString());
+                                            SendMessage(userID, new MessageResponse(ResponseType.SucceessfulRegistration).response);
+                                        }
+                                        else
+                                        {
+                                            SendMessage(userID, new MessageResponse(ResponseType.GroupError).response);
+                                        }
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
+                    case UsersStates.Register:
+                        {
+                            switch (messageText)
+                            {
+                                case "расписание на сегодня":
+                                    {
+                                        messageHandler.GetScheduleForToday(userID.ToString());
+                                        break;
+                                    }
+                                case "расписание на завтра":
+                                    {
+                                        messageHandler.GetScheduleForNextDay(userID.ToString());
+                                        break;
+                                    }
+                                case "я в столовой":
+                                    {
+                                        var visitorsCount = messageHandler.GetDinigRoom(userID.ToString());
+                                        var text = new MessageResponse(ResponseType.DiningRoom).response;
+                                        SendMessage(userID, text + visitorsCount);
+                                        break;
+                                    }
+                                case "ссылки на учебные чаты":
+                                    {
+                                        messageHandler.GetLinks(userID.ToString());
+                                        break;
+                                    }
+                                case "help":
+                                case "/help":
+                                case "помощь":
+                                case "помоги":
+                                    {
+                                        HandleHelpMessage(userID.ToString(), currentCommand.keyboard);
+                                        break;
+                                    }
+                            }
+                            break;
+                        }
                 }
             }
             catch (Exception e)
             {
-                if (e.Message == "constraint failed\r\nUNIQUE constraint failed: PeopleAndGroups.ChatID")
+                var text = new MessageResponse(ResponseType.CatchError).response;
+                Console.WriteLine(e);
+                SendMessage(userID, text);
+            }
+        }
+
+        private CommandVK DefineCommand(string chatID)
+        {
+            var userState = peopleParser.GetStateFromId(chatID);
+            if (userState == "")
+            {
+                userState = "0";
+            }
+            return new CommandVK(int.Parse(userState));
+        }
+
+        private bool IsCorrectCommand(CommandVK currentCommand, string messageText)
+        {
+            if (availableСommands.Contains(messageText))
+            {
+                switch (currentCommand.userState)
                 {
-                    text = "Вы уже зарегистрированы в боте. Смену группы мы добавим позже :-)";
-                    keyboard = CreateMenuKeyboard();
-                }
-                else
-                {
-                    text = "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'";
-                    keyboard = CreateStartKeyboard();
-                    Console.WriteLine(e);
+                    case UsersStates.NotRegister when !currentCommand.availableСommands.Contains(messageText):
+                        SendMessage(userID, new MessageResponse(ResponseType.NotRegisterError).response);
+                        return false;
+                    case UsersStates.RegisterInProcess when !currentCommand.availableСommands.Contains(messageText):
+                        SendMessage(userID, new MessageResponse(ResponseType.RegisterInProgressError).response);
+                        return false;
+                    case UsersStates.Register when !currentCommand.availableСommands.Contains(messageText):
+                        SendMessage(userID, new MessageResponse(ResponseType.RegisterError).response);
+                        return false;
+                    default:
+                        return true;
                 }
             }
-            //SendMessage(userID, text, keyboard);
+
+            SendMessage(userID, new MessageResponse(ResponseType.Error).response);
+            return false;
         }
 
-        public static void SendMessage(long id, string text, MessageKeyboard keyboard)
+        public void SendMessage(long id, string text)
         {
-            vkApi.Messages.Send(new MessagesSendParams
+            try
             {
-                UserId = id,
-                Message = text,
-                RandomId = rnd.Next(),
-                Keyboard = keyboard
-            });
+                var currentCommand = DefineCommand(id.ToString());
+                vkApi.Messages.Send(new MessagesSendParams
+                {
+                    UserId = id,
+                    Message = text,
+                    RandomId = rnd.Next(),
+                    Keyboard = currentCommand.keyboard
+                });
+            }
+            catch (CannotSendToUserFirstlyException)
+            {
+                return;
+            }
         }
 
-        private static MessageKeyboard CreateStartKeyboard()
+        private void HandleHelpMessage(string chatId, MessageKeyboard keyboard)
         {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Начать", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
+            var text = new MessageResponse(ResponseType.Help).response;
+            SendMessage(userID, text);
         }
 
-        private static MessageKeyboard CreateGroupKeyboard()
-        {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "ФТ-201",
-                        Type = KeyboardButtonActionType.Text
-                    },
-
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "ФТ-202",
-                        Type = KeyboardButtonActionType.Text
-                    },
-
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
-        }
-
-        private static MessageKeyboard CreateMenuKeyboard()
-        {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Расписание на сегодня", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Positive
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Расписание на завтра", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            var line2 = new List<MessageKeyboardButton>();
-            line2.Add(new MessageKeyboardButton
-            {
-                Action = new MessageKeyboardButtonAction
-                {
-                    Label = "Я в столовой",
-                    Type = KeyboardButtonActionType.Text
-                },
-
-                Color = KeyboardButtonColor.Primary
-            });
-            line2.Add(new MessageKeyboardButton
-            {
-                Action = new MessageKeyboardButtonAction
-                {
-                    Label = "Help",
-                    Type = KeyboardButtonActionType.Text
-                },
-
-                Color = KeyboardButtonColor.Primary
-            });
-            buttonsList.Add(line1);
-            buttonsList.Add(line2);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
-        }
-
-        //public void BotNotificationSender()
-        //{
-        //    var usersList = peopleParserSql.GetAllUsers();
-        //    //var usersList = peopleParserCsv.GetAllUsers();
-        //    foreach (var id in usersList)
-        //    {
-        //        var flag = false;
-        //        if (!usersLastNotify.ContainsKey(id))
-        //        {
-        //            usersLastNotify[id] = DateTime.Now;
-        //            flag = true;
-        //        }
-        //        var group = peopleParserSql.GetGroupFromId(id);
-        //        //var group = peopleParserCsv.GetGroupFromId(id);
-        //        var message = messageHandler.LessonReminderHandler(group);
-        //        if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute < //87
-        //            5 && !flag))
-        //            continue;
-        //        if (message.Contains("пар больше нет"))
-        //            continue;
-        //        try
-        //        {
-        //            usersLastNotify[id] = DateTime.Now;
-        //            SendMessage(long.Parse(id), message, CreateMenuKeyboard());
-        //        }
-        //        catch
-        //        {
-        //            return;
-        //        }
-        //    }
-        //}
-
-        private static void Eye()
+        private void Eye()
         {
             var poll = vkApi.Messages.GetLongPollServer();
             StartAsync(poll.Pts);
             NewMessages += OnMessageReceived;
         }
 
-        private static void OnMessageReceived(VkApi owner, ReadOnlyCollection<Message> messages)
+        private void OnMessageReceived(VkApi owner, ReadOnlyCollection<Message> messages)
         {
             foreach (var message in messages)
             {

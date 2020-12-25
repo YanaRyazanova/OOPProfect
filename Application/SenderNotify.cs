@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Domain.Functions;
+using Infrastructure;
 using Infrastructure.Csv;
 using Infrastructure.SQL;
 
@@ -13,8 +14,9 @@ namespace Application
 
         private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
 
-        private readonly PeopleParserSql peopleParserSql;
-        private readonly PeopleParserCsv peopleParserCsv;
+        private readonly IPeopleParser peopleParser;
+        private readonly DiningRoomIndicator indicator;
+        private readonly IDataBaseParser dataBaseParser;
 
         private readonly LessonReminder lessonReminder;
 
@@ -23,11 +25,13 @@ namespace Application
         public SenderNotify
         (
             LessonReminder lessonReminder,
-            PeopleParserSql peopleParserSql,
-            PeopleParserCsv peopleParserCsv)
+            IPeopleParser peopleParser,
+            DiningRoomIndicator indicator,
+            IDataBaseParser dataBaseParser)
         {
-            this.peopleParserSql = peopleParserSql;
-            this.peopleParserCsv = peopleParserCsv;
+            this.peopleParser = peopleParser;
+            this.indicator = indicator;
+            this.dataBaseParser = dataBaseParser;
             this.lessonReminder = lessonReminder;
         }
 
@@ -36,10 +40,10 @@ namespace Application
             try
             {
                 Console.WriteLine("Hello from BotNotification");
-                var usersList = peopleParserSql.GetAllUsers();
-                //var usersList = peopleParserCsv.GetAllUsers();
+                var usersList = peopleParser.GetAllUsers();
                 foreach (var id in usersList)
                 {
+                    indicator.Decrement(id);
                     var flag = false;
                     if (!usersLastNotify.ContainsKey(id))
                     {
@@ -47,8 +51,7 @@ namespace Application
                         flag = true;
                     }
 
-                    var group = peopleParserSql.GetGroupFromId(id);
-                    //var group = peopleParserCsv.GetGroupFromId(id);
+                    var group = peopleParser.GetGroupFromId(id);
                     var message = LessonReminderHandler(group);
                     if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute //40
                         < 3 && !flag))
@@ -58,23 +61,21 @@ namespace Application
                     usersLastNotify[id] = DateTime.Now;
                     Console.Write(message, id);
                     OnReply(id, message);
+                    OnReplyVK(long.Parse(id), message);
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-            
         }
 
         public string LessonReminderHandler(string group)
         {
             if (group == null)
                 return null;
-            var startTime = DataBaseSql.GetNearestLesson(group);
-            //var startTime = dataBaseParserCsv.GetNearestLesson(group);
+            var startTime = dataBaseParser.GetNearestLesson(group);
             var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
-            //var result = Task.Run(() => lessonReminder.Do(DateTime.Now.AddMinutes(7), "Самая лучшая пара в твоей жизни"));
             return result.Result;
         }
     }

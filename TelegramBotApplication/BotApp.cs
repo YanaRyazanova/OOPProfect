@@ -34,25 +34,14 @@ namespace View
                     "api", vkApi),
                 new ConstructorArgument("keyVkToken", vkToken),
                 new ConstructorArgument("handler", messageHandler));
+
             senderNotify.OnReply += telegramBot.SendNotificationLesson;
             messageHandler.OnReply += telegramBot.SendNotification;
-            //senderNotify.OnReplyVK += vkBot.SendMessage;
-            //messageHandler.OnReplyVK += vkBot.SendMessage;
-            //vkBot.Run();
+            senderNotify.OnReplyVK += vkBot.SendMessage;
+            messageHandler.OnReplyVK += vkBot.SendMessage;
+            vkBot.Run();
             telegramBot.Run();
             Task.Run(messageHandler.Run);
-            //messageHandler.Run();
-            //while (true)
-            //{
-            //    var currentTime = DateTime.Now;
-            //    foreach (var time in times)
-            //    {
-            //        var difference = currentTime.Hour + currentTime.Minute - time.Hour - time.Minute;
-            //        if (difference >= 2 || difference < 0) continue;
-            //        telegramBot.BotNotificationsSender();
-            //        vkBot.BotNotificationSender();
-            //    }
-            //}
             Console.ReadLine();
             //telegramBot.Stop();
         }
@@ -69,9 +58,9 @@ namespace View
 
             //container.Bind<DataBaseSql>().ToSelf();
             
-            container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
-            container.Bind<IPeopleParser>().To<PeopleParserSql>();
-            container.Bind<ILinkParser>().To<LinkParserSQL>();
+            container.Bind<IDataBaseParser>().To<DataBaseParserCsv>();
+            container.Bind<IPeopleParser>().To<PeopleParserCsv>();
+            container.Bind<ILinkParser>().To<LinkParserCSV>();
             return container;
         }
     }

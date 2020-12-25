@@ -7,5 +7,6 @@ namespace Infrastructure
     public interface IDataBaseParser
     {
         public Lesson[] GetTimetableForGroupForCurrentDay(string groupName, DateTime day);
+        public Lesson GetNearestLesson(string groupName);
     }
 }

@@ -19,14 +19,14 @@ namespace Application
         private readonly SenderNotify senderNotify;
 
         private readonly IDataBaseParser dataBaseParser;
-        private readonly DataBaseParserCsv dataBaseParserCsv;
 
         private readonly IPeopleParser peopleParser;
         private readonly ILinkParser linkParser;
 
         private readonly DiningRoomIndicator diningRoom;
-        
+        private static Timer timer;
 
+        private readonly List<string> groups = new List<string> {"ФТ-201", "ФТ-202"};
         public MessageHandler(
             DiningRoomIndicator diningRoom,
             IDataBaseParser dataBaseParser,
@@ -46,8 +46,14 @@ namespace Application
 
         public void Run()
         {
-            var tm = new TimerCallback(Method);
-            var timer = new Timer(tm, null, 0, 120000);
+            timer = new Timer(
+                callback: new TimerCallback(Method),
+                state: null,
+                dueTime: 1000,
+                period: 10000);
+            //var tm = new TimerCallback(Method);
+            //var timer = new Timer(tm, null, 0, 2000);
+            //var timer = System.Timers.Timer(2000);
         }
 
         private void Method(object obj)
@@ -59,6 +65,7 @@ namespace Application
         {
             var schedule = SheduleModify(0, userId);
             OnReply(userId, schedule);
+            OnReplyVK(long.Parse(userId), schedule);
         }
 
         public void GetScheduleForNextDay(string userId)
@@ -66,25 +73,38 @@ namespace Application
             var scheduleNextDay = SheduleModify(1, userId);
             var result = new ScheduleSender(scheduleNextDay).Do();
             OnReply(userId, result);
+            OnReplyVK(long.Parse(userId), scheduleNextDay);
         }
 
-        public void GetDinigRoom(string userId)
+        public int GetDinigRoom(string userId)
         {
             diningRoom.Increment(userId);
-            OnReply(userId, diningRoom.VisitorsCount.ToString());
+            return diningRoom.VisitorsCount;
         }
 
-        public void GetGroup(string group, long userId)
+        public bool GetGroup(string group, string userId)
         {
-            //peopleParser.AddNewUser(userId.ToString(), group, "0");
-            peopleParser.ChangeGroup(userId.ToString(), group);
+            if (groups.Contains(group))
+            {
+                peopleParser.ChangeGroup(userId, group);
+                return true;
+            }
+
+            return false;
         }
 
         public void GetLinks(string userId)
         {
             var group = peopleParser.GetGroupFromId(userId);
-            var result = linkParser.GetActualLinksForGroup(group);
+            var links = linkParser.GetActualLinksForGroup(group);
+            var result = new StringBuilder();
+            foreach (var link in links)
+            {
+                result.Append($"{link.name}: {link.link}");
+                result.Append("\n");
+            }
             OnReply(userId, result.ToString());
+            OnReplyVK(long.Parse(userId), result.ToString());
         }
 
         private string SheduleModify(int days, string userId)
