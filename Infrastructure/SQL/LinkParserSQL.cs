@@ -15,7 +15,9 @@ namespace Infrastructure.SQL
             this.dbNameProvider = dbNameProvider;
         }
 
-        public Link[] GetActualLinksForGroup(string group)
+        public Link[] GetActualLinksForGroup(string group) => new ParseMethods().ParseLinks(GetActualLinksForGroupInString(group));
+
+        private string GetActualLinksForGroupInString(string group)
         {
             var dbName = dbNameProvider.GetDBName("link");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
@@ -24,12 +26,26 @@ namespace Infrastructure.SQL
                 var command = new SQLiteCommand(string.Format("SELECT links FROM Links WHERE GROUP_='{0}'", group), connection);
                 var reader = command.ExecuteReader();
                 var emptyLinks = new Link[0];
-                foreach (DbDataRecord record in reader) 
+                foreach (DbDataRecord record in reader)
                 {
                     var notParsedLinks = record["links"].ToString();
-                    return new ParseMethods().ParseLinks(notParsedLinks);
+                    return notParsedLinks;
                 }
-                return emptyLinks;
+                return "";
+            }
+        }
+
+        public void AddLinkForGroup(string group, string target, string link)
+        {
+            var currentLink = GetActualLinksForGroupInString(group);
+            currentLink = $"{currentLink}\n{target}$$${link}";
+            var dbName = dbNameProvider.GetDBName("link");
+            using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
+            {
+                connection.Open();
+                var command = new SQLiteCommand(
+                        string.Format("UPDATE PeopleAndGroups SET links='{0}' WHERE GROUP_='{1}'", currentLink, group), connection);
+                command.ExecuteNonQuery();
             }
         }
     }
