@@ -59,7 +59,7 @@ namespace View
             //messageHandler.OnReplyVK += vkBot.SendMessage;
             //vkBot.Run();
             telegramBot.Run();
-            //Task.Run(messageHandler.Run);
+            Task.Run(messageHandler.Run);
             Console.ReadLine();
         }
 
@@ -78,7 +78,7 @@ namespace View
             container.Bind<LessonReminder>().ToSelf();
 
 
-            container.Bind<CommandTGFactory>().ToSelf();
+            container.Bind<CommandTGFactory>().ToSelf().InSingletonScope();
 
 
             container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
