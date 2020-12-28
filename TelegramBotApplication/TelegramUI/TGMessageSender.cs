@@ -6,7 +6,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class TGMessageSender : IMessageSender
+    public class TGMessageSender : ITGMessageSender
     {
         private readonly TelegramBotClient client;
 

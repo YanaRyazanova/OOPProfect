@@ -6,11 +6,11 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class Register : CommandTG
+    public class RegisterTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
         private readonly TGMessageSender tgMessageSender;
-        private readonly UnknownMessageProcessor unknownMessageProcessor;
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -35,11 +35,11 @@ namespace View
             return keyboard;
         }
 
-        public Register(MessageHandler messageHandler, TGMessageSender tgMessageSender, UnknownMessageProcessor unknownMessageProcessor) : base(UsersStates.Register)
+        public RegisterTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(TgUsersStates.Register)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
-            this.unknownMessageProcessor = unknownMessageProcessor;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -83,7 +83,7 @@ namespace View
                 }
                 default:
                 {
-                    unknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
+                    tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
                     break;
                 }
             }

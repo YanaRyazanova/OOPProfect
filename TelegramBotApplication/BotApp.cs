@@ -31,7 +31,7 @@ namespace View
             var messageHandler = container.Get<MessageHandler>(new ConstructorArgument("senderNotify", senderNotify));
             var telegramBot = container.Get<TelegramBotUI>(
                 new ConstructorArgument("newClient", client),
-                new ConstructorArgument("tgMessageSender", tgMessageSender));
+                new ConstructorArgument("tgItgMessageSender", tgMessageSender));
             //var vkBot = container.Get<VkBotUI>(new ConstructorArgument(
             //        "api", vkApi),
             //    new ConstructorArgument("keyVkToken", vkToken),
@@ -52,7 +52,7 @@ namespace View
             container.Bind<TelegramBotUI>().ToSelf();
             container.Bind<VkBotUI>().ToSelf();
 
-            container.Bind<IMessageSender>().To<TGMessageSender>().InSingletonScope();
+            container.Bind<ITGMessageSender>().To<TGMessageSender>().InSingletonScope();
             container.Bind<CommandTGFactory>().ToSelf();
 
             container.Bind<DiningRoomIndicator>().ToSelf();

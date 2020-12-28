@@ -5,7 +5,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public enum UsersStates
+    public enum TgUsersStates
     {
         NotRegister,
         Register,
@@ -14,25 +14,25 @@ namespace View
 
     public abstract class CommandTG
     {
-        public UsersStates userState;
+        public TgUsersStates TgUserState;
 
         public abstract ReplyKeyboardMarkup GetKeyboard();
         public abstract void ProcessMessage(string messageText, TGUser chatId);
 
-        public CommandTG(UsersStates userState)
+        public CommandTG(TgUsersStates tgUserState)
         {
-            this.userState = userState;
+            this.TgUserState = tgUserState;
         }
 
         public void RaiseState()
         {
-            switch (userState)
+            switch (TgUserState)
             {
-                case UsersStates.NotRegister:
-                    userState = UsersStates.RegisterInProcess;
+                case TgUsersStates.NotRegister:
+                    TgUserState = TgUsersStates.RegisterInProcess;
                     break;
-                case UsersStates.RegisterInProcess:
-                    userState = UsersStates.Register;
+                case TgUsersStates.RegisterInProcess:
+                    TgUserState = TgUsersStates.Register;
                     break;
             }
         }

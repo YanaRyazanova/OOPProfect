@@ -9,13 +9,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class RegisterInProcess : CommandTG
+    public class RegisterInProcessTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
         private readonly TGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly UnknownMessageProcessor unknownMessageProcessor;
-        private  ReplyKeyboardMarkup CreateStartKeyboard()
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        private ReplyKeyboardMarkup CreateStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
@@ -27,13 +27,13 @@ namespace View
             return keyboard;
         }
 
-        public RegisterInProcess(MessageHandler messageHandler, TGMessageSender tgMessageSender, IPeopleParser peopleParser, UnknownMessageProcessor unknownMessageProcessor) : base(
-            UsersStates.RegisterInProcess)
+        public RegisterInProcessTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(
+            TgUsersStates.RegisterInProcess)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
-            this.unknownMessageProcessor = unknownMessageProcessor;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -70,7 +70,7 @@ namespace View
                     }
                     else
                     {
-                        unknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
+                        tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
                     }
                     
                     break;

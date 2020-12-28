@@ -6,11 +6,11 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class NotRegister : CommandTG
+    public class NotRegisterTG : CommandTG
     {
-        private readonly IMessageSender tgMessageSender;
+        private readonly ITGMessageSender tgItgMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly UnknownMessageProcessor allCommands;
+        private readonly TGUnknownMessageProcessor allCommands;
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -23,10 +23,10 @@ namespace View
             return keyboard;
         }
 
-        public NotRegister(IMessageSender tgMessageSender, IPeopleParser peopleParser, UnknownMessageProcessor allCommands) : base(
-            UsersStates.NotRegister)
+        public NotRegisterTG(ITGMessageSender tgItgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor allCommands) : base(
+            TgUsersStates.NotRegister)
         {
-            this.tgMessageSender = tgMessageSender;
+            this.tgItgMessageSender = tgItgMessageSender;
             this.peopleParser = peopleParser;
             this.allCommands = allCommands;
         }
@@ -48,7 +48,7 @@ namespace View
                     RaiseState();
                     peopleParser.AddNewUser(chatId.ToString());
                     peopleParser.ChangeStateForUser(chatId.ToString());
-                    tgMessageSender.SendNotification(chatId, text, GetKeyboard());
+                    tgItgMessageSender.SendNotification(chatId, text, GetKeyboard());
                     break;
                 }
                 case "help":
@@ -56,7 +56,7 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgItgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
                     break;
                 }
                 default:

@@ -7,155 +7,185 @@ using VkNet.Model.Keyboard;
 
 namespace View
 {
-    public class CommandVK
+    public enum VkUsersStates
     {
-        public UsersStates userState;
-        public MessageKeyboard keyboard;
-        public readonly List<string> availableСommands;
-        private static MessageKeyboard CreateGroupKeyboard()
+        NotRegister,
+        Register,
+        RegisterInProcess
+    }
+
+
+    public abstract class CommandVK
+    {
+        public VkUsersStates VkUserState;
+
+        public abstract MessageKeyboard GetKeyboard();
+        public abstract void ProcessMessage(string messageText, VKUser userId);
+
+        public CommandVK(VkUsersStates vkUserState)
         {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "ФТ-201",
-                        Type = KeyboardButtonActionType.Text
-                    },
-
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "ФТ-202",
-                        Type = KeyboardButtonActionType.Text
-                    },
-
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
-        }
-
-        private static MessageKeyboard CreateMenuKeyboard()
-        {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Расписание на сегодня", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Расписание на завтра", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            var line2 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Я в столовой", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Ссылки на учебные чаты", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-            };
-            var line3 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Help", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
-            buttonsList.Add(line2);
-            buttonsList.Add(line3);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
-        }
-
-        private static MessageKeyboard CreateStartKeyboard()
-        {
-            var keyboard = new MessageKeyboard();
-            var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Начать", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
-            keyboard.Buttons = buttonsList;
-            return keyboard;
-        }
-
-        public CommandVK(int userState)
-        {
-            switch (userState)
-            {
-                case 0:
-                    availableСommands = new List<string> { "/start", "start", "начать", "help", "/help", "помощь", "помоги" };
-                    keyboard = CreateStartKeyboard();
-                    break;
-                case 1:
-                    this.userState = UsersStates.RegisterInProcess;
-                    availableСommands = new List<string> { "фт-201", "фт-202", "help", "/help", "помощь", "помоги" };
-                    keyboard = CreateGroupKeyboard();
-                    break;
-                case 2:
-                    this.userState = UsersStates.Register;
-                    availableСommands = new List<string> {"расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты", "help", "/help", "помощь", "помоги"};
-                    keyboard = CreateMenuKeyboard();
-                    break;
-            }
+            this.VkUserState = vkUserState;
         }
 
         public void RaiseState()
         {
-            switch (userState)
+            switch (VkUserState)
             {
-                case UsersStates.NotRegister:
-                    userState = UsersStates.RegisterInProcess;
+                case VkUsersStates.NotRegister:
+                    VkUserState = VkUsersStates.RegisterInProcess;
                     break;
-                case UsersStates.RegisterInProcess:
-                    userState = UsersStates.Register;
+                case VkUsersStates.RegisterInProcess:
+                    VkUserState = VkUsersStates.Register;
                     break;
             }
         }
+        //public TgUsersStates TgUserState;
+        //public MessageKeyboard keyboard;
+        //public readonly List<string> availableСommands;
+        //private static MessageKeyboard CreateGroupKeyboard()
+        //{
+        //var keyboard = new MessageKeyboard();
+        //var buttonsList = new List<List<MessageKeyboardButton>>();
+        //var line1 = new List<MessageKeyboardButton>
+        //    {
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "ФТ-201",
+        //                Type = KeyboardButtonActionType.Text
+        //            },
+
+        //            Color = KeyboardButtonColor.Primary
+        //        },
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "ФТ-202",
+        //                Type = KeyboardButtonActionType.Text
+        //            },
+
+        //            Color = KeyboardButtonColor.Primary
+        //        }
+        //    };
+        //buttonsList.Add(line1);
+        //    keyboard.Buttons = buttonsList;
+        //    return keyboard;
+        //}
+
+        //private static MessageKeyboard CreateMenuKeyboard()
+        //{
+        //var keyboard = new MessageKeyboard();
+        //var buttonsList = new List<List<MessageKeyboardButton>>();
+        //var line1 = new List<MessageKeyboardButton>
+        //    {
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Расписание на сегодня", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        },
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Расписание на завтра", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        }
+        //    };
+        //var line2 = new List<MessageKeyboardButton>
+        //    {
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Я в столовой", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        },
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Ссылки на учебные чаты", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        },
+        //    };
+        //var line3 = new List<MessageKeyboardButton>
+        //    {
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Help", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        }
+        //    };
+        //buttonsList.Add(line1);
+        //    buttonsList.Add(line2);
+        //    buttonsList.Add(line3);
+        //    keyboard.Buttons = buttonsList;
+        //    return keyboard;
+        //}
+
+        //private static MessageKeyboard CreateStartKeyboard()
+        //{
+        //    var keyboard = new MessageKeyboard();
+        //    var buttonsList = new List<List<MessageKeyboardButton>>();
+        //    var line1 = new List<MessageKeyboardButton>
+        //    {
+        //        new MessageKeyboardButton
+        //        {
+        //            Action = new MessageKeyboardButtonAction
+        //            {
+        //                Label = "Начать", Type = KeyboardButtonActionType.Text
+        //            },
+        //            Color = KeyboardButtonColor.Primary
+        //        }
+        //    };
+        //    buttonsList.Add(line1);
+        //    keyboard.Buttons = buttonsList;
+        //    return keyboard;
+        //}
+
+        //public CommandVK(int userState)
+        //{
+        //    switch (userState)
+        //    {
+        //        case 0:
+        //            availableСommands = new List<string> { "/start", "start", "начать", "help", "/help", "помощь", "помоги" };
+        //            keyboard = CreateStartKeyboard();
+        //            break;
+        //        case 1:
+        //            this.TgUserState = TgUsersStates.RegisterInProcessTG;
+        //            availableСommands = new List<string> { "фт-201", "фт-202", "help", "/help", "помощь", "помоги" };
+        //            keyboard = CreateGroupKeyboard();
+        //            break;
+        //        case 2:
+        //            this.TgUserState = TgUsersStates.RegisterTG;
+        //            availableСommands = new List<string> {"расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты", "help", "/help", "помощь", "помоги"};
+        //            keyboard = CreateMenuKeyboard();
+        //            break;
+        //    }
+        //}
+
+        //public void RaiseState()
+        //{
+        //    switch (TgUserState)
+        //    {
+        //        case TgUsersStates.NotRegisterTG:
+        //            TgUserState = TgUsersStates.RegisterInProcessTG;
+        //            break;
+        //        case TgUsersStates.RegisterInProcessTG:
+        //            TgUserState = TgUsersStates.RegisterTG;
+        //            break;
+        //    }
+        //}
     }
 }

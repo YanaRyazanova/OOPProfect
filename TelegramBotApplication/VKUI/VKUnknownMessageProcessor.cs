@@ -2,37 +2,38 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Telegram.Bot.Types.ReplyMarkups;
+using View.VKUI;
+using VkNet.Model.Keyboard;
 
 namespace View
 {
-    public class UnknownMessageProcessor
+    public class VKUnknownMessageProcessor
     {
-        private readonly TGMessageSender tgMessageSender;
+        private readonly VKMessageSender vkMessageSender;
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly RegisterInProcessCommandListProvider registerInProcessCommandListProvider;
         private readonly NotRegicterCommandListProvider notRegicterCommandListProvider;
 
-        public UnknownMessageProcessor(
-            TGMessageSender tgMessageSender,
+        public VKUnknownMessageProcessor(
+            VKMessageSender vkMessageSender,
             RegisterCommandListProvider registerCommandListProvider,
             RegisterInProcessCommandListProvider registerInProcessCommandListProvider,
             NotRegicterCommandListProvider notRegicterCommandListProvider)
         {
-            this.tgMessageSender = tgMessageSender;
+            this.vkMessageSender = vkMessageSender;
             this.registerCommandListProvider = registerCommandListProvider;
             this.registerInProcessCommandListProvider = registerInProcessCommandListProvider;
             this.notRegicterCommandListProvider = notRegicterCommandListProvider;
         }
 
-        public void ProcessUnknownCommand(string messageText, TGUser chatId, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
+        public void ProcessUnknownCommand(string messageText, VKUser userId, MessageKeyboard keyboard, MessageResponse messageResponse)
         {
             var allCommands = registerCommandListProvider.GetCommands()
                 .Concat(notRegicterCommandListProvider.GetCommands())
                 .Concat(registerInProcessCommandListProvider.GetCommands())
                 .ToArray();
             var response = allCommands.Contains(messageText) ? messageResponse : new MessageResponse(ResponseType.Error);
-            tgMessageSender.SendNotification(chatId, response.response, keyboard);
-        } 
+            vkMessageSender.SendNotification(userId, response.response, keyboard);
+        }
     }
 }
