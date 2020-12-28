@@ -9,13 +9,7 @@ namespace Domain.Functions
 {
     public class LessonReminder: BotFunction
     {
-        //private readonly TDataBase nearestLesson;
-        public LessonReminder(
-            //TDataBase lesson
-            )
-        {
-            //this.nearestLesson = lesson;
-        }
+        public LessonReminder() { }
         private int GetDifference(DateTime startTime)
         {
             var difference = startTime.Minute + startTime.Hour * 60
@@ -28,11 +22,9 @@ namespace Domain.Functions
             while (true)
             {
                 var difference = GetDifference(startTime);
-                if ( difference <= 10 && difference >=0) return $"Пара {name} начнется через столько минут: {difference}";
-                var sleepTime = difference - 10;
+                if ( difference <= 10 && difference >=0) return $"Пара '{name}' начнется через столько минут: {difference}";
                 if (difference < 0)
                     return null;
-                //Thread.Sleep(sleepTime);
             }
         }
     }

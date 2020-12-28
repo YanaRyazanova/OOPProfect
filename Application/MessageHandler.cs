@@ -25,7 +25,7 @@ namespace Application
 
         private readonly DiningRoomIndicator diningRoom;
         private static Timer timer;
-
+        public List<string> GetAllGroups () => groups;
         private readonly List<string> groups = new List<string> {"ФТ-201", "ФТ-202"};
         public MessageHandler(
             DiningRoomIndicator diningRoom,
@@ -51,9 +51,6 @@ namespace Application
                 state: null,
                 dueTime: 1000,
                 period: 10000);
-            //var tm = new TimerCallback(Method);
-            //var timer = new Timer(tm, null, 0, 2000);
-            //var timer = System.Timers.Timer(2000);
         }
 
         private void Method(object obj)

@@ -233,6 +233,7 @@ namespace View
                     Keyboard = currentCommand.keyboard
                 });
             }
+            
             catch (CannotSendToUserFirstlyException)
             {
                 return;

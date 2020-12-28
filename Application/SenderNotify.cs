@@ -53,13 +53,15 @@ namespace Application
 
                     var group = peopleParser.GetGroupFromId(id);
                     var message = LessonReminderHandler(group);
-                    if (message == null || (DateTime.Now.Minute - usersLastNotify[id].Minute //40
-                        < 3 && !flag))
+                    var difference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[id].Minute -
+                                     usersLastNotify[id].Hour;
+                    if (message == null ||  difference//40
+                        < 3 && !flag)
                         continue;
                     if (message.Contains("пар больше нет"))
                         continue;
                     usersLastNotify[id] = DateTime.Now;
-                    Console.Write(message, id);
+                    Console.Write(message + id);
                     OnReply(id, message);
                     OnReplyVK(long.Parse(id), message);
                 }
