@@ -43,13 +43,13 @@ namespace View
             client.StartReceiving();
         }
 
-        private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
+        private async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
             var chatId = new TGUser(message.Chat.Id);
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
-            var currentCommand = DefineCommand(chatId.ToString());
+            var currentCommand = DefineCommand(chatId.userID.ToString());
             try
             {
                 currentCommand.ProcessMessage(messageText, chatId);

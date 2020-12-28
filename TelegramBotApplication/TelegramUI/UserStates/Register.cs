@@ -35,7 +35,9 @@ namespace View
             return keyboard;
         }
 
-        public Register(MessageHandler messageHandler, TGMessageSender tgMessageSender, UnknownMessageProcessor unknownMessageProcessor) : base(UsersStates.Register)
+        public Register(MessageHandler messageHandler,
+            TGMessageSender tgMessageSender,
+            UnknownMessageProcessor unknownMessageProcessor) : base(UsersStates.Register)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
@@ -53,12 +55,12 @@ namespace View
             {
                 case "расписание на сегодня":
                 {
-                    messageHandler.GetScheduleForToday(chatId.ToString());
+                    messageHandler.GetScheduleForToday(chatId.userID.ToString());
                     break;
                 }
                 case "расписание на завтра":
                 {
-                    messageHandler.GetScheduleForNextDay(chatId.ToString());
+                    messageHandler.GetScheduleForNextDay(chatId.userID.ToString());
                     break;
                 }
                 case "я в столовой":

@@ -13,7 +13,11 @@ namespace View
         private readonly IPeopleParser peopleParser;
         private readonly MessageHandler messageHandler;
         private readonly UnknownMessageProcessor unknownMessageProcessor;
-        public CommandTGFactory(TGMessageSender tgMessageSender, IPeopleParser peopleParser, MessageHandler messageHandler, UnknownMessageProcessor unknownMessageProcessor)
+        public CommandTGFactory(
+            TGMessageSender tgMessageSender,
+            IPeopleParser peopleParser,
+            MessageHandler messageHandler,
+            UnknownMessageProcessor unknownMessageProcessor)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;

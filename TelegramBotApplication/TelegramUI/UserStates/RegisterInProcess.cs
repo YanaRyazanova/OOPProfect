@@ -55,9 +55,9 @@ namespace View
                 }
                 default:
                 {
-                    if (messageHandler.GetAllGroups().Contains(messageText))
+                    if (messageHandler.GetAllGroups().Contains(messageText.ToUpper()))
                     {
-                        if (messageHandler.GetGroup(messageText.ToUpper(), chatId.ToString()))
+                        if (messageHandler.GetGroup(messageText.ToUpper(), chatId.userID.ToString()))
                         {
                             RaiseState();
                             peopleParser.ChangeStateForUser(chatId.userID.ToString());

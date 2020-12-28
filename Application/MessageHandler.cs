@@ -86,7 +86,6 @@ namespace Application
                 peopleParser.ChangeGroup(userId, group);
                 return true;
             }
-
             return false;
         }
 
