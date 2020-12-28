@@ -28,27 +28,30 @@ namespace Infrastructure.Csv
                 ["2"] = "2",
             };
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            string[] values = File.ReadAllLines(dbName);
-            using (StreamWriter Writer = new StreamWriter(dbName, false))
-            {
-                for (int i = 0; i < values.Length; i++)
-                {
-                    Writer.WriteLine(values[i].Replace($"{id},{group},{prevState}", $"{id},{group},{states[prevState]}"));
-                }
-            }
+            RewriteFields(id, group, states[prevState], dbName);
         }
 
         public void ChangeGroup(string id, string group)
         {
-            var prevGrpoup = GetGroupFromId(id);
             var prevState = GetStateFromId(id);
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            string[] values = File.ReadAllLines(dbName);
+            RewriteFields(id, group, prevState, dbName);
+        }
+
+        private void RewriteFields(string id, string group, string state, string dbName)
+        {
+            var values = File.ReadAllLines(dbName);
+            for (var i = 0; i < values.Length; i++)
+            {
+                var line = values[i].Split(',');
+                if (line[0] == id)
+                    values[i] = $"{id},{group},{state}";
+            }
             using (StreamWriter Writer = new StreamWriter(dbName, false))
             {
                 for (int i = 0; i < values.Length; i++)
                 {
-                    Writer.WriteLine(values[i].Replace($"{id},{prevGrpoup},{prevState}", $"{id},{group},{prevState}"));
+                    Writer.WriteLine(values[i]);
                 }
             }
         }
@@ -60,7 +63,7 @@ namespace Infrastructure.Csv
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {
-                parser.SetDelimiters(";");
+                parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();

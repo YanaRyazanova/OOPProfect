@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Infrastructure.Csv
@@ -31,7 +32,25 @@ namespace Infrastructure.Csv
                     return new ParseMethods().ParseLinks(notParsedLinks.Replace(@"\n", "\n"));
                 }
             }
+            
             return new Link[0];
+        }
+
+        public void AddLinkForGroup(string group, string target, string link)
+        {
+            var dbName = dbNameProvider.GetDBName("link", extension);
+            var values = File.ReadAllLines(dbName);
+            for (var i = 0; i < values.Length; i++)
+            {
+                var line = values[i].Split(',');
+                if (line[0] == group)
+                    values[i] = $"{values[i]}\\n{target}$$${link}";
+            }
+            using (var Writer = new StreamWriter(dbName, false))
+            {
+                for (int i = 0; i < values.Length; i++)
+                    Writer.WriteLine(values[i]);
+            }
         }
     }
 }
