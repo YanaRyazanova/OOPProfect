@@ -9,13 +9,13 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class RegisterInProcess : CommandTG
+    public class RegisterInProcessTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
         private readonly TGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly UnknownMessageProcessor unknownMessageProcessor;
-        private  ReplyKeyboardMarkup CreateStartKeyboard()
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        private ReplyKeyboardMarkup CreateStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
@@ -27,13 +27,13 @@ namespace View
             return keyboard;
         }
 
-        public RegisterInProcess(MessageHandler messageHandler, TGMessageSender tgMessageSender, IPeopleParser peopleParser, UnknownMessageProcessor unknownMessageProcessor) : base(
-            UsersStates.RegisterInProcess)
+        public RegisterInProcessTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(
+            TgUsersStates.RegisterInProcess)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
-            this.unknownMessageProcessor = unknownMessageProcessor;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -41,7 +41,7 @@ namespace View
             return CreateStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, TGUser chatId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -50,27 +50,27 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
-                    if (messageHandler.GetAllGroups().Contains(messageText.ToUpper()))
+                    if (messageHandler.GetAllGroups().Contains(messageText))
                     {
-                        if (messageHandler.GetGroup(messageText.ToUpper(), chatId.userID.ToString()))
+                        if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {
                             RaiseState();
-                            peopleParser.ChangeStateForUser(chatId.userID.ToString());
-                            tgMessageSender.SendNotification(chatId, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
+                            peopleParser.ChangeStateForUser(user.UserId);
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
                         }
                         else
                         {
-                            tgMessageSender.SendNotification(chatId, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
                         }
                     }
                     else
                     {
-                        unknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
+                        tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
                     }
                     
                     break;

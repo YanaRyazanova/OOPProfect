@@ -12,31 +12,24 @@ namespace View
 
         private readonly IPeopleParser peopleParser;
         private readonly MessageHandler messageHandler;
-        private readonly UnknownMessageProcessor unknownMessageProcessor;
-        public CommandTGFactory(
-            TGMessageSender tgMessageSender,
-            IPeopleParser peopleParser,
-            MessageHandler messageHandler,
-            UnknownMessageProcessor unknownMessageProcessor)
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        public CommandTGFactory(TGMessageSender tgMessageSender, IPeopleParser peopleParser, MessageHandler messageHandler, TGUnknownMessageProcessor tgUnknownMessageProcessor)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.messageHandler = messageHandler;
-            this.unknownMessageProcessor = unknownMessageProcessor;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public CommandTG Create(int userState)
         {
-            switch (userState)
+            return userState switch
             {
-                case 0:
-                    return new NotRegister(tgMessageSender, peopleParser, unknownMessageProcessor);
-                case 1:
-                    return new RegisterInProcess(messageHandler, tgMessageSender, peopleParser, unknownMessageProcessor);
-                case 2:
-                    return new Register(messageHandler, tgMessageSender, unknownMessageProcessor);
-            }
-            throw new Exception("Wrong user state");
+                0 => (CommandTG) new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor),
+                1 => new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor),
+                2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor),
+                _ => throw new Exception("Wrong user state")
+            };
         }
     }
 }

@@ -41,8 +41,8 @@ namespace Application
             this.linkParser = linkParser;
         }
 
-        public event Action<string, string> OnReply;
-        public event Action<long, string> OnReplyVK;
+        public event Action<BotUser, string> OnReply;
+        public event Action<BotUser, string> OnReplyVK;
 
         public void Run()
         {
@@ -58,40 +58,38 @@ namespace Application
             senderNotify.Do();
         }
 
-        public void GetScheduleForToday(string userId)
+        public void GetScheduleForToday(BotUser user)
         {
-            var schedule = SheduleModify(0, userId);
-            OnReply(userId, schedule);
-            OnReplyVK(long.Parse(userId), schedule);
+            var schedule = SheduleModify(0, user);
+            OnReply(user, schedule);
+            OnReplyVK(user, schedule);
         }
 
-        public void GetScheduleForNextDay(string userId)
+        public void GetScheduleForNextDay(BotUser user)
         {
-            var scheduleNextDay = SheduleModify(1, userId);
+            var scheduleNextDay = SheduleModify(1, user);
             var result = new ScheduleSender(scheduleNextDay).Do();
-            OnReply(userId, result);
-            OnReplyVK(long.Parse(userId), scheduleNextDay);
+            OnReply(user, result);
+            OnReplyVK(user, scheduleNextDay);
         }
 
-        public int GetDinigRoom(string userId)
+        public int GetDinigRoom(BotUser user)
         {
-            diningRoom.Increment(userId);
+            diningRoom.Increment(user.UserId);
             return diningRoom.VisitorsCount;
         }
 
-        public bool GetGroup(string group, string userId)
+        public bool GetGroup(string group, BotUser user)
         {
-            if (groups.Contains(group))
-            {
-                peopleParser.ChangeGroup(userId, group);
-                return true;
-            }
-            return false;
+            if (!groups.Contains(group)) return false;
+            peopleParser.ChangeGroup(user.UserId.ToString(), group);
+            return true;
+
         }
 
-        public void GetLinks(string userId)
+        public void GetLinks(BotUser user)
         {
-            var group = peopleParser.GetGroupFromId(userId);
+            var group = peopleParser.GetGroupFromId(user.UserId.ToString());
             var links = linkParser.GetActualLinksForGroup(group);
             var result = new StringBuilder();
             foreach (var link in links)
@@ -99,13 +97,13 @@ namespace Application
                 result.Append($"{link.name}: {link.link}");
                 result.Append("\n");
             }
-            OnReply(userId, result.ToString());
-            OnReplyVK(long.Parse(userId), result.ToString());
+            OnReply(user, result.ToString());
+            OnReplyVK(user, result.ToString());
         }
 
-        private string SheduleModify(int days, string userId)
+        private string SheduleModify(int days, BotUser user)
         {
-            var groupName = peopleParser.GetGroupFromId(userId);
+            var groupName = peopleParser.GetGroupFromId(user.UserId.ToString());
             var scheduleArray = dataBaseParser
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();

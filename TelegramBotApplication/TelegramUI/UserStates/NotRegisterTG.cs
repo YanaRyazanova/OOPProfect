@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class NotRegister : CommandTG
+    public class NotRegisterTG : CommandTG
     {
-        private readonly IMessageSender tgMessageSender;
+        private readonly ITGMessageSender tgItgMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly UnknownMessageProcessor allCommands;
+        private readonly TGUnknownMessageProcessor allCommands;
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -23,10 +24,10 @@ namespace View
             return keyboard;
         }
 
-        public NotRegister(IMessageSender tgMessageSender, IPeopleParser peopleParser, UnknownMessageProcessor allCommands) : base(
-            UsersStates.NotRegister)
+        public NotRegisterTG(ITGMessageSender tgItgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor allCommands) : base(
+            TgUsersStates.NotRegister)
         {
-            this.tgMessageSender = tgMessageSender;
+            this.tgItgMessageSender = tgItgMessageSender;
             this.peopleParser = peopleParser;
             this.allCommands = allCommands;
         }
@@ -36,7 +37,7 @@ namespace View
             return CreatePreStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, TGUser chatId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -46,9 +47,9 @@ namespace View
                 {
                     var text = new MessageResponse(ResponseType.Start).response; 
                     RaiseState();
-                    peopleParser.AddNewUser(chatId.ToString());
-                    peopleParser.ChangeStateForUser(chatId.ToString());
-                    tgMessageSender.SendNotification(chatId, text, GetKeyboard());
+                    peopleParser.AddNewUser(user.UserId);
+                    peopleParser.ChangeStateForUser(user.UserId);
+                    tgItgMessageSender.SendNotification(user, text, GetKeyboard());
                     break;
                 }
                 case "help":
@@ -56,11 +57,11 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgItgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
-                    allCommands.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
+                    allCommands.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
                     break;
             }
         }

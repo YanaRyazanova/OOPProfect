@@ -6,11 +6,11 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class Register : CommandTG
+    public class RegisterTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
         private readonly TGMessageSender tgMessageSender;
-        private readonly UnknownMessageProcessor unknownMessageProcessor;
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -35,13 +35,11 @@ namespace View
             return keyboard;
         }
 
-        public Register(MessageHandler messageHandler,
-            TGMessageSender tgMessageSender,
-            UnknownMessageProcessor unknownMessageProcessor) : base(UsersStates.Register)
+        public RegisterTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(TgUsersStates.Register)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
-            this.unknownMessageProcessor = unknownMessageProcessor;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -49,30 +47,30 @@ namespace View
             return CreateKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, TGUser chatId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
                 case "расписание на сегодня":
                 {
-                    messageHandler.GetScheduleForToday(chatId.userID.ToString());
+                    messageHandler.GetScheduleForToday(user);
                     break;
                 }
                 case "расписание на завтра":
                 {
-                    messageHandler.GetScheduleForNextDay(chatId.userID.ToString());
+                    messageHandler.GetScheduleForNextDay(user);
                     break;
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(chatId.ToString());
+                    var visitorsCount = messageHandler.GetDinigRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
-                    tgMessageSender.SendNotification(chatId, text + visitorsCount, GetKeyboard());
+                    tgMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;
                 }
                 case "ссылки на учебные чаты":
                 {
-                    messageHandler.GetLinks(chatId.userID.ToString());
+                    messageHandler.GetLinks(user);
                     break;
                 }
                 case "help":
@@ -80,12 +78,12 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
-                    unknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
+                    tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
                     break;
                 }
             }

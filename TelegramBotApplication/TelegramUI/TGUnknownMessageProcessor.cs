@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Application;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public class UnknownMessageProcessor
+    public class TGUnknownMessageProcessor
     {
         private readonly TGMessageSender tgMessageSender;
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly RegisterInProcessCommandListProvider registerInProcessCommandListProvider;
         private readonly NotRegicterCommandListProvider notRegicterCommandListProvider;
 
-        public UnknownMessageProcessor(
+        public TGUnknownMessageProcessor(
             TGMessageSender tgMessageSender,
             RegisterCommandListProvider registerCommandListProvider,
             RegisterInProcessCommandListProvider registerInProcessCommandListProvider,
@@ -25,7 +26,7 @@ namespace View
             this.notRegicterCommandListProvider = notRegicterCommandListProvider;
         }
 
-        public void ProcessUnknownCommand(string messageText, TGUser chatId, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
+        public void ProcessUnknownCommand(string messageText, BotUser chatId, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
         {
             var allCommands = registerCommandListProvider.GetCommands()
                 .Concat(notRegicterCommandListProvider.GetCommands())
