@@ -17,7 +17,7 @@ namespace View
 {
     class BotApp
     {
-        
+
 
         static void Main(string[] args)
         {
@@ -27,11 +27,27 @@ namespace View
             var vkApi = new VkApi();
             var client = new TelegramBotClient(telegramToken);
             var senderNotify = container.Get<SenderNotify>();
-            var tgMessageSender = container.Get<TGMessageSender>(new ConstructorArgument("client", client));
+            var tgMessageSender = container.Get<ITGMessageSender>(new ConstructorArgument("client", client));
+
             var messageHandler = container.Get<MessageHandler>(new ConstructorArgument("senderNotify", senderNotify));
+            var registerProvider =
+                container.Get<RegisterCommandListProvider>(new ConstructorArgument("messageHandler", messageHandler));
+            var registerInProcessProvider =
+                container.Get<RegisterInProcessCommandListProvider>(new ConstructorArgument("messageHandler", messageHandler));
+            var notRegister =
+                container.Get<NotRegicterCommandListProvider>(new ConstructorArgument("messageHandler", messageHandler));
+            var tgUnknownMessageProcessor = container.Get<TGUnknownMessageProcessor>(
+                new ConstructorArgument("tgMessageSender", tgMessageSender),
+                new ConstructorArgument("registerCommandListProvider", registerProvider),
+                new ConstructorArgument("registerInProcessCommandListProvider", registerInProcessProvider),
+                new ConstructorArgument("notRegicterCommandListProvider", notRegister));
+            var commandTGFactory = container.Get<CommandTGFactory>(
+                new ConstructorArgument("tgMessageSender", tgMessageSender),
+                new ConstructorArgument("tgUnknownMessageProcessor", tgUnknownMessageProcessor));
             var telegramBot = container.Get<TelegramBotUI>(
                 new ConstructorArgument("newClient", client),
-                new ConstructorArgument("tgItgMessageSender", tgMessageSender));
+                new ConstructorArgument("commandTGFactory", commandTGFactory),
+                new ConstructorArgument("tgMessageSender", tgMessageSender));
             //var vkBot = container.Get<VkBotUI>(new ConstructorArgument(
             //        "api", vkApi),
             //    new ConstructorArgument("keyVkToken", vkToken),
@@ -43,7 +59,7 @@ namespace View
             //messageHandler.OnReplyVK += vkBot.SendMessage;
             //vkBot.Run();
             telegramBot.Run();
-            Task.Run(messageHandler.Run);
+            //Task.Run(messageHandler.Run);
             Console.ReadLine();
         }
 
@@ -53,17 +69,27 @@ namespace View
             container.Bind<VkBotUI>().ToSelf();
 
             container.Bind<ITGMessageSender>().To<TGMessageSender>().InSingletonScope();
-            container.Bind<CommandTGFactory>().ToSelf();
+            container.Bind<TGUnknownMessageProcessor>().ToSelf();
+
 
             container.Bind<DiningRoomIndicator>().ToSelf();
             container.Bind<SenderNotify>().ToSelf();
             container.Bind<MessageHandler>().ToSelf();
             container.Bind<LessonReminder>().ToSelf();
 
+
+            container.Bind<CommandTGFactory>().ToSelf();
+
+
             container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
             container.Bind<IPeopleParser>().To<PeopleParserSql>();
             container.Bind<ILinkParser>().To<LinkParserSQL>();
             return container;
+        }
+
+        private void GetTelegramBot()
+        {
+
         }
     }
 }

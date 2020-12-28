@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application;
 using Telegram.Bot;
 using Telegram.Bot.Types.ReplyMarkups;
 
@@ -15,14 +16,14 @@ namespace View
             this.client = client;
         }
 
-        public void SendNotification(TGUser chatID, string message, ReplyKeyboardMarkup keyboard)
+        public void SendNotification(BotUser user, string message, ReplyKeyboardMarkup keyboard)
         {
             if (message is null)
                 message = "У вас сегодня нет пар, отдыхайте!";
             
             try
             {
-                client.SendTextMessageAsync(chatID.userID, message, replyMarkup: keyboard).Wait();
+                client.SendTextMessageAsync(user.UserId, message, replyMarkup: keyboard).Wait();
             }
             catch (AggregateException)
             {
@@ -30,10 +31,10 @@ namespace View
             }
         }
 
-        public void HandleHelpMessage(TGUser chatId, ReplyKeyboardMarkup keyboard)
+        public void HandleHelpMessage(BotUser user, ReplyKeyboardMarkup keyboard)
         {
             var text = new MessageResponse(ResponseType.Help).response;
-            SendNotification(chatId, text, keyboard);
+            SendNotification(user, text, keyboard);
         }
     }
 }

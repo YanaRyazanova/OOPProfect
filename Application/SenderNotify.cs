@@ -12,7 +12,7 @@ namespace Application
     public class SenderNotify
     {
 
-        private Dictionary<string, DateTime> usersLastNotify = new Dictionary<string, DateTime>();
+        private Dictionary<BotUser, DateTime> usersLastNotify = new Dictionary<BotUser, DateTime>();
 
         private readonly IPeopleParser peopleParser;
         private readonly DiningRoomIndicator indicator;
@@ -20,8 +20,8 @@ namespace Application
 
         private readonly LessonReminder lessonReminder;
 
-        public event Action<string, string> OnReply;
-        public event Action<long, string> OnReplyVK;
+        public event Action<BotUser, string> OnReply;
+        public event Action<BotUser, string> OnReplyVK;
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -43,27 +43,28 @@ namespace Application
                 var usersList = peopleParser.GetAllUsers();
                 foreach (var id in usersList)
                 {
+                    var user = new BotUser(id);
                     indicator.Decrement(id);
                     var flag = false;
-                    if (!usersLastNotify.ContainsKey(id))
+                    if (!usersLastNotify.ContainsKey(user))
                     {
-                        usersLastNotify[id] = DateTime.Now;
+                        usersLastNotify[user] = DateTime.Now;
                         flag = true;
                     }
 
-                    var group = peopleParser.GetGroupFromId(id);
+                    var group = peopleParser.GetGroupFromId(user.UserId);
                     var message = LessonReminderHandler(group);
-                    var difference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[id].Minute -
-                                     usersLastNotify[id].Hour;
+                    var difference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
+                                     usersLastNotify[user].Hour;
                     if (message == null ||  difference//40
                         < 3 && !flag)
                         continue;
                     if (message.Contains("пар больше нет"))
                         continue;
-                    usersLastNotify[id] = DateTime.Now;
-                    Console.Write(message + id);
-                    OnReply(id, message);
-                    OnReplyVK(long.Parse(id), message);
+                    usersLastNotify[user] = DateTime.Now;
+                    Console.Write(message + user.UserId);
+                    OnReply(user, message);
+                    OnReplyVK(user, message);
                 }
             }
             catch (Exception e)

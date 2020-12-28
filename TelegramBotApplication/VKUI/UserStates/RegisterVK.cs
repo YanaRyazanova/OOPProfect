@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Application;
-using View.VKUI;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
 
@@ -85,30 +84,30 @@ namespace View
             return CreateKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, VKUser userId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
                 case "расписание на сегодня":
                 {
-                    messageHandler.GetScheduleForToday(userId.ToString());
+                    messageHandler.GetScheduleForToday(user);
                     break;
                 }
                 case "расписание на завтра":
                 {
-                    messageHandler.GetScheduleForNextDay(userId.ToString());
+                    messageHandler.GetScheduleForNextDay(user);
                     break;
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(userId.ToString());
+                    var visitorsCount = messageHandler.GetDinigRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
-                    vkMessageSender.SendNotification(userId, text + visitorsCount, GetKeyboard());
+                    vkMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;
                 }
                 case "ссылки на учебные чаты":
                 {
-                    messageHandler.GetLinks(userId.userID.ToString());
+                    messageHandler.GetLinks(user);
                     break;
                 }
                 case "help":
@@ -116,12 +115,12 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    vkMessageSender.HandleHelpMessage(userId, GetKeyboard());
+                    vkMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
-                    vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, userId, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
+                    vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
                     break;
                 }
             }

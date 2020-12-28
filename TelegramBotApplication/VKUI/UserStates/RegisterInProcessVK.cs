@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Application;
 using Infrastructure;
-using View.VKUI;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
 
@@ -61,7 +60,7 @@ namespace View
             return CreateStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, VKUser userId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -70,27 +69,27 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    vkMessageSender.HandleHelpMessage(userId, GetKeyboard());
+                    vkMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
                     if (messageHandler.GetAllGroups().Contains(messageText))
                     {
-                        if (messageHandler.GetGroup(messageText.ToUpper(), userId.ToString()))
+                        if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {
                             RaiseState();
-                            peopleParser.ChangeStateForUser(userId.userID.ToString());
-                            vkMessageSender.SendNotification(userId, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
+                            peopleParser.ChangeStateForUser(user.UserId);
+                            vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
                         }
                         else
                         {
-                            vkMessageSender.SendNotification(userId, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
+                            vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
                         }
                     }
                     else
                     {
-                        vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, userId, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
+                        vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
                     }
 
                     break;

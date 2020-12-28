@@ -47,30 +47,30 @@ namespace View
             return CreateKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, TGUser chatId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
                 case "расписание на сегодня":
                 {
-                    messageHandler.GetScheduleForToday(chatId.ToString());
+                    messageHandler.GetScheduleForToday(user);
                     break;
                 }
                 case "расписание на завтра":
                 {
-                    messageHandler.GetScheduleForNextDay(chatId.ToString());
+                    messageHandler.GetScheduleForNextDay(user);
                     break;
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(chatId.ToString());
+                    var visitorsCount = messageHandler.GetDinigRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
-                    tgMessageSender.SendNotification(chatId, text + visitorsCount, GetKeyboard());
+                    tgMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;
                 }
                 case "ссылки на учебные чаты":
                 {
-                    messageHandler.GetLinks(chatId.userID.ToString());
+                    messageHandler.GetLinks(user);
                     break;
                 }
                 case "help":
@@ -78,12 +78,12 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
-                    tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
+                    tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
                     break;
                 }
             }

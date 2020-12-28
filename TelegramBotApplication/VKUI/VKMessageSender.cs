@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application;
 using VkNet;
 using VkNet.Model.Keyboard;
 using VkNet.Model.RequestParams;
 
-namespace View.VKUI
+namespace View
 {
     public class VKMessageSender : IVkMessageSender
     {
@@ -17,7 +18,7 @@ namespace View.VKUI
             this.api = api;
         }
 
-        public void SendNotification(VKUser userID, string message, MessageKeyboard keyboard)
+        public void SendNotification(BotUser user, string message, MessageKeyboard keyboard)
         {
             if (message is null)
                 message = "У вас сегодня нет пар, отдыхайте!";
@@ -25,7 +26,7 @@ namespace View.VKUI
             {
                 api.Messages.Send(new MessagesSendParams
                 {
-                    UserId = userID.userID,
+                    UserId = long.Parse(user.UserId),
                     Message = message,
                     RandomId = rnd.Next(),
                     Keyboard = keyboard
@@ -37,10 +38,10 @@ namespace View.VKUI
             }
         }
 
-        public void HandleHelpMessage(VKUser userID, MessageKeyboard keyboard)
+        public void HandleHelpMessage(BotUser user, MessageKeyboard keyboard)
         {
             var text = new MessageResponse(ResponseType.Help).response;
-            SendNotification(userID, text, keyboard);
+            SendNotification(user, text, keyboard);
         }
     }
 }

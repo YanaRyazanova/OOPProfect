@@ -1,4 +1,5 @@
 ﻿using System;
+using Application;
 using Telegram.Bot;
 using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
@@ -35,25 +36,25 @@ namespace View
         private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
-            var chatId = new TGUser(message.Chat.Id);
+            var user = new BotUser(message.Chat.Id.ToString());
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
-            var currentCommand = DefineCommand(chatId.ToString());
+            var currentCommand = DefineCommand(user);
             try
             {
-                currentCommand.ProcessMessage(messageText, chatId);
+                currentCommand.ProcessMessage(messageText, user);
             }
             catch (Exception e)
             {
                 var text = new MessageResponse(ResponseType.CatchError).response;
                 Console.WriteLine(e);
-                tgMessageSender.SendNotification(chatId, text, currentCommand.GetKeyboard());
+                tgMessageSender.SendNotification(user, text, currentCommand.GetKeyboard());
             }
         }
 
-        private CommandTG DefineCommand(string chatID)
+        private CommandTG DefineCommand(BotUser user)
         {
-            var userState = peopleParser.GetStateFromId(chatID);
+            var userState = peopleParser.GetStateFromId(user.UserId);
             if (userState == "")
             {
                 userState = "0";
@@ -61,14 +62,14 @@ namespace View
             return commandTgFactory.Create(int.Parse(userState));
         }
         
-        public void SendNotificationLesson(string chatID, string message)
+        public void SendNotificationLesson(BotUser user, string message)
         {
             if (message is null)
                 message = "У вас сегодня нет пар, отдыхайте!";
             try
             {
-                var currentCommand = DefineCommand(chatID);
-                client.SendTextMessageAsync(chatID, message, replyMarkup: currentCommand.GetKeyboard()).Wait();
+                var currentCommand = DefineCommand(user);
+                client.SendTextMessageAsync(user.UserId, message, replyMarkup: currentCommand.GetKeyboard()).Wait();
             }
             catch (AggregateException)
             {

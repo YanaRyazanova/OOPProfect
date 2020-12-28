@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using View.VKUI;
+using Application;
 using VkNet.Model.Keyboard;
 
 namespace View
@@ -26,14 +26,14 @@ namespace View
             this.notRegicterCommandListProvider = notRegicterCommandListProvider;
         }
 
-        public void ProcessUnknownCommand(string messageText, VKUser userId, MessageKeyboard keyboard, MessageResponse messageResponse)
+        public void ProcessUnknownCommand(string messageText, BotUser user, MessageKeyboard keyboard, MessageResponse messageResponse)
         {
             var allCommands = registerCommandListProvider.GetCommands()
                 .Concat(notRegicterCommandListProvider.GetCommands())
                 .Concat(registerInProcessCommandListProvider.GetCommands())
                 .ToArray();
             var response = allCommands.Contains(messageText) ? messageResponse : new MessageResponse(ResponseType.Error);
-            vkMessageSender.SendNotification(userId, response.response, keyboard);
+            vkMessageSender.SendNotification(user, response.response, keyboard);
         }
     }
 }

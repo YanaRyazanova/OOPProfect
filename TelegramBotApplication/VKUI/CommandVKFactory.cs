@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Application;
 using Infrastructure;
-using View.VKUI;
 
 namespace View
 {

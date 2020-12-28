@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
 using VkNet.Enums.SafetyEnums;
@@ -46,7 +47,7 @@ namespace View
             return CreatePreStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, VKUser userId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -56,9 +57,9 @@ namespace View
                     {
                         var text = new MessageResponse(ResponseType.Start).response;
                         RaiseState();
-                        peopleParser.AddNewUser(userId.ToString());
-                        peopleParser.ChangeStateForUser(userId.ToString());
-                        vkMessageSender.SendNotification(userId, text, GetKeyboard());
+                        peopleParser.AddNewUser(user.UserId);
+                        peopleParser.ChangeStateForUser(user.UserId);
+                        vkMessageSender.SendNotification(user, text, GetKeyboard());
                         break;
                     }
                 case "help":
@@ -66,11 +67,11 @@ namespace View
                 case "помощь":
                 case "помоги":
                     {
-                        vkMessageSender.HandleHelpMessage(userId, GetKeyboard());
+                        vkMessageSender.HandleHelpMessage(user, GetKeyboard());
                         break;
                     }
                 default:
-                    allCommands.ProcessUnknownCommand(messageText, userId, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
+                    allCommands.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
                     break;
             }
         }

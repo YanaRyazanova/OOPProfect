@@ -2,8 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Application;
 using Infrastructure;
-using View.VKUI;
 using VkNet;
 using VkNet.Enums;
 using VkNet.Exception;
@@ -16,7 +16,7 @@ namespace View
     {
         private static VkApi vkApi;
         private static string vkToken;
-        private static VKUser userID;
+        private static BotUser user;
         private static ulong? ts;
         private static ulong? pts;
         private static Timer watchTimer = null;
@@ -70,8 +70,8 @@ namespace View
         private void Answer(string message)
         {
             var messageText = message.ToLower();
-            var vkUser = userID;
-            var currentCommand = DefineCommand(userID.ToString());
+            var vkUser = user;
+            var currentCommand = DefineCommand(user.UserId);
             try
             {
                 currentCommand.ProcessMessage(messageText, vkUser);
@@ -107,7 +107,7 @@ namespace View
             foreach (var message in messages)
             {
                 if (message.Type == MessageType.Sended) continue;
-                userID = new VKUser(message.FromId.Value);
+                user = new BotUser(message.FromId.Value.ToString());
                 Console.Beep();
                 Answer(message.Text);
             }

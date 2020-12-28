@@ -41,7 +41,7 @@ namespace View
             return CreateStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, TGUser chatId)
+        public override void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -50,27 +50,27 @@ namespace View
                 case "помощь":
                 case "помоги":
                 {
-                    tgMessageSender.HandleHelpMessage(chatId, GetKeyboard());
+                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:
                 {
                     if (messageHandler.GetAllGroups().Contains(messageText))
                     {
-                        if (messageHandler.GetGroup(messageText.ToUpper(), chatId.ToString()))
+                        if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {
                             RaiseState();
-                            peopleParser.ChangeStateForUser(chatId.userID.ToString());
-                            tgMessageSender.SendNotification(chatId, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
+                            peopleParser.ChangeStateForUser(user.UserId);
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
                         }
                         else
                         {
-                            tgMessageSender.SendNotification(chatId, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.GroupError).response, GetKeyboard());
                         }
                     }
                     else
                     {
-                        tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, chatId, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
+                        tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
                     }
                     
                     break;

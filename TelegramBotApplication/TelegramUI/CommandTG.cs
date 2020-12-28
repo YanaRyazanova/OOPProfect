@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Application;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
@@ -17,7 +18,7 @@ namespace View
         public TgUsersStates TgUserState;
 
         public abstract ReplyKeyboardMarkup GetKeyboard();
-        public abstract void ProcessMessage(string messageText, TGUser chatId);
+        public abstract void ProcessMessage(string messageText, BotUser user);
 
         public CommandTG(TgUsersStates tgUserState)
         {
