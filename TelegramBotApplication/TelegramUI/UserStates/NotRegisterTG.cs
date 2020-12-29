@@ -24,7 +24,9 @@ namespace View
             return keyboard;
         }
 
-        public NotRegisterTG(ITGMessageSender tgItgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor allCommands) : base(
+        public NotRegisterTG(ITGMessageSender tgItgMessageSender,
+            IPeopleParser peopleParser,
+            TGUnknownMessageProcessor allCommands) : base(
             TgUsersStates.NotRegister)
         {
             this.tgItgMessageSender = tgItgMessageSender;

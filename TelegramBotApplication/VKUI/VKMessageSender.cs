@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Application;
 using VkNet;
+using VkNet.Exception;
 using VkNet.Model.Keyboard;
 using VkNet.Model.RequestParams;
 
@@ -33,6 +34,10 @@ namespace View
                 });
             }
             catch (AggregateException)
+            {
+                return;
+            }
+            catch (CannotSendToUserFirstlyException)
             {
                 return;
             }

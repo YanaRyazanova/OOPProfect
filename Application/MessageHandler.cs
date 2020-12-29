@@ -22,23 +22,25 @@ namespace Application
 
         private readonly IPeopleParser peopleParser;
         private readonly ILinkParser linkParser;
+        private readonly GroupProvider groupProvider;
 
         private readonly DiningRoomIndicator diningRoom;
         private static Timer timer;
-        public List<string> GetAllGroups () => groups;
-        private readonly List<string> groups = new List<string> {"ФТ-201", "ФТ-202"};
+        
         public MessageHandler(
             DiningRoomIndicator diningRoom,
             IDataBaseParser dataBaseParser,
             IPeopleParser peopleParser,
             SenderNotify senderNotify,
-            ILinkParser linkParser)
+            ILinkParser linkParser,
+            GroupProvider groupProvider)
         {
             this.senderNotify = senderNotify;
             this.diningRoom = diningRoom;
             this.dataBaseParser = dataBaseParser;
             this.peopleParser = peopleParser;
             this.linkParser = linkParser;
+            this.groupProvider = groupProvider;
         }
 
         public event Action<BotUser, string> OnReply;
@@ -81,10 +83,9 @@ namespace Application
 
         public bool GetGroup(string group, BotUser user)
         {
-            if (!groups.Contains(group)) return false;
-            peopleParser.ChangeGroup(user.UserId.ToString(), group);
+            if (!groupProvider.GetAllGroups().Contains(group)) return false;
+            peopleParser.ChangeGroup(user.UserId, group);
             return true;
-
         }
 
         public void GetLinks(BotUser user)

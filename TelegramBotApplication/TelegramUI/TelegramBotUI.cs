@@ -36,6 +36,7 @@ namespace View
         private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
+            Console.WriteLine(message);
             var user = new BotUser(message.Chat.Id.ToString());
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
@@ -62,19 +63,21 @@ namespace View
             return commandTgFactory.Create(int.Parse(userState));
         }
         
-        public void SendNotificationLesson(BotUser user, string message)
+        public void SendMessage(BotUser user, string message)
         {
-            if (message is null)
-                message = "У вас сегодня нет пар, отдыхайте!";
-            try
-            {
-                var currentCommand = DefineCommand(user);
-                client.SendTextMessageAsync(user.UserId, message, replyMarkup: currentCommand.GetKeyboard()).Wait();
-            }
-            catch (AggregateException)
-            {
-                return;
-            }
+            var currentCommand = DefineCommand(user);
+            tgMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
+            //if (message is null)
+            //    message = "У вас сегодня нет пар, отдыхайте!";
+            //try
+            //{
+            //    
+            //    client.SendTextMessageAsync(user.UserId, message, replyMarkup: currentCommand.GetKeyboard()).Wait();
+            //}
+            //catch (AggregateException)
+            //{
+            //    return;
+            //}
         }
     }
 }

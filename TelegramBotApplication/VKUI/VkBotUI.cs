@@ -28,7 +28,11 @@ namespace View
         private static IPeopleParser peopleParser;
         private readonly CommandVKFactory commandVkFactory;
         private readonly VKMessageSender vkMessageSender;
-        public VkBotUI(VkApi api, string keyVkToken, VKMessageSender vkMessageSender, CommandVKFactory commandVkFactory, IPeopleParser newPeopleParser)
+        public VkBotUI(VkApi api,
+            string keyVkToken,
+            VKMessageSender vkMessageSender,
+            CommandVKFactory commandVkFactory,
+            IPeopleParser newPeopleParser)
         {
             vkApi = api;
             vkToken = keyVkToken;
@@ -70,6 +74,7 @@ namespace View
         private void Answer(string message)
         {
             var messageText = message.ToLower();
+            Console.WriteLine(messageText);
             var vkUser = user;
             var currentCommand = DefineCommand(user.UserId);
             try
@@ -182,6 +187,22 @@ namespace View
         {
             await GetLongPoolServerAsync(lastPts);
             watchTimer = new Timer(WatchAsync, null, 0, Timeout.Infinite);
+        }
+
+        private CommandVK DefineCommand(BotUser user)
+        {
+            var userState = peopleParser.GetStateFromId(user.UserId);
+            if (userState == "")
+            {
+                userState = "0";
+            }
+            return commandVkFactory.Create(int.Parse(userState));
+        }
+
+        public void SendMessage(BotUser user, string message)
+        {
+            var currentCommand = DefineCommand(user);
+            vkMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
         }
     }
 }

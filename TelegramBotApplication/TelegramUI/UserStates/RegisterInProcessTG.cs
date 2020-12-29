@@ -12,14 +12,16 @@ namespace View
     public class RegisterInProcessTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
-        private readonly TGMessageSender tgMessageSender;
+        private readonly ITGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        private readonly GroupProvider groupProvider;
+
         private ReplyKeyboardMarkup CreateStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
             {
-                messageHandler
+                groupProvider
                     .GetAllGroups()
                     .Select(x => new KeyboardButton(x))
                     .ToArray()
@@ -27,13 +29,18 @@ namespace View
             return keyboard;
         }
 
-        public RegisterInProcessTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, IPeopleParser peopleParser, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(
+        public RegisterInProcessTG(MessageHandler messageHandler,
+            ITGMessageSender tgMessageSender,
+            IPeopleParser peopleParser,
+            TGUnknownMessageProcessor tgUnknownMessageProcessor,
+            GroupProvider groupProvider) : base(
             TgUsersStates.RegisterInProcess)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
+            this.groupProvider = groupProvider;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -55,7 +62,7 @@ namespace View
                 }
                 default:
                 {
-                    if (messageHandler.GetAllGroups().Contains(messageText))
+                    if (groupProvider.GetAllGroups().Contains(messageText))
                     {
                         if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {

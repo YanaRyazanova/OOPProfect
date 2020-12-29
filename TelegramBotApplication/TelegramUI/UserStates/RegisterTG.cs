@@ -9,7 +9,7 @@ namespace View
     public class RegisterTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
-        private readonly TGMessageSender tgMessageSender;
+        private readonly ITGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
@@ -35,7 +35,9 @@ namespace View
             return keyboard;
         }
 
-        public RegisterTG(MessageHandler messageHandler, TGMessageSender tgMessageSender, TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(TgUsersStates.Register)
+        public RegisterTG(MessageHandler messageHandler,
+            ITGMessageSender tgMessageSender,
+            TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(TgUsersStates.Register)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;

@@ -8,16 +8,16 @@ namespace View
 {
     public class RegisterInProcessCommandListProvider : CommandListProvider
     {
-        private readonly MessageHandler messageHandler;
+        private readonly GroupProvider groupProvider;
 
-        public RegisterInProcessCommandListProvider(MessageHandler messageHandler)
+        public RegisterInProcessCommandListProvider(GroupProvider groupProvider)
         {
-            this.messageHandler = messageHandler;
+            this.groupProvider = groupProvider;
         }
 
         public override List<string> GetCommands()
         {
-            var groups = messageHandler
+            var groups = groupProvider
                 .GetAllGroups()
                 .ToList();
             return new List<string> {"help", "/help", "помощь", "помоги"}

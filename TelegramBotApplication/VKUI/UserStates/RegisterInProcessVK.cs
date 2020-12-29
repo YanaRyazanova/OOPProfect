@@ -14,6 +14,8 @@ namespace View
         private readonly VKMessageSender vkMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
+        private readonly GroupProvider groupProvider;
+
         private static MessageKeyboard CreateStartKeyboard()
         {
             var keyboard = new MessageKeyboard();
@@ -46,13 +48,18 @@ namespace View
             return keyboard;
         }
 
-        public RegisterInProcessVK(MessageHandler messageHandler, VKMessageSender vkMessageSender, IPeopleParser peopleParser, VKUnknownMessageProcessor vkUnknownMessageProcessor) : base(
+        public RegisterInProcessVK(MessageHandler messageHandler,
+            VKMessageSender vkMessageSender,
+            IPeopleParser peopleParser,
+            VKUnknownMessageProcessor vkUnknownMessageProcessor,
+            GroupProvider groupProvider) : base(
             VkUsersStates.RegisterInProcess)
         {
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
+            this.groupProvider = groupProvider;
         }
 
         public override MessageKeyboard GetKeyboard()
@@ -74,7 +81,7 @@ namespace View
                 }
                 default:
                 {
-                    if (messageHandler.GetAllGroups().Contains(messageText))
+                    if (groupProvider.GetAllGroups().Contains(messageText))
                     {
                         if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {

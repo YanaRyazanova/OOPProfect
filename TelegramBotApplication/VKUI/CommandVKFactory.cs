@@ -12,12 +12,19 @@ namespace View
         private readonly IPeopleParser peopleParser;
         private readonly MessageHandler messageHandler;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
-        public CommandVKFactory(VKMessageSender vkMessageSender, IPeopleParser peopleParser, MessageHandler messageHandler, VKUnknownMessageProcessor vkUnknownMessageProcessor)
+        private readonly GroupProvider groupProvider;
+
+        public CommandVKFactory(VKMessageSender vkMessageSender, 
+            IPeopleParser peopleParser, 
+            MessageHandler messageHandler, 
+            VKUnknownMessageProcessor vkUnknownMessageProcessor,
+            GroupProvider groupProvider)
         {
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
             this.messageHandler = messageHandler;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
+            this.groupProvider = groupProvider;
         }
 
         public CommandVK Create(int userState)
@@ -25,7 +32,7 @@ namespace View
             return userState switch
             {
                 0 => (CommandVK) new NotRegisterVK(vkMessageSender, peopleParser, vkUnknownMessageProcessor),
-                1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor),
+                1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider),
                 2 => new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor),
                 _ => throw new Exception("Wrong user state")
             };
