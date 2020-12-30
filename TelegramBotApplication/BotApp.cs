@@ -17,8 +17,6 @@ namespace View
 {
     class BotApp
     {
-
-
         static void Main(string[] args)
         {
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather

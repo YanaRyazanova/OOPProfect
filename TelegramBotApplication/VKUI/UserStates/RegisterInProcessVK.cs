@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Application;
 using Infrastructure;
@@ -16,34 +17,49 @@ namespace View
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
 
-        private static MessageKeyboard CreateStartKeyboard()
+        private MessageKeyboard CreateStartKeyboard()
         {
             var keyboard = new MessageKeyboard();
             var buttonsList = new List<List<MessageKeyboardButton>>();
-            var line1 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
+            var buttons = groupProvider
+                .GetAllGroups()
+                .Select(x => new MessageKeyboardButton
                 {
                     Action = new MessageKeyboardButtonAction
                     {
-                        Label = "ФТ-201",
+                        Label = x,
                         Type = KeyboardButtonActionType.Text
                     },
 
                     Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "ФТ-202",
-                        Type = KeyboardButtonActionType.Text
-                    },
+                })
+                .ToList();
+            buttonsList.Add(buttons);
+            //var buttonsList = new List<List<MessageKeyboardButton>>();
+            //var line1 = new List<MessageKeyboardButton>
+            //{
+            //    new MessageKeyboardButton
+            //    {
+            //        Action = new MessageKeyboardButtonAction
+            //        {
+            //            Label = "ФТ-201",
+            //            Type = KeyboardButtonActionType.Text
+            //        },
 
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            buttonsList.Add(line1);
+            //        Color = KeyboardButtonColor.Primary
+            //    },
+            //    new MessageKeyboardButton
+            //    {
+            //        Action = new MessageKeyboardButtonAction
+            //        {
+            //            Label = "ФТ-202",
+            //            Type = KeyboardButtonActionType.Text
+            //        },
+
+            //        Color = KeyboardButtonColor.Primary
+            //    }
+            //};
+            //buttonsList.Add(line1);
             keyboard.Buttons = buttonsList;
             return keyboard;
         }
@@ -81,7 +97,7 @@ namespace View
                 }
                 default:
                 {
-                    if (groupProvider.GetAllGroups().Contains(messageText))
+                    if (groupProvider.GetAllGroups().Contains(messageText.ToUpper()))
                     {
                         if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {

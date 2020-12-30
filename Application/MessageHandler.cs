@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,7 +76,7 @@ namespace Application
             OnReplyVK(user, scheduleNextDay);
         }
 
-        public int GetDinigRoom(BotUser user)
+        public int GetDiningRoom(BotUser user)
         {
             diningRoom.Increment(user.UserId);
             return diningRoom.VisitorsCount;
@@ -88,9 +89,25 @@ namespace Application
             return true;
         }
 
+        public void AddLink(BotUser user, string name, string link)
+        {
+            var group = peopleParser.GetGroupFromId(user.UserId);
+            linkParser.AddLinkForGroup(group, name, link);
+            const string answer = "Ссылка успешно добавлена";
+            OnReply(user, answer);
+            OnReplyVK(user, answer);
+        }
+
+        public void AskForLink(BotUser user)
+        {
+            const string answer = "Отправьте сообщение в формате:\n*Название чата*: *ссылка*";
+            OnReply(user, answer);
+            OnReplyVK(user, answer);
+        }
+
         public void GetLinks(BotUser user)
         {
-            var group = peopleParser.GetGroupFromId(user.UserId.ToString());
+            var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
             var result = new StringBuilder();
             foreach (var link in links)
@@ -104,13 +121,13 @@ namespace Application
 
         private string SheduleModify(int days, BotUser user)
         {
-            var groupName = peopleParser.GetGroupFromId(user.UserId.ToString());
+            var groupName = peopleParser.GetGroupFromId(user.UserId);
             var scheduleArray = dataBaseParser
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
-                scheduleNextDay.Append(item.ToString());
+                scheduleNextDay.Append(item);
                 scheduleNextDay.Append("\n");
             }
 

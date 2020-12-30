@@ -29,6 +29,7 @@ namespace View
 
                 new []
                 {
+                    new KeyboardButton("Добавить ссылку на чат"), 
                     new KeyboardButton("Help")
                 }
             });
@@ -51,6 +52,15 @@ namespace View
 
         public override void ProcessMessage(string messageText, BotUser user)
         {
+            if (messageText.Contains("https"))
+            {
+                var splittedMessage = messageText.Split(": ");
+                var name = splittedMessage[0];
+                var link = splittedMessage[1];
+                messageHandler.AddLink(user, name, link);
+                return;
+            }
+            
             switch (messageText)
             {
                 case "расписание на сегодня":
@@ -65,7 +75,7 @@ namespace View
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(user);
+                    var visitorsCount = messageHandler.GetDiningRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
                     tgMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;
@@ -73,6 +83,11 @@ namespace View
                 case "ссылки на учебные чаты":
                 {
                     messageHandler.GetLinks(user);
+                    break;
+                }
+                case "добавить ссылку на чат":
+                {
+                    messageHandler.AskForLink(user);
                     break;
                 }
                 case "help":
