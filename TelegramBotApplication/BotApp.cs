@@ -17,8 +17,6 @@ namespace View
 {
     class BotApp
     {
-
-
         static void Main(string[] args)
         {
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
@@ -88,9 +86,9 @@ namespace View
 
             container.Bind<CommandTGFactory>().ToSelf().InSingletonScope();
 
-            container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
-            container.Bind<IPeopleParser>().To<PeopleParserSql>();
-            container.Bind<ILinkParser>().To<LinkParserSQL>();
+            container.Bind<IDataBaseParser>().To<DataBaseParserCsv>();
+            container.Bind<IPeopleParser>().To<PeopleParserCsv>();
+            container.Bind<ILinkParser>().To<LinkParserCSV>();
             return container;
         }
 

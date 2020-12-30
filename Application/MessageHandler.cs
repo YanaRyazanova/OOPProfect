@@ -75,7 +75,7 @@ namespace Application
             OnReplyVK(user, scheduleNextDay);
         }
 
-        public int GetDinigRoom(BotUser user)
+        public int GetDiningRoom(BotUser user)
         {
             diningRoom.Increment(user.UserId);
             return diningRoom.VisitorsCount;
@@ -88,9 +88,15 @@ namespace Application
             return true;
         }
 
+        public void AddLink(BotUser user, string link)
+        {
+            //var group = peopleParser.GetGroupFromId(user.UserId);
+            //linkParser.AddLinkForGroup(group, );
+        } 
+
         public void GetLinks(BotUser user)
         {
-            var group = peopleParser.GetGroupFromId(user.UserId.ToString());
+            var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
             var result = new StringBuilder();
             foreach (var link in links)
@@ -104,13 +110,13 @@ namespace Application
 
         private string SheduleModify(int days, BotUser user)
         {
-            var groupName = peopleParser.GetGroupFromId(user.UserId.ToString());
+            var groupName = peopleParser.GetGroupFromId(user.UserId);
             var scheduleArray = dataBaseParser
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
             var scheduleNextDay = new StringBuilder();
             foreach (var item in scheduleArray)
             {
-                scheduleNextDay.Append(item.ToString());
+                scheduleNextDay.Append(item);
                 scheduleNextDay.Append("\n");
             }
 

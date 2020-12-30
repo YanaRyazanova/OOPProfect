@@ -28,8 +28,10 @@ namespace Infrastructure.Csv
                 {
                     var fields = parser.ReadFields();
                     if (fields[0] == group)
+                    {
                         notParsedLinks = fields[1];
-                    return new ParseMethods().ParseLinks(notParsedLinks.Replace(@"\n", "\n"));
+                        return new ParseMethods().ParseLinks(notParsedLinks.Replace(@"\n", "\n"));
+                    }
                 }
             }
             

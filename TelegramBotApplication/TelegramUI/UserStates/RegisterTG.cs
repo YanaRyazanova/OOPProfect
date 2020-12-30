@@ -29,6 +29,7 @@ namespace View
 
                 new []
                 {
+                    new KeyboardButton("Добавить ссылку на чат"), 
                     new KeyboardButton("Help")
                 }
             });
@@ -65,7 +66,7 @@ namespace View
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(user);
+                    var visitorsCount = messageHandler.GetDiningRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
                     tgMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;

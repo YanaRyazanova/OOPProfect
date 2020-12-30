@@ -60,6 +60,15 @@ namespace View
                 {
                     Action = new MessageKeyboardButtonAction
                     {
+                        Label = "Добавить ссылку на чат", Type = KeyboardButtonActionType.Text
+                    },
+                    Color = KeyboardButtonColor.Primary
+                },
+                
+                new MessageKeyboardButton
+                {
+                    Action = new MessageKeyboardButtonAction
+                    {
                         Label = "Help", Type = KeyboardButtonActionType.Text
                     },
                     Color = KeyboardButtonColor.Primary
@@ -100,7 +109,7 @@ namespace View
                 }
                 case "я в столовой":
                 {
-                    var visitorsCount = messageHandler.GetDinigRoom(user);
+                    var visitorsCount = messageHandler.GetDiningRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
                     vkMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
                     break;
