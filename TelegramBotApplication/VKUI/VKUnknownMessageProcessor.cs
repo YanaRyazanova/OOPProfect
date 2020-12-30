@@ -13,17 +13,20 @@ namespace View
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly RegisterInProcessCommandListProvider registerInProcessCommandListProvider;
         private readonly NotRegicterCommandListProvider notRegicterCommandListProvider;
+        private readonly HelpCommandListProvider helpCommandListProvider;
 
         public VKUnknownMessageProcessor(
             VKMessageSender vkMessageSender,
             RegisterCommandListProvider registerCommandListProvider,
             RegisterInProcessCommandListProvider registerInProcessCommandListProvider,
-            NotRegicterCommandListProvider notRegicterCommandListProvider)
+            NotRegicterCommandListProvider notRegicterCommandListProvider,
+            HelpCommandListProvider helpCommandListProvider)
         {
             this.vkMessageSender = vkMessageSender;
             this.registerCommandListProvider = registerCommandListProvider;
             this.registerInProcessCommandListProvider = registerInProcessCommandListProvider;
             this.notRegicterCommandListProvider = notRegicterCommandListProvider;
+            this.helpCommandListProvider = helpCommandListProvider;
         }
 
         public void ProcessUnknownCommand(string messageText, BotUser user, MessageKeyboard keyboard, MessageResponse messageResponse)
@@ -31,7 +34,14 @@ namespace View
             var allCommands = registerCommandListProvider.GetCommands()
                 .Concat(notRegicterCommandListProvider.GetCommands())
                 .Concat(registerInProcessCommandListProvider.GetCommands())
+                .Concat(helpCommandListProvider.GetCommands())
                 .ToArray();
+            if (helpCommandListProvider.GetCommands().Contains(messageText))
+            {
+                var helpMessage = new MessageResponse(ResponseType.Help).response;
+                vkMessageSender.SendNotification(user, helpMessage, keyboard);
+                return;
+            }
             var response = allCommands.Contains(messageText) ? messageResponse : new MessageResponse(ResponseType.Error);
             vkMessageSender.SendNotification(user, response.response, keyboard);
         }

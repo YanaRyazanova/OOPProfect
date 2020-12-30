@@ -78,7 +78,7 @@ namespace View
             container.Bind<ITGMessageSender>().To<TGMessageSender>().InSingletonScope();
             container.Bind<TGUnknownMessageProcessor>().ToSelf();
 
-            container.Bind<DiningRoomIndicator>().ToSelf();
+            container.Bind<DiningRoomIndicator>().ToSelf().InSingletonScope();
             container.Bind<SenderNotify>().ToSelf().InSingletonScope();
             container.Bind<MessageHandler>().ToSelf().InSingletonScope();
             container.Bind<LessonReminder>().ToSelf();

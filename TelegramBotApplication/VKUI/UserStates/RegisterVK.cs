@@ -10,7 +10,7 @@ namespace View
     public class RegisterVK : CommandVK
     {
         private readonly MessageHandler messageHandler;
-        private readonly VKMessageSender vkMessageSender;
+        private readonly IVkMessageSender vkMessageSender;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private static MessageKeyboard CreateKeyboard()
         {
@@ -81,7 +81,10 @@ namespace View
             return keyboard;
         }
 
-        public RegisterVK(MessageHandler messageHandler, VKMessageSender vkMessageSender, VKUnknownMessageProcessor vkUnknownMessageProcessor) : base(VkUsersStates.Register)
+        public RegisterVK(
+            MessageHandler messageHandler,
+            IVkMessageSender vkMessageSender,
+            VKUnknownMessageProcessor vkUnknownMessageProcessor) : base(VkUsersStates.Register)
         {
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
@@ -131,14 +134,6 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     messageHandler.AskForLink(user);
-                    break;
-                }
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                {
-                    vkMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:

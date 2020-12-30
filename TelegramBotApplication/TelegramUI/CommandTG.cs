@@ -24,18 +24,5 @@ namespace View
         {
             this.TgUserState = tgUserState;
         }
-
-        public void RaiseState()
-        {
-            switch (TgUserState)
-            {
-                case TgUsersStates.NotRegister:
-                    TgUserState = TgUsersStates.RegisterInProcess;
-                    break;
-                case TgUsersStates.RegisterInProcess:
-                    TgUserState = TgUsersStates.Register;
-                    break;
-            }
-        }
     }
 }

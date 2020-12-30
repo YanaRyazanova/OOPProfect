@@ -90,14 +90,6 @@ namespace View
                     messageHandler.AskForLink(user);
                     break;
                 }
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                {
-                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
-                    break;
-                }
                 default:
                 {
                     tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));

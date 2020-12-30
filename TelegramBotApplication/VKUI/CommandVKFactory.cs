@@ -31,7 +31,7 @@ namespace View
         {
             return userState switch
             {
-                0 => (CommandVK) new NotRegisterVK(vkMessageSender, peopleParser, vkUnknownMessageProcessor),
+                0 => (CommandVK) new NotRegisterVK(vkMessageSender, peopleParser, messageHandler, vkUnknownMessageProcessor, groupProvider),
                 1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider),
                 2 => new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor),
                 _ => throw new Exception("Wrong user state")

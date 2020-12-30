@@ -37,14 +37,11 @@ namespace Infrastructure.SQL
                             statesChanges[currentState], id), connection))
                 {
                     try
-                    {
-                        Console.WriteLine(command.Connection.State);
+                    { ;
                         command.ExecuteNonQuery();
-                        Console.WriteLine("Hello from ChangeStateForUser");
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(command.Connection.State);
                         Console.WriteLine(e);
                     }
                 }
