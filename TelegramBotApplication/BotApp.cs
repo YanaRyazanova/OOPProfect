@@ -86,9 +86,9 @@ namespace View
 
             container.Bind<CommandTGFactory>().ToSelf().InSingletonScope();
 
-            container.Bind<IDataBaseParser>().To<DataBaseParserCsv>();
-            container.Bind<IPeopleParser>().To<PeopleParserCsv>();
-            container.Bind<ILinkParser>().To<LinkParserCSV>();
+            container.Bind<IDataBaseParser>().To<DataBaseParserSql>();
+            container.Bind<IPeopleParser>().To<PeopleParserSql>();
+            container.Bind<ILinkParser>().To<LinkParserSQL>();
             return container;
         }
 

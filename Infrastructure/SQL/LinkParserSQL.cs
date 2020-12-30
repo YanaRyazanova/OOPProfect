@@ -23,15 +23,17 @@ namespace Infrastructure.SQL
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
                 connection.Open();
-                var command = new SQLiteCommand(string.Format("SELECT links FROM Links WHERE GROUP_='{0}'", group), connection);
-                var reader = command.ExecuteReader();
-                var emptyLinks = new Link[0];
-                foreach (DbDataRecord record in reader)
+                using (var command = new SQLiteCommand(string.Format("SELECT links FROM Links WHERE GROUP_='{0}'", group), connection))
                 {
-                    var notParsedLinks = record["links"].ToString();
-                    return notParsedLinks;
+                    var reader = command.ExecuteReader();
+                    var emptyLinks = new Link[0];
+                    foreach (DbDataRecord record in reader)
+                    {
+                        var notParsedLinks = record["links"].ToString();
+                        return notParsedLinks;
+                    }
+                    return "";
                 }
-                return "";
             }
         }
 
@@ -43,9 +45,11 @@ namespace Infrastructure.SQL
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
                 connection.Open();
-                var command = new SQLiteCommand(
-                        string.Format("UPDATE PeopleAndGroups SET links='{0}' WHERE GROUP_='{1}'", currentLink, group), connection);
-                command.ExecuteNonQuery();
+                using (var command = new SQLiteCommand(
+                        string.Format("UPDATE Links SET links='{0}' WHERE GROUP_='{1}'", currentLink, group), connection))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
         }
     }
