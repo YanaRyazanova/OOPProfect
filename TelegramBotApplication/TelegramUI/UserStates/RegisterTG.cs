@@ -52,7 +52,7 @@ namespace View
 
         public override void ProcessMessage(string messageText, BotUser user)
         {
-            if (messageText.Contains("https"))
+            if (messageText.Contains("http"))
             {
                 var splittedMessage = messageText.Split(": ");
                 var name = splittedMessage[0];
