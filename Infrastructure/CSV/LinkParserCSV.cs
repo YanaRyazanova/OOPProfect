@@ -38,7 +38,7 @@ namespace Infrastructure.Csv
             return new Link[0];
         }
 
-        public void AddLinkForGroup(string group, string target, string link)
+        public void AddLinkForGroup(string group, string name, string link)
         {
             var dbName = dbNameProvider.GetDBName("link", extension);
             var values = File.ReadAllLines(dbName);
@@ -46,7 +46,7 @@ namespace Infrastructure.Csv
             {
                 var line = values[i].Split(',');
                 if (line[0] == group)
-                    values[i] = $"{values[i]}\\n{target}$$${link}";
+                    values[i] = $"{values[i]}\\n{name}$$${link}";
             }
             using (var Writer = new StreamWriter(dbName, false))
             {

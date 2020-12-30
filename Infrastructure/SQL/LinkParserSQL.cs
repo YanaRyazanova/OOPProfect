@@ -35,10 +35,10 @@ namespace Infrastructure.SQL
             }
         }
 
-        public void AddLinkForGroup(string group, string target, string link)
+        public void AddLinkForGroup(string group, string name, string link)
         {
             var currentLink = GetActualLinksForGroupInString(group);
-            currentLink = $"{currentLink}\n{target}$$${link}";
+            currentLink = $"{currentLink}\n{name}$$${link}";
             var dbName = dbNameProvider.GetDBName("link");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {

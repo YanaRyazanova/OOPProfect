@@ -97,7 +97,7 @@ namespace View
                 }
                 default:
                 {
-                    if (groupProvider.GetAllGroups().Contains(messageText))
+                    if (groupProvider.GetAllGroups().Contains(messageText.ToUpper()))
                     {
                         if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {

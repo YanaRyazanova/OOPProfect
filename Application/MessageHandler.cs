@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -88,11 +89,21 @@ namespace Application
             return true;
         }
 
-        public void AddLink(BotUser user, string link)
+        public void AddLink(BotUser user, string name, string link)
         {
-            //var group = peopleParser.GetGroupFromId(user.UserId);
-            //linkParser.AddLinkForGroup(group, );
-        } 
+            var group = peopleParser.GetGroupFromId(user.UserId);
+            linkParser.AddLinkForGroup(group, name, link);
+            const string answer = "Ссылка успешно добавлена";
+            OnReply(user, answer);
+            OnReplyVK(user, answer);
+        }
+
+        public void AskForLink(BotUser user)
+        {
+            const string answer = "Отправьте сообщение в формате:\n*Название чата*: *ссылка*";
+            OnReply(user, answer);
+            OnReplyVK(user, answer);
+        }
 
         public void GetLinks(BotUser user)
         {

@@ -95,6 +95,15 @@ namespace View
 
         public override void ProcessMessage(string messageText, BotUser user)
         {
+            if (messageText.Contains("https"))
+            {
+                var splittedMessage = messageText.Split(": ");
+                var name = splittedMessage[0];
+                var link = splittedMessage[1];
+                messageHandler.AddLink(user, name, link);
+                return;
+            }
+
             switch (messageText)
             {
                 case "расписание на сегодня":
@@ -117,6 +126,11 @@ namespace View
                 case "ссылки на учебные чаты":
                 {
                     messageHandler.GetLinks(user);
+                    break;
+                }
+                case "добавить ссылку на чат":
+                {
+                    messageHandler.AskForLink(user);
                     break;
                 }
                 case "help":

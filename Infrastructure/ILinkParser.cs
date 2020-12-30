@@ -7,6 +7,6 @@ namespace Infrastructure
     public  interface ILinkParser
     {
         public Link[] GetActualLinksForGroup(string group);
-        public void AddLinkForGroup(string group, string target, string link);
+        public void AddLinkForGroup(string group, string name, string link);
     }
 }
