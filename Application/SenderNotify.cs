@@ -21,7 +21,6 @@ namespace Application
         private readonly LessonReminder lessonReminder;
 
         public event Action<BotUser, string> OnReply;
-        public event Action<BotUser, string> OnReplyVK;
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -59,12 +58,9 @@ namespace Application
                     if (message == null ||  difference//40
                         < 3 && !flag)
                         continue;
-                    if (message.Contains("пар больше нет"))
-                        continue;
                     usersLastNotify[user] = DateTime.Now;
                     Console.Write(message + user.UserId);
                     OnReply(user, message);
-                    OnReplyVK(user, message);
                 }
             }
             catch (Exception e)

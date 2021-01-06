@@ -26,7 +26,7 @@ namespace Application
         private readonly GroupProvider groupProvider;
 
         private readonly DiningRoomIndicator diningRoom;
-        private static Timer timer;
+        private Timer timer;
         
         public MessageHandler(
             DiningRoomIndicator diningRoom,
@@ -44,36 +44,31 @@ namespace Application
             this.groupProvider = groupProvider;
         }
 
-        public event Action<BotUser, string> OnReply;
-        public event Action<BotUser, string> OnReplyVK;
+        public event Action<BotUser, Reply> OnReply;
+        //public event Action<BotUser, string> OnReplyVK;
 
         public void Run()
         {
+            senderNotify.OnReply += OnReply;
             timer = new Timer(
-                callback: new TimerCallback(Method),
+                callback: _ => senderNotify.Do(),
                 state: null,
                 dueTime: 1000,
                 period: 10000);
-        }
-
-        private void Method(object obj)
-        {
-            senderNotify.Do();
         }
 
         public void GetScheduleForToday(BotUser user)
         {
             var schedule = SheduleModify(0, user);
             OnReply(user, schedule);
-            OnReplyVK(user, schedule);
+            //OnReplyVK(user, schedule);
         }
 
         public void GetScheduleForNextDay(BotUser user)
         {
             var scheduleNextDay = SheduleModify(1, user);
-            var result = new ScheduleSender(scheduleNextDay).Do();
             OnReply(user, result);
-            OnReplyVK(user, scheduleNextDay);
+            //OnReplyVK(user, scheduleNextDay);
         }
 
         public int GetDiningRoom(BotUser user)
@@ -82,7 +77,7 @@ namespace Application
             return diningRoom.VisitorsCount;
         }
 
-        public bool GetGroup(string group, BotUser user)
+        public bool SaveGroup(string group, BotUser user)
         {
             if (!groupProvider.GetAllGroups().Contains(group)) return false;
             peopleParser.ChangeGroup(user.UserId, group);
@@ -95,14 +90,14 @@ namespace Application
             linkParser.AddLinkForGroup(group, name, link);
             const string answer = "Ссылка успешно добавлена";
             OnReply(user, answer);
-            OnReplyVK(user, answer);
+            //OnReplyVK(user, answer);
         }
 
         public void AskForLink(BotUser user)
         {
             const string answer = "Отправьте сообщение в формате:\n*Название чата*: *ссылка*";
             OnReply(user, answer);
-            OnReplyVK(user, answer);
+            //OnReplyVK(user, answer);
         }
 
         public void GetLinks(BotUser user)
@@ -115,23 +110,16 @@ namespace Application
                 result.Append($"{link.name}: {link.link}");
                 result.Append("\n");
             }
-            OnReply(user, result.ToString());
-            OnReplyVK(user, result.ToString());
+            OnReply(user, );
+            //OnReplyVK(user, result.ToString());
         }
 
-        private string SheduleModify(int days, BotUser user)
+        private Reply SheduleModify(int days, BotUser user)
         {
             var groupName = peopleParser.GetGroupFromId(user.UserId);
             var scheduleArray = dataBaseParser
                 .GetTimetableForGroupForCurrentDay(groupName, DateTime.Today.AddDays(days));
-            var scheduleNextDay = new StringBuilder();
-            foreach (var item in scheduleArray)
-            {
-                scheduleNextDay.Append(item);
-                scheduleNextDay.Append("\n");
-            }
-
-            return scheduleNextDay.Length == 0 ? null : scheduleNextDay.ToString();
+            return new ScheduleReply(scheduleArray);
         }
     }
 }

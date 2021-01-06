@@ -4,8 +4,8 @@ using System.Text;
 
 namespace View
 {
-    public abstract class CommandListProvider
+    public interface CommandListProvider
     {
-        public abstract List<string> GetCommands();
+        public List<string> GetCommands();
     }
 }

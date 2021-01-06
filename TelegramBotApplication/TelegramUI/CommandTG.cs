@@ -6,23 +6,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View
 {
-    public enum TgUsersStates
+    public interface CommandTG
     {
-        NotRegister,
-        Register,
-        RegisterInProcess
-    }
-
-    public abstract class CommandTG
-    {
-        public TgUsersStates TgUserState;
-
-        public abstract ReplyKeyboardMarkup GetKeyboard();
-        public abstract void ProcessMessage(string messageText, BotUser user);
-
-        public CommandTG(TgUsersStates tgUserState)
-        {
-            this.TgUserState = tgUserState;
-        }
+        public  ReplyKeyboardMarkup GetKeyboard();
+        public void ProcessMessage(string messageText, BotUser user);
     }
 }

@@ -8,7 +8,7 @@ namespace View
     {
         public override List<string> GetCommands()
         {
-            return new List<string> {"/start", "start", "начать", "help", "/help", "помощь", "помоги"};
+            return new List<string> {"/start", "start", "начать"};
         }
     }
 }

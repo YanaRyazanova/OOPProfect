@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using Application;
 using Telegram.Bot;
 using Telegram.Bot.Args;
@@ -63,21 +64,26 @@ namespace View
             return commandTgFactory.Create(int.Parse(userState));
         }
         
-        public void SendMessage(BotUser user, string message)
+        public void SendMessage(BotUser user, Reply reply)
         {
             var currentCommand = DefineCommand(user);
+            var message = (reply) switch
+            {
+                ScheduleReply s => GetReply(s),
+            };
             tgMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
-            //if (message is null)
-            //    message = "У вас сегодня нет пар, отдыхайте!";
-            //try
-            //{
-            //    
-            //    client.SendTextMessageAsync(user.UserId, message, replyMarkup: currentCommand.GetKeyboard()).Wait();
-            //}
-            //catch (AggregateException)
-            //{
-            //    return;
-            //}
+        }
+
+        private static string GetReply(ScheduleReply reply)
+        {
+            var scheduleNextDay = new StringBuilder();
+            foreach (var item in reply.lessons)
+            {
+                scheduleNextDay.Append(item);
+                scheduleNextDay.Append("\n");
+            }
+
+            return scheduleNextDay.Length == 0 ? null : scheduleNextDay.ToString();
         }
     }
 }

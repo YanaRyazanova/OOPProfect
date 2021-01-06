@@ -6,11 +6,13 @@ namespace View
 {
     public class RegisterCommandListProvider : CommandListProvider
     {
-        public override List<string> GetCommands()
+        private const string DiningRoom = "я в столовой";
+        public string GetingDiningRoom => DiningRoom;
+        public  List<string> GetCommands()
         {
             return new List<string>
             {
-                "расписание на сегодня", "расписание на завтра", "я в столовой", "ссылки на учебные чаты", "help",
+                "расписание на сегодня", "расписание на завтра", DiningRoom, "ссылки на учебные чаты", "help",
                 "/help", "помощь", "помоги"
             };
         }

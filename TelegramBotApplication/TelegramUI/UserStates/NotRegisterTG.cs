@@ -28,8 +28,7 @@ namespace View
 
         public NotRegisterTG(ITGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
-            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider) : base(
-            TgUsersStates.NotRegister)
+            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;

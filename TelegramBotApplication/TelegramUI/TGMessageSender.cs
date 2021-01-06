@@ -18,23 +18,13 @@ namespace View
 
         public void SendNotification(BotUser user, string message, ReplyKeyboardMarkup keyboard)
         {
-            if (message is null)
-                message = "У вас сегодня нет пар, отдыхайте!";
-            
             try
             {
                 client.SendTextMessageAsync(user.UserId, message, replyMarkup: keyboard).Wait();
             }
             catch (AggregateException)
             {
-                return;
             }
-        }
-
-        public void HandleHelpMessage(BotUser user, ReplyKeyboardMarkup keyboard)
-        {
-            var text = new MessageResponse(ResponseType.Help).response;
-            SendNotification(user, text, keyboard);
         }
     }
 }

@@ -62,7 +62,7 @@ namespace View
         {
             if (groupProvider.GetAllGroups().Contains(messageText.ToUpper()))
             {
-                if (messageHandler.GetGroup(messageText.ToUpper(), user))
+                if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                 {
                     peopleParser.ChangeStateForUser(user.UserId);
                     var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor);
