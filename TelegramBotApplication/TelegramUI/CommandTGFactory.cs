@@ -39,7 +39,7 @@ namespace View
             {
                 0 => (CommandTG) new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor, messageHandler, groupProvider, registerCommandListProvider),
                 1 => new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider),
-                2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider),
+                2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser),
                 3 => new AddingLink(messageHandler, peopleParser, tgMessageSender),
                 _ => throw new Exception("Wrong user state")
             };

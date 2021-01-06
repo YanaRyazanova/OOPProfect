@@ -58,7 +58,7 @@ namespace View
                 {
                     var text = new MessageResponse(ResponseType.Start).response;
                     peopleParser.AddNewUser(user.UserId);
-                    peopleParser.ChangeStateForUser(user.UserId);
+                    peopleParser.EvaluateState(user.UserId);
                     var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider);
                     tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;

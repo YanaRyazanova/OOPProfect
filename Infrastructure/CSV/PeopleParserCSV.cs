@@ -16,7 +16,7 @@ namespace Infrastructure.Csv
             this.dbNameProvider = dbNameProvider;
         }
 
-        public void ChangeStateForUser(string id)
+        public void EvaluateState(string id)
         {
             var group = GetGroupFromId(id);
             var prevState = GetStateFromId(id);
@@ -25,27 +25,38 @@ namespace Infrastructure.Csv
                 [""] = "0",
                 ["0"] = "1",
                 ["1"] = "2",
-                ["2"] = "2",
+                ["2"] = "3",
+                ["3"] = "3"
             };
+            var platform = GetPlatformFromId(id);
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            RewriteFields(id, group, states[prevState], dbName);
+            RewriteFields(id, group, states[prevState], platform, dbName);
         }
 
         public void ChangeGroup(string id, string group)
         {
             var prevState = GetStateFromId(id);
+            var platform = GetPlatformFromId(id);
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
-            RewriteFields(id, group, prevState, dbName);
+            RewriteFields(id, group, prevState, platform, dbName);
         }
 
-        private void RewriteFields(string id, string group, string state, string dbName)
+        public void ChangeState(string id, string newState)
+        {
+            var group = GetGroupFromId(id);
+            var platform = GetPlatformFromId(id);
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
+            RewriteFields(id, group, newState, platform, dbName);
+        }
+
+        private void RewriteFields(string id, string group, string state, string platform, string dbName)
         {
             var values = File.ReadAllLines(dbName);
             for (var i = 0; i < values.Length; i++)
             {
                 var line = values[i].Split(',');
                 if (line[0] == id)
-                    values[i] = $"{id},{group},{state}";
+                    values[i] = $"{id},{group},{state},{platform}";
             }
             using (StreamWriter Writer = new StreamWriter(dbName, false))
             {
@@ -81,8 +92,7 @@ namespace Infrastructure.Csv
             }
             return "";
         }
-
-        public void AddNewUser(string id, string state="0", string platform="tg")
+        public void AddNewUser(string id, string state = "0", string platform = "tg")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))

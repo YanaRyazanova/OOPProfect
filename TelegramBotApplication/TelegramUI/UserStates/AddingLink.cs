@@ -61,6 +61,7 @@ namespace View.TelegramUI.UserStates
             var link = splittedMessage[1];
             messageHandler.AddLink(user, name, link);
             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response, GetKeyboard());
+            peopleParser.ChangeState(user.UserId, "2");
         }
     }
 }

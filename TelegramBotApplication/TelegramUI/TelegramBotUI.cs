@@ -70,7 +70,7 @@ namespace View
             var message = (reply) switch
             {
                 ScheduleReply s => GetReply(s),
-                LessonReply l => GetLessonReply(l)
+                LessonReply l => GetLessonReply(l),
                 LinksReply s => GetLinksReply(s)
             };
             tgMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());

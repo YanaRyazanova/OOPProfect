@@ -60,8 +60,8 @@ namespace View
                     {
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
-                            peopleParser.ChangeStateForUser(user.UserId);
-                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider);
+                            peopleParser.EvaluateState(user.UserId);
+                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser);
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else
