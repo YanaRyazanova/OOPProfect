@@ -108,7 +108,9 @@ namespace Application
                 result.Append($"{link.name}: {link.link}");
                 result.Append("\n");
             }
-            OnReply(user, );
+
+            var reply = new LinksReply(result.ToString());
+            OnReply(user, reply);
             //OnReplyVK(user, result.ToString());
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Domain;
 using Domain.Functions;
 using Infrastructure;
 using Infrastructure.Csv;
@@ -11,7 +12,6 @@ namespace Application
 {
     public class SenderNotify
     {
-
         private Dictionary<BotUser, DateTime> usersLastNotify = new Dictionary<BotUser, DateTime>();
 
         private readonly IPeopleParser peopleParser;
@@ -20,7 +20,7 @@ namespace Application
 
         private readonly LessonReminder lessonReminder;
 
-        public event Action<BotUser, string> OnReply;
+        public event Action<BotUser, Reply> OnReply;
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -53,15 +53,18 @@ namespace Application
                     }
 
                     var group = peopleParser.GetGroupFromId(user.UserId);
-                    var message = LessonReminderHandler(group);
+                    var lesson = LessonReminderHandler(group);
                     var difference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
                                      usersLastNotify[user].Hour;
-                    if (message == null ||  difference//40
+                    if (lesson == null ||  difference//40
                         < 3 && !flag)
                         continue;
                     usersLastNotify[user] = DateTime.Now;
-                    Console.Write(message + user.UserId);
-                    OnReply(user, message);
+                    Console.Write(lesson + user.UserId);
+                    //var text = $"{message.LessonName} через {message.TimeToStart} минут";
+                    var info = new Tuple<string, int>(lesson.LessonName, lesson.TimeToStart);
+                    var result = new LessonReply(info);
+                    OnReply(user, result);
                 }
             }
             catch (Exception e)
@@ -70,7 +73,7 @@ namespace Application
             }
         }
 
-        public string LessonReminderHandler(string group)
+        public NextLesson LessonReminderHandler(string group)
         {
             if (group == null)
                 return null;

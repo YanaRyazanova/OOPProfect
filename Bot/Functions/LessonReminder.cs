@@ -7,9 +7,12 @@ using System.Threading;
 
 namespace Domain.Functions
 {
-    public class LessonReminder: BotFunction
+    public class LessonReminder
     {
-        public LessonReminder() { }
+        public LessonReminder()
+        {
+
+        }
         private int GetDifference(DateTime startTime)
         {
             var difference = startTime.Minute + startTime.Hour * 60
@@ -17,12 +20,17 @@ namespace Domain.Functions
             return difference;
         }
 
-        public string Do(DateTime startTime, string name)
+        public NextLesson Do(DateTime startTime, string name)
         {
             while (true)
             {
                 var difference = GetDifference(startTime);
-                if ( difference <= 10 && difference >=0) return $"Пара '{name}' начнется через столько минут: {difference}";
+                if (difference <= 10 && difference >=0)
+                {
+                    var nextLesson = new NextLesson(name, difference);
+                    return nextLesson;
+                    //return $"Пара '{name}' начнется через столько минут: {difference}";
+                }
                 if (difference < 0)
                     return null;
             }

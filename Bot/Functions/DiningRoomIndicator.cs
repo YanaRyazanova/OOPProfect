@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Domain.Functions
 {
-    public class DiningRoomIndicator : BotFunction
+    public class DiningRoomIndicator
     {
         public int VisitorsCount { get; private set; }
         private Dictionary<string, DateTime> users = new Dictionary<string, DateTime>();

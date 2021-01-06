@@ -16,6 +16,7 @@ namespace View
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
 
         private ReplyKeyboardMarkup CreateStartKeyboard()
         {
@@ -58,7 +59,7 @@ namespace View
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
                             peopleParser.ChangeStateForUser(user.UserId);
-                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor);
+                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider);
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else
