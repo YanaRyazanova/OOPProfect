@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Domain.Functions
 {
-    public class LessonReminder: BotFunction
+    public class LessonReminder
     {
         public LessonReminder() { }
         private int GetDifference(DateTime startTime)

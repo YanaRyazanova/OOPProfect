@@ -45,7 +45,6 @@ namespace Application
         }
 
         public event Action<BotUser, Reply> OnReply;
-        //public event Action<BotUser, string> OnReplyVK;
 
         public void Run()
         {
@@ -82,34 +81,31 @@ namespace Application
             return true;
         }
 
-        public void AddLink(BotUser user, string name, string link)
+        public bool AddLink(BotUser user, string name, string link)
         {
-            var group = peopleParser.GetGroupFromId(user.UserId);
-            linkParser.AddLinkForGroup(group, name, link);
-            const string answer = "Ссылка успешно добавлена";
-            OnReply(user, answer);
-            //OnReplyVK(user, answer);
+            try
+            {
+                var group = peopleParser.GetGroupFromId(user.UserId);
+                linkParser.AddLinkForGroup(group, name, link);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public void AskForLink(BotUser user)
-        {
-            const string answer = "Отправьте сообщение в формате:\n*Название чата*: *ссылка*";
-            OnReply(user, answer);
-            //OnReplyVK(user, answer);
-        }
+        //public void AskForLink(BotUser user)
+        //{
+        //    OnReply(user, answer);
+        //}
 
         public void GetLinks(BotUser user)
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            var result = new StringBuilder();
-            foreach (var link in links)
-            {
-                result.Append($"{link.name}: {link.link}");
-                result.Append("\n");
-            }
-            OnReply(user, );
-            //OnReplyVK(user, result.ToString());
+            
+            OnReply(user, new LinksReply(links));
         }
 
         private Reply SheduleModify(int days, BotUser user)

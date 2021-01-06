@@ -70,8 +70,21 @@ namespace View
             var message = (reply) switch
             {
                 ScheduleReply s => GetReply(s),
+                LinksReply s => GetLinksReply(s)
             };
             tgMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
+        }
+
+        private static string GetLinksReply(LinksReply links)
+        {
+            var result = new StringBuilder();
+            foreach (var link in links.links)
+            {
+                result.Append($"{link.name}: {link.link}");
+                result.Append("\n");
+            }
+
+            return result.ToString();
         }
 
         private static string GetReply(ScheduleReply reply)

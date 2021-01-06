@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Application;
 using Infrastructure;
+using View.TelegramUI.UserStates;
 
 namespace View
 {
@@ -20,7 +21,8 @@ namespace View
             IPeopleParser peopleParser,
             MessageHandler messageHandler,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
-            GroupProvider groupProvider)
+            GroupProvider groupProviderб
+            Register)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
@@ -36,6 +38,7 @@ namespace View
                 0 => (CommandTG) new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor, messageHandler, groupProvider),
                 1 => new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider),
                 2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor),
+                3 => new AddingLink(messageHandler, peopleParser, tgMessageSender),
                 _ => throw new Exception("Wrong user state")
             };
         }

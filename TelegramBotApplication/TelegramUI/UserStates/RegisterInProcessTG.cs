@@ -59,7 +59,7 @@ namespace View
                         {
                             peopleParser.ChangeStateForUser(user.UserId);
                             var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor);
-                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, updatedState.GetKeyboard());
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else
                         {
