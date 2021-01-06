@@ -18,7 +18,8 @@ namespace Domain.Functions
             {
                 users.Add(id, DateTime.Now);
                 VisitorsCount++;
-                Console.WriteLine("Increment for ", id);
+                Console.WriteLine("Increment for " + id);
+                Console.WriteLine(users.Keys + users.Values.ToString());
             }
         }
 
@@ -27,7 +28,7 @@ namespace Domain.Functions
             if (!users.ContainsKey(id))
                 return;
             var difference = DateTime.Now.Hour + DateTime.Now.Minute - users[id].Hour - users[id].Minute;
-            if (difference >= 2)
+            if (difference >= 20)
             {
                 VisitorsCount--;
                 users.Remove(id);

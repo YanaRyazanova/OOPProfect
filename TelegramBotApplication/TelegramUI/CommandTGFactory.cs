@@ -33,7 +33,7 @@ namespace View
         {
             return userState switch
             {
-                0 => (CommandTG) new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor),
+                0 => (CommandTG) new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor, messageHandler, groupProvider),
                 1 => new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider),
                 2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor),
                 _ => throw new Exception("Wrong user state")

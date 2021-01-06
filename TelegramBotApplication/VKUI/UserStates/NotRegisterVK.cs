@@ -11,7 +11,10 @@ namespace View
     {
         private readonly IVkMessageSender vkMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly VKUnknownMessageProcessor allCommands;
+        private readonly MessageHandler messageHandler;
+        private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
+        private readonly GroupProvider groupProvider;
+
         private static MessageKeyboard CreatePreStartKeyboard()
         {
             var keyboard = new MessageKeyboard();
@@ -32,12 +35,19 @@ namespace View
             return keyboard;
         }
 
-        public NotRegisterVK(IVkMessageSender vkMessageSender, IPeopleParser peopleParser, VKUnknownMessageProcessor allCommands) : base(
+        public NotRegisterVK(
+            IVkMessageSender vkMessageSender,
+            IPeopleParser peopleParser,
+            MessageHandler messageHandler,
+            VKUnknownMessageProcessor vkUnknownMessageProcessor,
+            GroupProvider groupProvider) : base(
             VkUsersStates.NotRegister)
         {
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
-            this.allCommands = allCommands;
+            this.messageHandler = messageHandler;
+            this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
+            this.groupProvider = groupProvider;
         }
 
         public override MessageKeyboard GetKeyboard()
@@ -54,22 +64,14 @@ namespace View
                 case "начать":
                     {
                         var text = new MessageResponse(ResponseType.Start).response;
-                        RaiseState();
                         peopleParser.AddNewUser(user.UserId);
                         peopleParser.ChangeStateForUser(user.UserId);
-                        vkMessageSender.SendNotification(user, text, GetKeyboard());
-                        break;
-                    }
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                    {
-                        vkMessageSender.HandleHelpMessage(user, GetKeyboard());
+                        var updatedState = new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider);
+                        vkMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                         break;
                     }
                 default:
-                    allCommands.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
+                    vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
                     break;
             }
         }

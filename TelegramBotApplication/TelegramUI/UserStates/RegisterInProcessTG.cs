@@ -52,23 +52,15 @@ namespace View
         {
             switch (messageText)
             {
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                {
-                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
-                    break;
-                }
                 default:
                 {
                     if (groupProvider.GetAllGroups().Contains(messageText.ToUpper()))
                     {
                         if (messageHandler.GetGroup(messageText.ToUpper(), user))
                         {
-                            RaiseState();
                             peopleParser.ChangeStateForUser(user.UserId);
-                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, GetKeyboard());
+                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor);
+                            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else
                         {

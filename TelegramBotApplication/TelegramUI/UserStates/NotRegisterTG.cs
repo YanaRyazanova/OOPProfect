@@ -9,9 +9,11 @@ namespace View
 {
     public class NotRegisterTG : CommandTG
     {
-        private readonly ITGMessageSender tgItgMessageSender;
+        private readonly ITGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
-        private readonly TGUnknownMessageProcessor allCommands;
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        private readonly MessageHandler messageHandler;
+        private readonly GroupProvider groupProvider;
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -24,14 +26,16 @@ namespace View
             return keyboard;
         }
 
-        public NotRegisterTG(ITGMessageSender tgItgMessageSender,
+        public NotRegisterTG(ITGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
-            TGUnknownMessageProcessor allCommands) : base(
+            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider) : base(
             TgUsersStates.NotRegister)
         {
-            this.tgItgMessageSender = tgItgMessageSender;
+            this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
-            this.allCommands = allCommands;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
+            this.messageHandler = messageHandler;
+            this.groupProvider = groupProvider;
         }
 
         public override ReplyKeyboardMarkup GetKeyboard()
@@ -47,23 +51,15 @@ namespace View
                 case "start":
                 case "начать":
                 {
-                    var text = new MessageResponse(ResponseType.Start).response; 
-                    RaiseState();
+                    var text = new MessageResponse(ResponseType.Start).response;
                     peopleParser.AddNewUser(user.UserId);
                     peopleParser.ChangeStateForUser(user.UserId);
-                    tgItgMessageSender.SendNotification(user, text, GetKeyboard());
-                    break;
-                }
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                {
-                    tgItgMessageSender.HandleHelpMessage(user, GetKeyboard());
+                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider);
+                    tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;
                 }
                 default:
-                    allCommands.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
+                    tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.NotRegisterError));
                     break;
             }
         }

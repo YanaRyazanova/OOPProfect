@@ -52,7 +52,7 @@ namespace View
 
         public override void ProcessMessage(string messageText, BotUser user)
         {
-            if (messageText.Contains("https"))
+            if (messageText.Contains("http"))
             {
                 var splittedMessage = messageText.Split(": ");
                 var name = splittedMessage[0];
@@ -88,14 +88,6 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     messageHandler.AskForLink(user);
-                    break;
-                }
-                case "help":
-                case "/help":
-                case "помощь":
-                case "помоги":
-                {
-                    tgMessageSender.HandleHelpMessage(user, GetKeyboard());
                     break;
                 }
                 default:

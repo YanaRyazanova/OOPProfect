@@ -27,18 +27,5 @@ namespace View
         {
             this.VkUserState = vkUserState;
         }
-
-        public void RaiseState()
-        {
-            switch (VkUserState)
-            {
-                case VkUsersStates.NotRegister:
-                    VkUserState = VkUsersStates.RegisterInProcess;
-                    break;
-                case VkUsersStates.RegisterInProcess:
-                    VkUserState = VkUsersStates.Register;
-                    break;
-            }
-        }
     }
 }
