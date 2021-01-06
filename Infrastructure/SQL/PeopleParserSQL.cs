@@ -15,6 +15,7 @@ namespace Infrastructure.SQL
             this.dbNameProvider = dbNameProvider;
         }
 
+        public string GetPlatformFromId(string id) => GetThingFromId(id, "platfrom");
         public string GetGroupFromId(string id) => GetThingFromId(id, "GROUP_");
         public string GetStateFromId(string id) => GetThingFromId(id, "State");
         public void ChangeStateForUser(string id)
@@ -86,7 +87,7 @@ namespace Infrastructure.SQL
             }
         }
 
-        public void AddNewUser(string id, string state = "0")
+        public void AddNewUser(string id, string state = "0", string platform="tg")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
@@ -94,8 +95,8 @@ namespace Infrastructure.SQL
                 connection.Open();
                 using (var command =
                     new SQLiteCommand(string.Format(
-                        "INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_', 'State') VALUES ('{0}', '{1}', '{2}')",
-                        id, " ", state), connection))
+                        "INSERT INTO PeopleAndGroups ('ChatID', 'GROUP_', 'State', 'platform') VALUES ('{0}', '{1}', '{2}', '{3}')",
+                        id, " ", state, platform), connection))
                 {
                     try
                     {
