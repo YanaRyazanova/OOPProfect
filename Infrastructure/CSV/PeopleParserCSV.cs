@@ -56,7 +56,7 @@ namespace Infrastructure.Csv
             }
         }
 
-        public string getPlatformFromId(string id) => GetThingFromId(id, "platform");
+        public string GetPlatformFromId(string id) => GetThingFromId(id, "platform");
         public string GetGroupFromId(string id) => GetThingFromId(id, "group");
         public string GetStateFromId(string id) => GetThingFromId(id, "state");
         private string GetThingFromId(string id, string thingToGet)

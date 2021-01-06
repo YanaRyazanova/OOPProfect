@@ -42,7 +42,8 @@ namespace Application
                 var usersList = peopleParser.GetAllUsers();
                 foreach (var id in usersList)
                 {
-                    var user = new BotUser(id);
+                    var domain = peopleParser.GetPlatformFromId(id);
+                    var user = new BotUser(id, domain);
                     indicator.Decrement(id);
                     var flag = false;
                     if (!usersLastNotify.ContainsKey(user))

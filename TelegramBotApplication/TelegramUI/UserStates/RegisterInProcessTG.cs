@@ -42,12 +42,12 @@ namespace View
             this.groupProvider = groupProvider;
         }
 
-        public override ReplyKeyboardMarkup GetKeyboard()
+        public ReplyKeyboardMarkup GetKeyboard()
         {
             return CreateStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, BotUser user)
+        public void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {

@@ -6,7 +6,7 @@ namespace View
 {
     public class NotRegicterCommandListProvider : CommandListProvider
     {
-        public override List<string> GetCommands()
+        public List<string> GetCommands()
         {
             return new List<string> {"/start", "start", "начать"};
         }
