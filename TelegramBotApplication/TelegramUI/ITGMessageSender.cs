@@ -9,6 +9,5 @@ namespace View
     public interface ITGMessageSender
     {
         public void SendNotification(BotUser user, string message, ReplyKeyboardMarkup keyboard);
-        public void HandleHelpMessage(BotUser user, ReplyKeyboardMarkup keyboard);
     }
 }
