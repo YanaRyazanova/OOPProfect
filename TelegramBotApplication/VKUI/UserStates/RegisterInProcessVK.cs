@@ -66,7 +66,7 @@ namespace View
                 {
                     peopleParser.ChangeStateForUser(user.UserId);
                     var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor);
-                    vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucceessfulRegistration).response, updatedState.GetKeyboard());
+                    vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                 }
                 else
                 {

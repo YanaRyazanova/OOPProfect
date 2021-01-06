@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Infrastructure;
 
 namespace Application
 {
     public class LinksReply : Reply
     {
-        public string Link { get; }
-
-        public LinksReply(string link)
+        public Link[] links { get; }
+        public LinksReply(Link[] links)
         {
-            Link = link;
+
         }
     }
 }

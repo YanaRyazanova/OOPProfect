@@ -14,10 +14,14 @@ namespace View
         StartError,
         Start,
         GroupError,
-        SucceessfulRegistration,
+        SuccessfulRegistration,
         CatchError,
         NotRegisterError,
         RegisterInProgressError,
+        RegisterError,
+        SucessfulLinks,
+        LinksMessage,
+        LinksError
         RegisterError,
         NextLesson
     }
@@ -32,12 +36,15 @@ namespace View
             dict.Add(ResponseType.StartError, "Начните с команды: \"/start\" ");
             dict.Add(ResponseType.Start, File.ReadAllText("welcome.txt"));
             dict.Add(ResponseType.GroupError, "Такая группа не зарегистрирована в нашем боте. Можешь написать разбаботчикам @barakovskiydef, @yana_rya, @artamaney, @love_3axap и они все сделают :-)");
-            dict.Add(ResponseType.SucceessfulRegistration, "Вы успешно зарегистрированы! Выберите пункт меню");
+            dict.Add(ResponseType.SuccessfulRegistration, "Вы успешно зарегистрированы! Выберите пункт меню");
             dict.Add(ResponseType.CatchError, "Упс! Кажется что-то пошло не так!Попробуйте начать с команды '/start'");
             dict.Add(ResponseType.NotRegisterError, "Вы еще не зарегистрированы и вам пока не доступна эта команда. Для начала напишите '/start', а потом выберите свою группу.");
             dict.Add(ResponseType.RegisterInProgressError, "Вы еще не выбрали свою группу");
             dict.Add(ResponseType.RegisterError, "Вы уже зарегистрированы, не стоит использовать эту команду)");
             dict.Add(ResponseType.NextLesson, "Следующая пара: ");
+            dict.Add(ResponseType.SucessfulLinks, "Отправьте сообщение в формате:\n*Название чата*: *ссылка*");
+            dict.Add(ResponseType.LinksMessage, "Ссылка успешно добавлена");
+            dict.Add(ResponseType.LinksError, "Формат ссылки неверный. Ссылка должна содержать 'http(https)://...'");
         }
     }
     public class MessageResponse
