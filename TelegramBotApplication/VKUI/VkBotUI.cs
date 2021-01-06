@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Application;
@@ -9,6 +10,7 @@ using VkNet.Enums;
 using VkNet.Exception;
 using VkNet.Model;
 using VkNet.Model.RequestParams;
+using Reply = Application.Reply;
 
 namespace View
 {
@@ -112,7 +114,7 @@ namespace View
             foreach (var message in messages)
             {
                 if (message.Type == MessageType.Sended) continue;
-                user = new BotUser(message.FromId.Value.ToString());
+                user = new BotUser(message.FromId.Value.ToString(), "vk");
                 Console.Beep();
                 Answer(message.Text);
             }
@@ -199,10 +201,25 @@ namespace View
             return commandVkFactory.Create(int.Parse(userState));
         }
 
-        public void SendMessage(BotUser user, string message)
+        public void SendMessage(BotUser user, Reply reply)
         {
             var currentCommand = DefineCommand(user);
+            var message = (reply) switch
+            {
+                ScheduleReply s => GetReply(s),
+            };
             vkMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
+        }
+        private static string GetReply(ScheduleReply reply)
+        {
+            var scheduleNextDay = new StringBuilder();
+            foreach (var item in reply.lessons)
+            {
+                scheduleNextDay.Append(item);
+                scheduleNextDay.Append("\n");
+            }
+
+            return scheduleNextDay.Length == 0 ? null : scheduleNextDay.ToString();
         }
     }
 }

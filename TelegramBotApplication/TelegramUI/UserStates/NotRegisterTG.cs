@@ -28,8 +28,7 @@ namespace View
 
         public NotRegisterTG(ITGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
-            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider) : base(
-            TgUsersStates.NotRegister)
+            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
@@ -38,12 +37,12 @@ namespace View
             this.groupProvider = groupProvider;
         }
 
-        public override ReplyKeyboardMarkup GetKeyboard()
+        public ReplyKeyboardMarkup GetKeyboard()
         {
             return CreatePreStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, BotUser user)
+        public void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {

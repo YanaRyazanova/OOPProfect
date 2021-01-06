@@ -31,17 +31,19 @@ namespace View
 
         public void ProcessUnknownCommand(string messageText, BotUser chatId, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
         {
-            var allCommands = registerCommandListProvider.GetCommands()
-                .Concat(notRegicterCommandListProvider.GetCommands())
-                .Concat(registerInProcessCommandListProvider.GetCommands())
-                .Concat(helpCommandListProvider.GetCommands())
-                .ToArray();
-            if (helpCommandListProvider.GetCommands().Contains(messageText))
+            var helpCommands = helpCommandListProvider.GetCommands();
+            if (helpCommands.Contains(messageText))
             {
                 var helpMessage = new MessageResponse(ResponseType.Help).response;
                 tgMessageSender.SendNotification(chatId, helpMessage, keyboard);
                 return;
             }
+            var allCommands = registerCommandListProvider.GetCommands()
+                .Concat(notRegicterCommandListProvider.GetCommands())
+                .Concat(registerInProcessCommandListProvider.GetCommands())
+                .Concat(helpCommands)
+                .ToArray();
+            
             var response = allCommands.Contains(messageText) ? messageResponse : new MessageResponse(ResponseType.Error);
             tgMessageSender.SendNotification(chatId, response.response, keyboard);
         } 

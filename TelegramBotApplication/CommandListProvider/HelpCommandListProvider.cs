@@ -6,7 +6,7 @@ namespace View
 {
     public class HelpCommandListProvider : CommandListProvider
     {
-        public override List<string> GetCommands()
+        public  List<string> GetCommands()
         {
             return new List<string> { "help", "/help", "помощь", "помоги" };
         }

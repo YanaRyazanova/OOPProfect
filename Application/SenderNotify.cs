@@ -21,7 +21,6 @@ namespace Application
         private readonly LessonReminder lessonReminder;
 
         public event Action<BotUser, string> OnReply;
-        public event Action<BotUser, string> OnReplyVK;
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -43,7 +42,8 @@ namespace Application
                 var usersList = peopleParser.GetAllUsers();
                 foreach (var id in usersList)
                 {
-                    var user = new BotUser(id);
+                    var domain = peopleParser.GetPlatformFromId(id);
+                    var user = new BotUser(id, domain);
                     indicator.Decrement(id);
                     var flag = false;
                     if (!usersLastNotify.ContainsKey(user))
@@ -59,12 +59,9 @@ namespace Application
                     if (message == null ||  difference//40
                         < 3 && !flag)
                         continue;
-                    if (message.Contains("пар больше нет"))
-                        continue;
                     usersLastNotify[user] = DateTime.Now;
                     Console.Write(message + user.UserId);
                     OnReply(user, message);
-                    OnReplyVK(user, message);
                 }
             }
             catch (Exception e)

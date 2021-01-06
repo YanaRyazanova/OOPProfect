@@ -15,7 +15,7 @@ namespace View
             this.groupProvider = groupProvider;
         }
 
-        public override List<string> GetCommands()
+        public List<string> GetCommands()
         {
             var groups = groupProvider
                 .GetAllGroups()

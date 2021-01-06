@@ -56,6 +56,7 @@ namespace Infrastructure.Csv
             }
         }
 
+        public string GetPlatformFromId(string id) => GetThingFromId(id, "platform");
         public string GetGroupFromId(string id) => GetThingFromId(id, "group");
         public string GetStateFromId(string id) => GetThingFromId(id, "state");
         private string GetThingFromId(string id, string thingToGet)
@@ -71,14 +72,17 @@ namespace Infrastructure.Csv
                     {
                         if (thingToGet == "group")
                             return fields[1];
-                        return fields[2];
+                        else if (thingToGet == "state")
+                            return fields[2];
+                        else
+                            return fields[3];
                     }
                 }
             }
             return "";
         }
 
-        public void AddNewUser(string id, string state="0")
+        public void AddNewUser(string id, string state="0", string platform="tg")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
@@ -97,6 +101,7 @@ namespace Infrastructure.Csv
                 csv.WriteField(id);
                 csv.WriteField(" ");
                 csv.WriteField(state);
+                csv.WriteField(platform);
                 csv.NextRecord();
             }
         }

@@ -32,10 +32,9 @@ namespace View
             var telegramBot = GetTelegramBot(container, registerProvider, registerInProcessProvider, notRegister);
             var vkBot = GetVkBot(container, registerProvider, registerInProcessProvider, notRegister);
 
-            senderNotify.OnReply += telegramBot.SendMessage;
             messageHandler.OnReply += telegramBot.SendMessage;
-            senderNotify.OnReplyVK += vkBot.SendMessage;
-            messageHandler.OnReplyVK += vkBot.SendMessage;
+            
+            messageHandler.OnReply += vkBot.SendMessage;
             vkBot.Run();
             telegramBot.Run();
             Task.Run(messageHandler.Run);
@@ -72,6 +71,7 @@ namespace View
         {
             var telegramToken = File.ReadAllText("telegramToken.txt"); // token, который вернул BotFather
             var client = new TelegramBotClient(telegramToken);
+            container.Bind<TelegramBotClient>().ToConstant(new TelegramBotClient(telegramToken));
             var tgMessageSender = container.Get<ITGMessageSender>(new ConstructorArgument("client", client));
             var tgUnknownMessageProcessor = container.Get<TGUnknownMessageProcessor>(
                 new ConstructorArgument("tgMessageSender", tgMessageSender),

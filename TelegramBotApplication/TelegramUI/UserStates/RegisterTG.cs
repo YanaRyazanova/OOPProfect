@@ -11,6 +11,7 @@ namespace View
         private readonly MessageHandler messageHandler;
         private readonly ITGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -38,19 +39,20 @@ namespace View
 
         public RegisterTG(MessageHandler messageHandler,
             ITGMessageSender tgMessageSender,
-            TGUnknownMessageProcessor tgUnknownMessageProcessor) : base(TgUsersStates.Register)
+            TGUnknownMessageProcessor tgUnknownMessageProcessor, RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
-        public override ReplyKeyboardMarkup GetKeyboard()
+        public ReplyKeyboardMarkup GetKeyboard()
         {
             return CreateKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, BotUser user)
+        public void ProcessMessage(string messageText, BotUser user)
         {
             if (messageText.Contains("http"))
             {
@@ -73,7 +75,7 @@ namespace View
                     messageHandler.GetScheduleForNextDay(user);
                     break;
                 }
-                case "я в столовой":
+                case var n when(n == registerCommandListProvider.GetingDiningRoom):
                 {
                     var visitorsCount = messageHandler.GetDiningRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;
