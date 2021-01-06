@@ -61,14 +61,12 @@ namespace Application
         {
             var schedule = SheduleModify(0, user);
             OnReply(user, schedule);
-            //OnReplyVK(user, schedule);
         }
 
         public void GetScheduleForNextDay(BotUser user)
         {
             var scheduleNextDay = SheduleModify(1, user);
-            OnReply(user, result);
-            //OnReplyVK(user, scheduleNextDay);
+            OnReply(user, scheduleNextDay);
         }
 
         public int GetDiningRoom(BotUser user)

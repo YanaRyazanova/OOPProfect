@@ -38,7 +38,7 @@ namespace View
         {
             var message = messageEventArgs.Message;
             Console.WriteLine(message);
-            var user = new BotUser(message.Chat.Id.ToString());
+            var user = new BotUser(message.Chat.Id.ToString(), "tg");
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
             var currentCommand = DefineCommand(user);

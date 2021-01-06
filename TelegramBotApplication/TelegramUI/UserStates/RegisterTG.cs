@@ -39,7 +39,8 @@ namespace View
 
         public RegisterTG(MessageHandler messageHandler,
             ITGMessageSender tgMessageSender,
-            TGUnknownMessageProcessor tgUnknownMessageProcessor, RegisterCommandListProvider registerCommandListProvider)
+            TGUnknownMessageProcessor tgUnknownMessageProcessor,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
