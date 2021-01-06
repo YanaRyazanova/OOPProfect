@@ -10,7 +10,6 @@ using VkNet.Enums;
 using VkNet.Exception;
 using VkNet.Model;
 using VkNet.Model.RequestParams;
-using Reply = Application.Reply;
 
 namespace View
 {
@@ -201,7 +200,7 @@ namespace View
             return commandVkFactory.Create(int.Parse(userState));
         }
 
-        public void SendMessage(BotUser user, Reply reply)
+        public void SendMessage(BotUser user, Application.Reply reply)
         {
             var currentCommand = DefineCommand(user);
             var message = (reply) switch
