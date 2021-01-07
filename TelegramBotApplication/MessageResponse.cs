@@ -41,8 +41,8 @@ namespace View
             dict.Add(ResponseType.RegisterInProgressError, "Вы еще не выбрали свою группу");
             dict.Add(ResponseType.RegisterError, "Вы уже зарегистрированы, не стоит использовать эту команду)");
             dict.Add(ResponseType.NextLesson, "Следующая пара: ");
-            dict.Add(ResponseType.SucessfulLinks, "Отправьте сообщение в формате:\n*Название чата*: *ссылка*");
-            dict.Add(ResponseType.LinksMessage, "Ссылка успешно добавлена");
+            dict.Add(ResponseType.LinksMessage, "Отправьте сообщение в формате:\n*Название чата*: *ссылка*");
+            dict.Add(ResponseType.SucessfulLinks, "Ссылка успешно добавлена");
             dict.Add(ResponseType.LinksError, "Формат ссылки неверный. Ссылка должна содержать 'http(https)://...'");
         }
     }

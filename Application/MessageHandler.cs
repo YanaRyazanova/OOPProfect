@@ -95,16 +95,10 @@ namespace Application
             }
         }
 
-        //public void AskForLink(BotUser user)
-        //{
-        //    OnReply(user, answer);
-        //}
-
         public void GetLinks(BotUser user)
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            
             OnReply(user, new LinksReply(links));
         }
 

@@ -18,13 +18,9 @@ namespace View
 
         public void SendNotification(BotUser user, string message, ReplyKeyboardMarkup keyboard)
         {
-            try
-            {
-                client.SendTextMessageAsync(user.UserId, message, replyMarkup: keyboard).Wait();
-            }
-            catch (AggregateException)
-            {
-            }
+            if (user.Domain != "tg")
+                return;
+            client.SendTextMessageAsync(user.UserId, message, replyMarkup: keyboard).Wait();
         }
     }
 }

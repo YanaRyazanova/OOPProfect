@@ -21,26 +21,15 @@ namespace View
 
         public void SendNotification(BotUser user, string message, MessageKeyboard keyboard)
         {
-            if (message is null)
-                message = "У вас сегодня нет пар, отдыхайте!";
-            try
-            {
-                api.Messages.Send(new MessagesSendParams
-                {
-                    UserId = long.Parse(user.UserId),
-                    Message = message,
-                    RandomId = rnd.Next(),
-                    Keyboard = keyboard
-                });
-            }
-            catch (AggregateException)
-            {
+            if (user.Domain != "vk")
                 return;
-            }
-            catch (CannotSendToUserFirstlyException)
+            api.Messages.Send(new MessagesSendParams
             {
-                return;
-            }
+                UserId = long.Parse(user.UserId),
+                Message = message,
+                RandomId = rnd.Next(),
+                Keyboard = keyboard
+            });
         }
 
         public void HandleHelpMessage(BotUser user, MessageKeyboard keyboard)

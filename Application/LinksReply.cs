@@ -10,7 +10,7 @@ namespace Application
         public Link[] links { get; }
         public LinksReply(Link[] links)
         {
-
+            this.links = links;
         }
     }
 }

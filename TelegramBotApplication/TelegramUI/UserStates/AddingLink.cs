@@ -12,6 +12,7 @@ namespace View.TelegramUI.UserStates
         private readonly MessageHandler messageHandler;
         private readonly IPeopleParser peopleParser;
         private readonly ITGMessageSender tgMessageSender;
+        private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
 
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
@@ -45,16 +46,19 @@ namespace View.TelegramUI.UserStates
 
         public AddingLink(MessageHandler messageHandler,
             IPeopleParser peopleParser,
-            ITGMessageSender tgMessageSender)
+            ITGMessageSender tgMessageSender,
+            TGUnknownMessageProcessor tgUnknownMessageProcessor)
         {
             this.messageHandler = messageHandler;
             this.peopleParser = peopleParser;
             this.tgMessageSender = tgMessageSender;
+            this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
         }
 
         public void ProcessMessage(string messageText, BotUser user)
         {
-            if (!messageText.Contains("http")) 
+
+            if (!messageText.Contains("http") && !messageText.Contains(":")) 
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response, GetKeyboard());
             var splittedMessage = messageText.Split(": ");
             var name = splittedMessage[0];
