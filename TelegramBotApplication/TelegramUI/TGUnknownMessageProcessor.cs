@@ -29,13 +29,13 @@ namespace View
             this.helpCommandListProvider = helpCommandListProvider;
         }
 
-        public void ProcessUnknownCommand(string messageText, BotUser chatId, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
+        public void ProcessUnknownCommand(string messageText, BotUser user, ReplyKeyboardMarkup keyboard, MessageResponse messageResponse)
         {
             var helpCommands = helpCommandListProvider.GetCommands();
             if (helpCommands.Contains(messageText))
             {
                 var helpMessage = new MessageResponse(ResponseType.Help).response;
-                tgMessageSender.SendNotification(chatId, helpMessage, keyboard);
+                tgMessageSender.SendNotification(user, helpMessage, keyboard);
                 return;
             }
             var allCommands = registerCommandListProvider.GetCommands()
@@ -45,7 +45,7 @@ namespace View
                 .ToArray();
             
             var response = allCommands.Contains(messageText) ? messageResponse : new MessageResponse(ResponseType.Error);
-            tgMessageSender.SendNotification(chatId, response.response, keyboard);
+            tgMessageSender.SendNotification(user, response.response, keyboard);
         } 
     }
 }
