@@ -21,8 +21,7 @@ namespace View
         RegisterError,
         SucessfulLinks,
         LinksMessage,
-        LinksError
-        RegisterError,
+        LinksError,
         NextLesson
     }
     public class DictOfEnumsAndResponses
