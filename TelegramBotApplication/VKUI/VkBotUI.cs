@@ -203,12 +203,35 @@ namespace View
         public void SendMessage(BotUser user, Application.Reply reply)
         {
             var currentCommand = DefineCommand(user);
-            var message = (reply) switch
+            var message = reply switch
             {
                 ScheduleReply s => GetReply(s),
+                LessonReply l => GetLessonReply(l),
+                LinksReply s => GetLinksReply(s)
             };
             vkMessageSender.SendNotification(user, message, currentCommand.GetKeyboard());
         }
+
+        private static string GetLinksReply(LinksReply links)
+        {
+            var result = new StringBuilder();
+            foreach (var link in links.links)
+            {
+                result.Append($"{link.name}: {link.link}");
+                result.Append("\n");
+            }
+
+            return result.ToString();
+        }
+
+        private static string GetLessonReply(LessonReply lessonReply)
+        {
+            if (lessonReply == null)
+                return null;
+            var reply = $"{lessonReply.LessonInfo.Item1} через {lessonReply.LessonInfo.Item2} минут";
+            return reply;
+        }
+
         private static string GetReply(ScheduleReply reply)
         {
             var scheduleNextDay = new StringBuilder();

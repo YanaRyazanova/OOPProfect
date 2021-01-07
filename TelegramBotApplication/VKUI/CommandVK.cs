@@ -8,24 +8,9 @@ using VkNet.Model.Keyboard;
 
 namespace View
 {
-    public enum VkUsersStates
+    public interface CommandVK
     {
-        NotRegister,
-        Register,
-        RegisterInProcess
-    }
-
-
-    public abstract class CommandVK
-    {
-        public VkUsersStates VkUserState;
-
-        public abstract MessageKeyboard GetKeyboard();
-        public abstract void ProcessMessage(string messageText, BotUser user);
-
-        public CommandVK(VkUsersStates vkUserState)
-        {
-            this.VkUserState = vkUserState;
-        }
+        public MessageKeyboard GetKeyboard();
+        public void ProcessMessage(string messageText, BotUser user);
     }
 }

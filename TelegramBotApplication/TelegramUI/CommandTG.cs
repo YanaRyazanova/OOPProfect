@@ -8,7 +8,7 @@ namespace View
 {
     public interface CommandTG
     {
-        public  ReplyKeyboardMarkup GetKeyboard();
+        public ReplyKeyboardMarkup GetKeyboard();
         public void ProcessMessage(string messageText, BotUser user);
     }
 }

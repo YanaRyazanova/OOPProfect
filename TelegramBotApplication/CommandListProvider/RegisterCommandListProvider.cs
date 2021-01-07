@@ -7,7 +7,7 @@ namespace View
     public class RegisterCommandListProvider : CommandListProvider
     {
         private const string DiningRoom = "я в столовой";
-        public string GetingDiningRoom => DiningRoom;
+        public string GettingDiningRoom => DiningRoom;
         public  List<string> GetCommands()
         {
             return new List<string>

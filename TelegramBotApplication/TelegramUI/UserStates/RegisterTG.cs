@@ -72,7 +72,7 @@ namespace View
                     messageHandler.GetScheduleForNextDay(user);
                     break;
                 }
-                case var n when(n == registerCommandListProvider.GetingDiningRoom):
+                case var n when n == registerCommandListProvider.GettingDiningRoom:
                 {
                     var visitorsCount = messageHandler.GetDiningRoom(user);
                     var text = new MessageResponse(ResponseType.DiningRoom).response;

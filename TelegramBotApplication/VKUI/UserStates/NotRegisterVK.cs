@@ -14,6 +14,8 @@ namespace View
         private readonly MessageHandler messageHandler;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
+
 
         private static MessageKeyboard CreatePreStartKeyboard()
         {
@@ -40,22 +42,24 @@ namespace View
             IPeopleParser peopleParser,
             MessageHandler messageHandler,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
-            GroupProvider groupProvider) : base(
-            VkUsersStates.NotRegister)
+            GroupProvider groupProvider,
+            RegisterCommandListProvider registerCommandListProvider
+            )
         {
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
             this.messageHandler = messageHandler;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
-        public override MessageKeyboard GetKeyboard()
+        public MessageKeyboard GetKeyboard()
         {
             return CreatePreStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, BotUser user)
+        public void ProcessMessage(string messageText, BotUser user)
         {
             switch (messageText)
             {
@@ -66,7 +70,7 @@ namespace View
                         var text = new MessageResponse(ResponseType.Start).response;
                         peopleParser.AddNewUser(user.UserId);
                         peopleParser.EvaluateState(user.UserId);
-                        var updatedState = new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider);
+                        var updatedState = new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider);
                         vkMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                         break;
                     }

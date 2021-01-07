@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View.TelegramUI.UserStates
 {
-    public class AddingLink : CommandTG
+    public class AddingLinkTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
         private readonly IPeopleParser peopleParser;
@@ -44,7 +44,7 @@ namespace View.TelegramUI.UserStates
             return CreateKeyboard();
         }
 
-        public AddingLink(MessageHandler messageHandler,
+        public AddingLinkTG(MessageHandler messageHandler,
             IPeopleParser peopleParser,
             ITGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor)
@@ -64,7 +64,7 @@ namespace View.TelegramUI.UserStates
             var name = splittedMessage[0];
             var link = splittedMessage[1];
             messageHandler.AddLink(user, name, link);
-            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response, GetKeyboard());
+            tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulLinks).response, GetKeyboard());
             peopleParser.ChangeState(user.UserId, "2");
         }
     }

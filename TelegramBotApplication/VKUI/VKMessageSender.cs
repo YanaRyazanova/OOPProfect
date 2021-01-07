@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Application;
 using VkNet;
 using VkNet.Exception;
@@ -30,12 +28,6 @@ namespace View
                 RandomId = rnd.Next(),
                 Keyboard = keyboard
             });
-        }
-
-        public void HandleHelpMessage(BotUser user, MessageKeyboard keyboard)
-        {
-            var text = new MessageResponse(ResponseType.Help).response;
-            SendNotification(user, text, keyboard);
         }
     }
 }

@@ -16,6 +16,7 @@ namespace View
         private readonly IPeopleParser peopleParser;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
 
         private MessageKeyboard CreateStartKeyboard()
         {
@@ -43,29 +44,30 @@ namespace View
             IVkMessageSender vkMessageSender,
             IPeopleParser peopleParser,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
-            GroupProvider groupProvider) : base(
-            VkUsersStates.RegisterInProcess)
+            GroupProvider groupProvider,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
-        public override MessageKeyboard GetKeyboard()
+        public MessageKeyboard GetKeyboard()
         {
             return CreateStartKeyboard();
         }
 
-        public override void ProcessMessage(string messageText, BotUser user)
+        public void ProcessMessage(string messageText, BotUser user)
         {
             if (groupProvider.GetAllGroups().Contains(messageText.ToUpper()))
             {
                 if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                 {
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor);
+                    var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider);
                     vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                 }
                 else

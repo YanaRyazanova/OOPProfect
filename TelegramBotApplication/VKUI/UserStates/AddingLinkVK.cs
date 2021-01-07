@@ -8,13 +8,21 @@ using VkNet.Model.Keyboard;
 
 namespace View
 {
-    public class RegisterVK : CommandVK
+    public class AddingLinkVK : CommandVK
     {
         private readonly MessageHandler messageHandler;
-        private readonly IVkMessageSender vkMessageSender;
-        private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
-        private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly IPeopleParser peopleParser;
+        private readonly IVkMessageSender vkMessageSender;
+
+        public AddingLinkVK(MessageHandler messageHandler,
+            IPeopleParser peopleParser,
+            IVkMessageSender vkMessageSender)
+        {
+            this.messageHandler = messageHandler;
+            this.peopleParser = peopleParser;
+            this.vkMessageSender = vkMessageSender;
+        }
+
         private static MessageKeyboard CreateKeyboard()
         {
             var keyboard = new MessageKeyboard();
@@ -67,7 +75,7 @@ namespace View
                     },
                     Color = KeyboardButtonColor.Primary
                 },
-                
+
                 new MessageKeyboardButton
                 {
                     Action = new MessageKeyboardButtonAction
@@ -84,20 +92,6 @@ namespace View
             return keyboard;
         }
 
-        public RegisterVK(
-            MessageHandler messageHandler,
-            IVkMessageSender vkMessageSender,
-            VKUnknownMessageProcessor vkUnknownMessageProcessor,
-            IPeopleParser peopleParser,
-            RegisterCommandListProvider registerCommandListProvider)
-        {
-            this.messageHandler = messageHandler;
-            this.vkMessageSender = vkMessageSender;
-            this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
-            this.peopleParser = peopleParser;
-            this.registerCommandListProvider = registerCommandListProvider;
-        }
-
         public MessageKeyboard GetKeyboard()
         {
             return CreateKeyboard();
@@ -105,51 +99,14 @@ namespace View
 
         public void ProcessMessage(string messageText, BotUser user)
         {
-            //if (messageText.Contains("http"))
-            //{
-            //    var splittedMessage = messageText.Split(": ");
-            //    var name = splittedMessage[0];
-            //    var link = splittedMessage[1];
-            //    messageHandler.AddLink(user, name, link);
-            //    return;
-            //}
-
-            switch (messageText)
-            {
-                case "расписание на сегодня":
-                {
-                    messageHandler.GetScheduleForToday(user);
-                    break;
-                }
-                case "расписание на завтра":
-                {
-                    messageHandler.GetScheduleForNextDay(user);
-                    break;
-                }
-                case var n when n == registerCommandListProvider.GettingDiningRoom:
-                {
-                    var visitorsCount = messageHandler.GetDiningRoom(user);
-                    var text = new MessageResponse(ResponseType.DiningRoom).response;
-                    vkMessageSender.SendNotification(user, text + visitorsCount, GetKeyboard());
-                    break;
-                }
-                case "ссылки на учебные чаты":
-                {
-                    messageHandler.GetLinks(user);
-                    break;
-                }
-                case "добавить ссылку на чат":
-                {
-                    peopleParser.ChangeState(user.UserId, "3");
-                    vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, GetKeyboard());
-                    break;
-                    }
-                default:
-                {
-                    vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterError));
-                    break;
-                }
-            }
+            if (!messageText.Contains("http"))
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response, GetKeyboard());
+            var splittedMessage = messageText.Split(": ");
+            var name = splittedMessage[0];
+            var link = splittedMessage[1];
+            messageHandler.AddLink(user, name, link);
+            vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulLinks).response, GetKeyboard());
+            peopleParser.ChangeState(user.UserId, "2");
         }
     }
 }

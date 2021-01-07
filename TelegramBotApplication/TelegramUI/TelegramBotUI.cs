@@ -67,7 +67,7 @@ namespace View
         public void SendMessage(BotUser user, Reply reply)
         {
             var currentCommand = DefineCommand(user);
-            var message = (reply) switch
+            var message = reply switch
             {
                 ScheduleReply s => GetReply(s),
                 LessonReply l => GetLessonReply(l),
