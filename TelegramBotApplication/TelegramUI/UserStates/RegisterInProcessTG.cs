@@ -34,13 +34,15 @@ namespace View
             ITGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
-            GroupProvider groupProvider)
+            GroupProvider groupProvider,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.groupProvider = groupProvider;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -58,8 +60,8 @@ namespace View
                     {
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
-                            peopleParser.ChangeStateForUser(user.UserId);
-                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor);
+                            peopleParser.EvaluateState(user.UserId);
+                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser);
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else

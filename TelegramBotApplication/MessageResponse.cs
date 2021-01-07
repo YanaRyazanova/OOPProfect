@@ -18,7 +18,6 @@ namespace View
         CatchError,
         NotRegisterError,
         RegisterInProgressError,
-        RegisterError,
         SucessfulLinks,
         LinksMessage,
         LinksError,

@@ -11,7 +11,8 @@ namespace Infrastructure
         public string GetStateFromId(string id);
         public void AddNewUser(string id, string state = "0", string platform="tg");
         public void ChangeGroup(string id, string group);
-        public void ChangeStateForUser(string id);
+        public void EvaluateState(string id);
+        public void ChangeState(string id, string newState);
         public string[] GetAllUsers();
     }
 }

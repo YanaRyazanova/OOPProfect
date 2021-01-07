@@ -133,7 +133,7 @@ namespace View
                 }
                 case "добавить ссылку на чат":
                 {
-                    messageHandler.AskForLink(user);
+                    //messageHandler.AskForLink(user);
                     break;
                 }
                 default:

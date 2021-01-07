@@ -13,6 +13,8 @@ namespace View
         private readonly ITGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly IPeopleParser peopleParser;
+
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -41,12 +43,14 @@ namespace View
         public RegisterTG(MessageHandler messageHandler,
             ITGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            IPeopleParser peopleParser)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.peopleParser = peopleParser;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -82,8 +86,8 @@ namespace View
                 }
                 case "добавить ссылку на чат":
                 {
-                    //messageHandler.AskForLink(user);
-                    //peopleParser.ChangeStateForUser(user.UserId);
+                    peopleParser.ChangeState(user.UserId, "3");
+                    tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, GetKeyboard());
                     break;
                 }
                 default:

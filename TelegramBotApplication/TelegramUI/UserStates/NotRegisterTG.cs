@@ -14,6 +14,8 @@ namespace View
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly MessageHandler messageHandler;
         private readonly GroupProvider groupProvider;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
+
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
             var keyboard = new ReplyKeyboardMarkup(new[]
@@ -28,13 +30,17 @@ namespace View
 
         public NotRegisterTG(ITGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
-            TGUnknownMessageProcessor tgUnknownMessageProcessor, MessageHandler messageHandler, GroupProvider groupProvider)
+            TGUnknownMessageProcessor tgUnknownMessageProcessor,
+            MessageHandler messageHandler,
+            GroupProvider groupProvider,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.messageHandler = messageHandler;
             this.groupProvider = groupProvider;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -52,8 +58,8 @@ namespace View
                 {
                     var text = new MessageResponse(ResponseType.Start).response;
                     peopleParser.AddNewUser(user.UserId);
-                    peopleParser.ChangeStateForUser(user.UserId);
-                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider);
+                    peopleParser.EvaluateState(user.UserId);
+                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider);
                     tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;
                 }

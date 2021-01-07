@@ -15,19 +15,20 @@ namespace Infrastructure.SQL
             this.dbNameProvider = dbNameProvider;
         }
 
-        public string GetPlatformFromId(string id) => GetThingFromId(id, "platfrom");
+        public string GetPlatformFromId(string id) => GetThingFromId(id, "platform");
         public string GetGroupFromId(string id) => GetThingFromId(id, "GROUP_");
         public string GetStateFromId(string id) => GetThingFromId(id, "State");
-        public void ChangeStateForUser(string id)
+        public void EvaluateState(string id)
         {
-            var currentState = GetStateFromId(id);
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            var currentState = GetStateFromId(id);
             var statesChanges = new Dictionary<string, string>
             {
                 [""] = "0",
                 ["0"] = "1",
                 ["1"] = "2",
-                ["2"] = "2",
+                ["2"] = "3",
+                ["3"] = "3"
             };
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
@@ -38,7 +39,8 @@ namespace Infrastructure.SQL
                             statesChanges[currentState], id), connection))
                 {
                     try
-                    { ;
+                    {
+                        ;
                         command.ExecuteNonQuery();
                     }
                     catch (Exception e)
@@ -48,6 +50,23 @@ namespace Infrastructure.SQL
                 }
             }
         }
+
+        private void ChangeThing(string id, string thing, string whatToChange)
+        {
+            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
+            using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
+            {
+                connection.Open();
+                var command =
+                    new SQLiteCommand(
+                        string.Format("UPDATE PeopleAndGroups SET {0}='{1}' WHERE ChatID='{2}'", whatToChange, thing, id),
+                        connection);
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public void ChangeGroup(string id, string group) => ChangeThing(id, group, "GROUP_");
+        public void ChangeState(string id, string newState) => ChangeThing(id, newState, "State");
 
         private string GetThingFromId(string id, string thingToGet)
         {
@@ -72,22 +91,7 @@ namespace Infrastructure.SQL
                 }
             }
         }
-
-        public void ChangeGroup(string id, string group)
-        {
-            var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
-            using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
-            {
-                connection.Open();
-                var command =
-                    new SQLiteCommand(
-                        string.Format("UPDATE PeopleAndGroups SET GROUP_='{0}' WHERE ChatID='{1}'", group, id),
-                        connection);
-                command.ExecuteNonQuery();
-            }
-        }
-
-        public void AddNewUser(string id, string state = "0", string platform="tg")
+        public void AddNewUser(string id, string state = "0", string platform = "tg")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
