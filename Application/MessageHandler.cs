@@ -53,7 +53,7 @@ namespace Application
                 callback: _ => senderNotify.Do(),
                 state: null,
                 dueTime: 1000,
-                period: 10000);
+                period: 120000);
         }
 
         public void GetScheduleForToday(BotUser user)

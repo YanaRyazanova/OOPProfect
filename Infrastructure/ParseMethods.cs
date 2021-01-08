@@ -28,7 +28,7 @@ namespace Infrastructure
         public Lesson GetNearestLesson(Lesson[] timeTable)
         {
             var now = DateTime.Now;
-            var nearestLesson = new Lesson(DateTime.Now, "Сегодня пар больше нет ^-^");
+            var nearestLesson = new Lesson(DateTime.Now, null);
             var minDif = long.MaxValue;
             foreach (var el in timeTable)
             {

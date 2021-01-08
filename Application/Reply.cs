@@ -6,6 +6,6 @@ namespace Application
 {
     public abstract class Reply
     {
-
+        public Reply() {}
     }
 }
