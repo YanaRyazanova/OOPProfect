@@ -14,6 +14,7 @@ namespace View.TelegramUI.UserStates
         private readonly ITGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
 
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
@@ -36,13 +37,15 @@ namespace View.TelegramUI.UserStates
             IPeopleParser peopleParser,
             ITGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor, 
-            AddingLinkCommandListProvider addingLinkCommandListProvider)
+            AddingLinkCommandListProvider addingLinkCommandListProvider,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.peopleParser = peopleParser;
             this.tgMessageSender = tgMessageSender;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.addingLinkCommandListProvider = addingLinkCommandListProvider;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
         public void ProcessMessage(string messageText, BotUser user)
@@ -65,11 +68,11 @@ namespace View.TelegramUI.UserStates
                 var name = splittedMessage[0];
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
+                var newUserState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
-                    GetKeyboard());
+                    newUserState.GetKeyboard());
                 peopleParser.ChangeState(user.UserId, "2");
             }
-
             else
             {
                 tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.Help));

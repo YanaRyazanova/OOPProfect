@@ -73,7 +73,6 @@ namespace View
                     {
                         tgUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.RegisterInProgressError));
                     }
-                    
                     break;
                 }
             }
