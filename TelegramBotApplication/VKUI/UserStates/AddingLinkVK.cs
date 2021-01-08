@@ -79,9 +79,11 @@ namespace View
                 var name = splittedMessage[0];
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
-                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
-                    GetKeyboard());
+                var newUserState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor,
+                    peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
                 peopleParser.ChangeState(user.UserId, "2");
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
+                    newUserState.GetKeyboard());
             }
 
             else

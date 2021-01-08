@@ -90,7 +90,7 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     peopleParser.ChangeState(user.UserId, "3");
-                    var newUserState = new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider);
+                    var newUserState = new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider, registerCommandListProvider);
                     tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;
                 }

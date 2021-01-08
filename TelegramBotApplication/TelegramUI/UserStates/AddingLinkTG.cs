@@ -52,8 +52,10 @@ namespace View.TelegramUI.UserStates
         {
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
-                tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, GetKeyboard());
+                var newUserState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor,
+                    registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
                 peopleParser.ChangeState(user.UserId, "2");
+                tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, newUserState.GetKeyboard());
             }
             
             else if (!messageText.Contains("http") && !messageText.Contains(":"))
@@ -68,10 +70,11 @@ namespace View.TelegramUI.UserStates
                 var name = splittedMessage[0];
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
+                peopleParser.ChangeState(user.UserId, "2");
                 var newUserState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
                     newUserState.GetKeyboard());
-                peopleParser.ChangeState(user.UserId, "2");
+                
             }
             else
             {

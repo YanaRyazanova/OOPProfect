@@ -15,6 +15,7 @@ namespace View
         private readonly MessageHandler messageHandler;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
@@ -33,7 +34,8 @@ namespace View
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             MessageHandler messageHandler,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
@@ -41,6 +43,7 @@ namespace View
             this.messageHandler = messageHandler;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -59,7 +62,7 @@ namespace View
                     var text = new MessageResponse(ResponseType.Start).response;
                     peopleParser.AddNewUser(user.UserId);
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider);
+                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
                     tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;
                 }

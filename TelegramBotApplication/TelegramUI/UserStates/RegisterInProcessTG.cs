@@ -17,6 +17,7 @@ namespace View
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private ReplyKeyboardMarkup CreateStartKeyboard()
         {
@@ -35,7 +36,8 @@ namespace View
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
@@ -43,6 +45,7 @@ namespace View
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -61,7 +64,7 @@ namespace View
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
                             peopleParser.EvaluateState(user.UserId);
-                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser);
+                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else
