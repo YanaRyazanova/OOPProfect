@@ -14,13 +14,15 @@ namespace View
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         public CommandVKFactory(IVkMessageSender vkMessageSender, 
             IPeopleParser peopleParser, 
             MessageHandler messageHandler, 
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
             GroupProvider groupProvider, 
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
@@ -28,6 +30,7 @@ namespace View
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public CommandVK Create(int userState)
@@ -37,7 +40,7 @@ namespace View
                 0 => new NotRegisterVK(vkMessageSender, peopleParser, messageHandler, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider),
                 1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider),
                 2 => new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider),
-                3 => new AddingLinkVK(messageHandler, peopleParser, vkMessageSender),
+                3 => new AddingLinkVK(messageHandler, peopleParser, vkMessageSender, addingLinkCommandListProvider, vkUnknownMessageProcessor),
                 _ => throw new Exception("Wrong user state")
             };
         }

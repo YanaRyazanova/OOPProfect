@@ -22,7 +22,8 @@ namespace View
         LinksMessage,
         LinksError,
         RegisterError,
-        NextLesson
+        NextLesson,
+        LinkCancel
     }
     public class DictOfEnumsAndResponses
     {
@@ -44,6 +45,7 @@ namespace View
             dict.Add(ResponseType.LinksMessage, "Отправьте сообщение в формате:\n*Название чата*: *ссылка*");
             dict.Add(ResponseType.SucessfulLinks, "Ссылка успешно добавлена");
             dict.Add(ResponseType.LinksError, "Формат ссылки неверный. Ссылка должна содержать 'http(https)://...'");
+            dict.Add(ResponseType.LinkCancel, "Добавление ссылки отменено");
         }
     }
     public class MessageResponse

@@ -2,9 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace View.CommandListProvider
+namespace View
 {
-    class AddingLinkCommandListProvider
+    public class AddingLinkCommandListProvider : CommandListProvider
     {
+        public List<string> GetCommands()
+        {
+            return new List<string>{"назад"};
+        }
     }
 }

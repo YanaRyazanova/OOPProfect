@@ -13,14 +13,20 @@ namespace View
         private readonly MessageHandler messageHandler;
         private readonly IPeopleParser peopleParser;
         private readonly IVkMessageSender vkMessageSender;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
+        private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
 
         public AddingLinkVK(MessageHandler messageHandler,
             IPeopleParser peopleParser,
-            IVkMessageSender vkMessageSender)
+            IVkMessageSender vkMessageSender,
+            AddingLinkCommandListProvider addingLinkCommandListProvider,
+            VKUnknownMessageProcessor vkUnknownMessageProcessor)
         {
             this.messageHandler = messageHandler;
             this.peopleParser = peopleParser;
             this.vkMessageSender = vkMessageSender;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
+            this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
         }
 
         private static MessageKeyboard CreateKeyboard()
@@ -33,61 +39,12 @@ namespace View
                 {
                     Action = new MessageKeyboardButtonAction
                     {
-                        Label = "Расписание на сегодня", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Расписание на завтра", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                }
-            };
-            var line2 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Я в столовой", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Ссылки на учебные чаты", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-            };
-            var line3 = new List<MessageKeyboardButton>
-            {
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Добавить ссылку на чат", Type = KeyboardButtonActionType.Text
-                    },
-                    Color = KeyboardButtonColor.Primary
-                },
-
-                new MessageKeyboardButton
-                {
-                    Action = new MessageKeyboardButtonAction
-                    {
-                        Label = "Help", Type = KeyboardButtonActionType.Text
+                        Label = "Назад", Type = KeyboardButtonActionType.Text
                     },
                     Color = KeyboardButtonColor.Primary
                 }
             };
             buttonsList.Add(line1);
-            buttonsList.Add(line2);
-            buttonsList.Add(line3);
             keyboard.Buttons = buttonsList;
             return keyboard;
         }
@@ -99,14 +56,33 @@ namespace View
 
         public void ProcessMessage(string messageText, BotUser user)
         {
-            if (!messageText.Contains("http"))
-                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response, GetKeyboard());
-            var splittedMessage = messageText.Split(": ");
-            var name = splittedMessage[0];
-            var link = splittedMessage[1];
-            messageHandler.AddLink(user, name, link);
-            vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response, GetKeyboard());
-            peopleParser.ChangeState(user.UserId, "2");
+            if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
+            {
+                peopleParser.ChangeState(user.UserId, "2");
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, GetKeyboard());
+            }
+
+            else if (!messageText.Contains("http") && !messageText.Contains(":"))
+            {
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response,
+                    GetKeyboard());
+            }
+
+            else if (messageText.Contains("http") && messageText.Contains(":"))
+            {
+                var splittedMessage = messageText.Split(": ");
+                var name = splittedMessage[0];
+                var link = splittedMessage[1];
+                messageHandler.AddLink(user, name, link);
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
+                    GetKeyboard());
+                peopleParser.ChangeState(user.UserId, "2");
+            }
+
+            else
+            {
+                vkUnknownMessageProcessor.ProcessUnknownCommand(messageText, user, GetKeyboard(), new MessageResponse(ResponseType.Help));
+            }
         }
     }
 }
