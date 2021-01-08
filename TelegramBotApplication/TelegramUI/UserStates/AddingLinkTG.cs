@@ -57,7 +57,6 @@ namespace View.TelegramUI.UserStates
 
         public void ProcessMessage(string messageText, BotUser user)
         {
-
             if (!messageText.Contains("http") && !messageText.Contains(":")) 
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response, GetKeyboard());
             var splittedMessage = messageText.Split(": ");
