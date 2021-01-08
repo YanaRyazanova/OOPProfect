@@ -15,6 +15,7 @@ namespace View
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         public CommandTGFactory(
             ITGMessageSender tgMessageSender,
@@ -22,7 +23,8 @@ namespace View
             MessageHandler messageHandler,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
@@ -30,6 +32,7 @@ namespace View
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public CommandTG Create(int userState)
@@ -39,7 +42,7 @@ namespace View
                 0 => new NotRegisterTG(tgMessageSender, peopleParser, tgUnknownMessageProcessor, messageHandler, groupProvider, registerCommandListProvider),
                 1 => new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider),
                 2 => new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser),
-                3 => new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor),
+                3 => new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider),
                 _ => throw new Exception("Wrong user state")
             };
         }
