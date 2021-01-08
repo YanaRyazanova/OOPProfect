@@ -37,10 +37,10 @@ namespace View
         {
             return userState switch
             {
-                0 => new NotRegisterVK(vkMessageSender, peopleParser, messageHandler, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider),
-                1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider),
-                2 => new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider),
-                3 => new AddingLinkVK(messageHandler, peopleParser, vkMessageSender, addingLinkCommandListProvider, vkUnknownMessageProcessor),
+                0 => new NotRegisterVK(vkMessageSender, peopleParser, messageHandler, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider),
+                1 => new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider),
+                2 => new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider, addingLinkCommandListProvider),
+                3 => new AddingLinkVK(messageHandler, peopleParser, vkMessageSender, addingLinkCommandListProvider, vkUnknownMessageProcessor, registerCommandListProvider),
                 _ => throw new Exception("Wrong user state")
             };
         }

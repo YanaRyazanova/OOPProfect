@@ -14,6 +14,7 @@ namespace View
         private readonly IVkMessageSender vkMessageSender;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
         private readonly IPeopleParser peopleParser;
         private static MessageKeyboard CreateKeyboard()
         {
@@ -89,13 +90,15 @@ namespace View
             IVkMessageSender vkMessageSender,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
             IPeopleParser peopleParser,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.peopleParser = peopleParser;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public MessageKeyboard GetKeyboard()
@@ -140,8 +143,9 @@ namespace View
                 }
                 case "добавить ссылку на чат":
                 {
+                    var newUserState = new AddingLinkVK(messageHandler, peopleParser, vkMessageSender, addingLinkCommandListProvider, vkUnknownMessageProcessor, registerCommandListProvider);
                     peopleParser.ChangeState(user.UserId, "3");
-                    vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, GetKeyboard());
+                    vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;
                     }
                 default:

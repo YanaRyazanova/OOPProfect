@@ -15,18 +15,21 @@ namespace View
         private readonly IVkMessageSender vkMessageSender;
         private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
+        private readonly RegisterCommandListProvider registerCommandListProvider;
 
         public AddingLinkVK(MessageHandler messageHandler,
             IPeopleParser peopleParser,
             IVkMessageSender vkMessageSender,
             AddingLinkCommandListProvider addingLinkCommandListProvider,
-            VKUnknownMessageProcessor vkUnknownMessageProcessor)
+            VKUnknownMessageProcessor vkUnknownMessageProcessor,
+            RegisterCommandListProvider registerCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.peopleParser = peopleParser;
             this.vkMessageSender = vkMessageSender;
             this.addingLinkCommandListProvider = addingLinkCommandListProvider;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
+            this.registerCommandListProvider = registerCommandListProvider;
         }
 
         private static MessageKeyboard CreateKeyboard()
@@ -58,8 +61,10 @@ namespace View
         {
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
+                var newUserState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor,
+                    peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
                 peopleParser.ChangeState(user.UserId, "2");
-                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, GetKeyboard());
+                vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, newUserState.GetKeyboard());
             }
 
             else if (!messageText.Contains("http") && !messageText.Contains(":"))

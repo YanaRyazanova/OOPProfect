@@ -17,6 +17,7 @@ namespace View
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private MessageKeyboard CreateStartKeyboard()
         {
@@ -45,7 +46,8 @@ namespace View
             IPeopleParser peopleParser,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
@@ -53,6 +55,7 @@ namespace View
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public MessageKeyboard GetKeyboard()
@@ -67,7 +70,7 @@ namespace View
                 if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                 {
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider);
+                    var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
                     vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                 }
                 else

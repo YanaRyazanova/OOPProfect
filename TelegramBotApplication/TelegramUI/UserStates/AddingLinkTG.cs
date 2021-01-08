@@ -49,8 +49,8 @@ namespace View.TelegramUI.UserStates
         {
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
-                peopleParser.ChangeState(user.UserId, "2");
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, GetKeyboard());
+                peopleParser.ChangeState(user.UserId, "2");
             }
             
             else if (!messageText.Contains("http") && !messageText.Contains(":"))

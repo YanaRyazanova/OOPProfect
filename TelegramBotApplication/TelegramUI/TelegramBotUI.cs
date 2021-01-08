@@ -94,7 +94,8 @@ namespace View
             if (lessonReply == null)
                 return null;
             var reply = $"{lessonReply.LessonInfo.Item1} через {lessonReply.LessonInfo.Item2} минут";
-            return reply;
+            var text = new MessageResponse(ResponseType.NextLesson);
+            return text + reply;
         }
 
         private static string GetReply(ScheduleReply reply)

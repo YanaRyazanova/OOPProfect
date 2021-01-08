@@ -15,6 +15,7 @@ namespace View
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
         private readonly RegisterCommandListProvider registerCommandListProvider;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
 
         private static MessageKeyboard CreatePreStartKeyboard()
@@ -43,7 +44,8 @@ namespace View
             MessageHandler messageHandler,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider
+            RegisterCommandListProvider registerCommandListProvider,
+            AddingLinkCommandListProvider addingLinkCommandListProvider
             )
         {
             this.vkMessageSender = vkMessageSender;
@@ -52,6 +54,7 @@ namespace View
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public MessageKeyboard GetKeyboard()
@@ -70,7 +73,7 @@ namespace View
                         var text = new MessageResponse(ResponseType.Start).response;
                         peopleParser.AddNewUser(user.UserId);
                         peopleParser.EvaluateState(user.UserId);
-                        var updatedState = new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider);
+                        var updatedState = new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
                         vkMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                         break;
                     }
