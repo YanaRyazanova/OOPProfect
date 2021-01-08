@@ -21,6 +21,7 @@ namespace Application
         private readonly LessonReminder lessonReminder;
 
         public event Action<BotUser, Reply> OnReply;
+        private object lockObj = new object();
         public SenderNotify
         (
             LessonReminder lessonReminder,
@@ -46,18 +47,20 @@ namespace Application
                     var user = new BotUser(id, domain);
                     indicator.Decrement(id);
                     var flag = false;
-                    if (!usersLastNotify.ContainsKey(user))
+                    lock (lockObj)
                     {
-                        usersLastNotify[user] = DateTime.Now;
-                        flag = true;
+                        if (!usersLastNotify.ContainsKey(user))
+                        {
+                            usersLastNotify[user] = DateTime.Now;
+                            flag = true;
+                        }
                     }
-
                     var group = peopleParser.GetGroupFromId(user.UserId);
                     var lesson = LessonReminderHandler(group);
-                    var difference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
-                                     usersLastNotify[user].Hour;
-                    if (lesson == null ||  difference//40
-                        < 3 && !flag)
+                    var lastNotifyDifferense = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
+                                               usersLastNotify[user].Hour;
+                    if (lesson == null ||  lastNotifyDifferense//40
+                        > 3 && !flag)
                         continue;
                     usersLastNotify[user] = DateTime.Now;
                     Console.Write(lesson + user.UserId);
@@ -77,8 +80,10 @@ namespace Application
         {
             if (group == null)
                 return null;
-            var startTime = dataBaseParser.GetNearestLesson(group);
-            var result = Task.Run(() => lessonReminder.Do(startTime.time, startTime.name));
+            var nearestLesson = dataBaseParser.GetNearestLesson(group);
+            if (nearestLesson.name == null)
+                return null;
+            var result = Task.Run(() => lessonReminder.Do(nearestLesson.time, nearestLesson.name));
             return result.Result;
         }
     }

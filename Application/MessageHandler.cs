@@ -53,7 +53,7 @@ namespace Application
                 callback: _ => senderNotify.Do(),
                 state: null,
                 dueTime: 1000,
-                period: 10000);
+                period: 120000);
         }
 
         public void GetScheduleForToday(BotUser user)
@@ -95,16 +95,10 @@ namespace Application
             }
         }
 
-        //public void AskForLink(BotUser user)
-        //{
-        //    OnReply(user, answer);
-        //}
-
         public void GetLinks(BotUser user)
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            
             OnReply(user, new LinksReply(links));
         }
 
