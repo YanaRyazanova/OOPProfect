@@ -4,6 +4,7 @@ using System.Text;
 using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
+using View.TelegramUI.UserStates;
 
 namespace View
 {
@@ -14,6 +15,7 @@ namespace View
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly IPeopleParser peopleParser;
+        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
@@ -44,13 +46,14 @@ namespace View
             ITGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             RegisterCommandListProvider registerCommandListProvider,
-            IPeopleParser peopleParser)
+            IPeopleParser peopleParser, AddingLinkCommandListProvider addingLinkCommandListProvider)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.registerCommandListProvider = registerCommandListProvider;
             this.peopleParser = peopleParser;
+            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -87,7 +90,8 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     peopleParser.ChangeState(user.UserId, "3");
-                    tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, GetKeyboard());
+                    var newUserState = new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider);
+                    tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;
                 }
                 default:
