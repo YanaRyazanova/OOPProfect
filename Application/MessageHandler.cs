@@ -1,17 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using Domain;
 using Domain.Functions;
 using Infrastructure;
-using Infrastructure.SQL;
-using Infrastructure.Csv;
-using Ninject;
 
 namespace Application
 {
@@ -59,13 +49,13 @@ namespace Application
         public void GetScheduleForToday(BotUser user)
         {
             var schedule = SheduleModify(0, user);
-            OnReply(user, schedule);
+            OnReply?.Invoke(user, schedule);
         }
 
         public void GetScheduleForNextDay(BotUser user)
         {
             var scheduleNextDay = SheduleModify(1, user);
-            OnReply(user, scheduleNextDay);
+            OnReply?.Invoke(user, scheduleNextDay);
         }
 
         public int GetDiningRoom(BotUser user)
@@ -99,7 +89,7 @@ namespace Application
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            OnReply(user, new LinksReply(links));
+            OnReply?.Invoke(user, new LinksReply(links));
         }
 
         private Reply SheduleModify(int days, BotUser user)

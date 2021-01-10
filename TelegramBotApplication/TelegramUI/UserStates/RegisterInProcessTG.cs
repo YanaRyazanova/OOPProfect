@@ -13,7 +13,7 @@ namespace View
     public class RegisterInProcessTG : CommandTG
     {
         private readonly MessageHandler messageHandler;
-        private readonly ITGMessageSender tgMessageSender;
+        private readonly TGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
@@ -32,7 +32,7 @@ namespace View
         }
 
         public RegisterInProcessTG(MessageHandler messageHandler,
-            ITGMessageSender tgMessageSender,
+            TGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             GroupProvider groupProvider,
