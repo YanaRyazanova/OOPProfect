@@ -5,17 +5,18 @@ using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
 using View.TelegramUI.UserStates;
+using Ninject;
 
 namespace View
 {
     public class RegisterTG : CommandTG
     {
+        private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
         private readonly ITGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly IPeopleParser peopleParser;
-        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private static ReplyKeyboardMarkup CreateKeyboard()
         {
@@ -42,18 +43,19 @@ namespace View
             return keyboard;
         }
 
-        public RegisterTG(MessageHandler messageHandler,
+        public RegisterTG(StandardKernel container,
+            MessageHandler messageHandler,
             ITGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             RegisterCommandListProvider registerCommandListProvider,
-            IPeopleParser peopleParser, AddingLinkCommandListProvider addingLinkCommandListProvider)
+            IPeopleParser peopleParser)
         {
+            this.container = container;
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.registerCommandListProvider = registerCommandListProvider;
             this.peopleParser = peopleParser;
-            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -90,7 +92,7 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     peopleParser.ChangeState(user.UserId, "3");
-                    var newUserState = new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider, registerCommandListProvider);
+                    var newUserState = container.Get<AddingLinkTG>();//new AddingLinkTG(messageHandler, peopleParser, tgMessageSender, tgUnknownMessageProcessor, addingLinkCommandListProvider, registerCommandListProvider);
                     tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;
                 }

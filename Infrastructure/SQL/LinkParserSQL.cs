@@ -25,30 +25,42 @@ namespace Infrastructure.SQL
                 connection.Open();
                 using (var command = new SQLiteCommand(string.Format("SELECT links FROM Links WHERE GROUP_='{0}'", group), connection))
                 {
-                    var reader = command.ExecuteReader();
-                    var emptyLinks = new Link[0];
-                    foreach (DbDataRecord record in reader)
+                    using (var reader = command.ExecuteReader())
                     {
-                        var notParsedLinks = record["links"].ToString();
-                        return notParsedLinks;
+                        var emptyLinks = new Link[0];
+                        foreach (DbDataRecord record in reader)
+                        {
+                            var notParsedLinks = record["links"].ToString();
+                            return notParsedLinks;
+                        }
+                        return "";
                     }
-                    return "";
                 }
             }
         }
 
         public void AddLinkForGroup(string group, string name, string link)
         {
-            var currentLink = GetActualLinksForGroupInString(group);
-            currentLink = $"{currentLink}\n{name}$$${link}";
+            var currentLink = new StringBuilder(GetActualLinksForGroupInString(group));
+            currentLink.Append($"\n{name}$$${link}");
             var dbName = dbNameProvider.GetDBName("link");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
                 connection.Open();
-                using (var command = new SQLiteCommand(
-                        string.Format("UPDATE Links SET links='{0}' WHERE GROUP_='{1}'", currentLink, group), connection))
+                using (var command =
+                    new SQLiteCommand(
+                        string.Format("UPDATE Links SET links='{0}' WHERE GROUP_='{1}'",
+                            currentLink, group), connection))
                 {
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        ;
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
                 }
             }
         }

@@ -11,6 +11,7 @@ using Ninject;
 using Ninject.Parameters;
 using NUnit.Framework;
 using Telegram.Bot;
+using View.TelegramUI.UserStates;
 using VkNet;
 
 namespace View
@@ -20,10 +21,10 @@ namespace View
         static void Main(string[] args)
         {
             var container = AddBindings(new StandardKernel());
-           
+            container.Bind<StandardKernel>().ToConstant(container);
+
             var senderNotify = container.Get<SenderNotify>();
             var messageHandler = container.Get<MessageHandler>(new ConstructorArgument("senderNotify", senderNotify));
-
             var telegramBot = container.Get<TelegramBotUI>();
 
             var vkToken = File.ReadAllText("vkToken.txt");
@@ -48,10 +49,20 @@ namespace View
             container.Bind<VkBotUI>().ToSelf();
 
             container.Bind<ITGMessageSender>().To<TGMessageSender>().InSingletonScope();
-            container.Bind<IVkMessageSender>().To<VKMessageSender>().InSingletonScope();
+            container.Bind<VKMessageSender>().ToSelf().InSingletonScope();
 
             container.Bind<TGUnknownMessageProcessor>().ToSelf();
             container.Bind<VKUnknownMessageProcessor>().ToSelf();
+
+            container.Bind<AddingLinkVK>().ToSelf();
+            container.Bind<NotRegisterVK>().ToSelf();
+            container.Bind<RegisterVK>().ToSelf();
+            container.Bind<RegisterInProcessVK>().ToSelf();
+
+            container.Bind<AddingLinkTG>().ToSelf();
+            container.Bind<NotRegisterTG>().ToSelf();
+            container.Bind<RegisterTG>().ToSelf();
+            container.Bind<RegisterInProcessTG>().ToSelf();
 
 
             container.Bind<DiningRoomIndicator>().ToSelf().InSingletonScope();

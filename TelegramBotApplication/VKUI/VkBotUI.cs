@@ -236,6 +236,8 @@ namespace View
 
         private static string GetReply(ScheduleReply reply)
         {
+            if (reply.lessons.Length == 0)
+                return "Сегодня пар больше нет :-)";
             var scheduleNextDay = new StringBuilder();
             foreach (var item in reply.lessons)
             {

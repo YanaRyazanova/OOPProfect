@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Application;
 using Infrastructure;
+using Ninject;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
 
@@ -10,26 +11,27 @@ namespace View
 {
     public class AddingLinkVK : CommandVK
     {
+        private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
         private readonly IPeopleParser peopleParser;
-        private readonly IVkMessageSender vkMessageSender;
+        private readonly VKMessageSender vkMessageSender;
         private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
-        private readonly RegisterCommandListProvider registerCommandListProvider;
 
-        public AddingLinkVK(MessageHandler messageHandler,
+        public AddingLinkVK(
+            StandardKernel container,
+            MessageHandler messageHandler,
             IPeopleParser peopleParser,
-            IVkMessageSender vkMessageSender,
+            VKMessageSender vkMessageSender,
             AddingLinkCommandListProvider addingLinkCommandListProvider,
-            VKUnknownMessageProcessor vkUnknownMessageProcessor,
-            RegisterCommandListProvider registerCommandListProvider)
+            VKUnknownMessageProcessor vkUnknownMessageProcessor)
         {
+            this.container = container;
             this.messageHandler = messageHandler;
             this.peopleParser = peopleParser;
             this.vkMessageSender = vkMessageSender;
             this.addingLinkCommandListProvider = addingLinkCommandListProvider;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
-            this.registerCommandListProvider = registerCommandListProvider;
         }
 
         private static MessageKeyboard CreateKeyboard()
@@ -59,28 +61,27 @@ namespace View
 
         public void ProcessMessage(string messageText, BotUser user)
         {
+            var httpConstant = "http";
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
-                var newUserState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor,
-                    peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
+                var newUserState = container.Get<RegisterVK>();
                 peopleParser.ChangeState(user.UserId, "2");
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, newUserState.GetKeyboard());
             }
 
-            else if (!messageText.Contains("http") && !messageText.Contains(":"))
+            else if (!messageText.Contains(httpConstant) && !messageText.Contains(":"))
             {
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response,
                     GetKeyboard());
             }
 
-            else if (messageText.Contains("http") && messageText.Contains(":"))
+            else if (messageText.Contains(httpConstant) && messageText.Contains(":"))
             {
                 var splittedMessage = messageText.Split(": ");
                 var name = splittedMessage[0];
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
-                var newUserState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor,
-                    peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
+                var newUserState = container.Get<RegisterVK>();
                 peopleParser.ChangeState(user.UserId, "2");
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
                     newUserState.GetKeyboard());

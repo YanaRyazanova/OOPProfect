@@ -4,11 +4,13 @@ using System.Text;
 using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
+using Ninject;
 
 namespace View
 {
     public class NotRegisterTG : CommandTG
     {
+        private readonly StandardKernel container;
         private readonly ITGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
@@ -35,7 +37,7 @@ namespace View
             MessageHandler messageHandler,
             GroupProvider groupProvider,
             RegisterCommandListProvider registerCommandListProvider,
-            AddingLinkCommandListProvider addingLinkCommandListProvider)
+            AddingLinkCommandListProvider addingLinkCommandListProvider, StandardKernel container)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
@@ -44,6 +46,7 @@ namespace View
             this.groupProvider = groupProvider;
             this.registerCommandListProvider = registerCommandListProvider;
             this.addingLinkCommandListProvider = addingLinkCommandListProvider;
+            this.container = container;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -62,7 +65,7 @@ namespace View
                     var text = new MessageResponse(ResponseType.Start).response;
                     peopleParser.AddNewUser(user.UserId);
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
+                    var updatedState = container.Get<RegisterInProcessTG>();//new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
                     tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;
                 }
