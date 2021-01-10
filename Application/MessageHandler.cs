@@ -58,13 +58,13 @@ namespace Application
 
         public void GetScheduleForToday(BotUser user)
         {
-            var schedule = SheduleModify(0, user);
+            var schedule = SсheduleModify(0, user);
             OnReply(user, schedule);
         }
 
         public void GetScheduleForNextDay(BotUser user)
         {
-            var scheduleNextDay = SheduleModify(1, user);
+            var scheduleNextDay = SсheduleModify(1, user);
             OnReply(user, scheduleNextDay);
         }
 
@@ -102,7 +102,7 @@ namespace Application
             OnReply(user, new LinksReply(links));
         }
 
-        private Reply SheduleModify(int days, BotUser user)
+        private Reply SсheduleModify(int days, BotUser user)
         {
             var groupName = peopleParser.GetGroupFromId(user.UserId);
             var scheduleArray = dataBaseParser

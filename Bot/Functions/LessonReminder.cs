@@ -9,11 +9,7 @@ namespace Domain.Functions
 {
     public class LessonReminder
     {
-        public LessonReminder()
-        {
-
-        }
-        private int GetDifference(DateTime startTime)
+        private static int GetDifference(DateTime startTime)
         {
             var difference = startTime.Minute + startTime.Hour * 60
                              - DateTime.Now.Minute - DateTime.Now.Hour * 60;
@@ -29,7 +25,6 @@ namespace Domain.Functions
                 {
                     var nextLesson = new NextLesson(name, difference);
                     return nextLesson;
-                    //return $"Пара '{name}' начнется через столько минут: {difference}";
                 }
                 if (difference < 0)
                     return null;
