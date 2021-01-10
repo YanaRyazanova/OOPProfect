@@ -6,18 +6,18 @@ using Application;
 using Infrastructure;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
+using Ninject;
 
 namespace View
 {
     public class RegisterInProcessVK : CommandVK
     {
+        private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
-        private readonly IVkMessageSender vkMessageSender;
+        private readonly VKMessageSender vkMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
-        private readonly RegisterCommandListProvider registerCommandListProvider;
-        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private MessageKeyboard CreateStartKeyboard()
         {
@@ -41,21 +41,19 @@ namespace View
             return keyboard;
         }
 
-        public RegisterInProcessVK(MessageHandler messageHandler,
-            IVkMessageSender vkMessageSender,
+        public RegisterInProcessVK(StandardKernel container,
+            MessageHandler messageHandler,
+            VKMessageSender vkMessageSender,
             IPeopleParser peopleParser,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
-            GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider,
-            AddingLinkCommandListProvider addingLinkCommandListProvider)
+            GroupProvider groupProvider)
         {
+            this.container = container;
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
             this.peopleParser = peopleParser;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.groupProvider = groupProvider;
-            this.registerCommandListProvider = registerCommandListProvider;
-            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public MessageKeyboard GetKeyboard()
@@ -70,7 +68,7 @@ namespace View
                 if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                 {
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = new RegisterVK(messageHandler, vkMessageSender, vkUnknownMessageProcessor, peopleParser, registerCommandListProvider, addingLinkCommandListProvider);
+                    var updatedState = container.Get<RegisterVK>();
                     vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                 }
                 else

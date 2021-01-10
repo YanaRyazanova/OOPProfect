@@ -6,6 +6,7 @@ using System.Text;
 using Application;
 using Infrastructure;
 using Telegram.Bot.Types.ReplyMarkups;
+using Ninject;
 
 namespace View
 {
@@ -16,8 +17,7 @@ namespace View
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly GroupProvider groupProvider;
-        private readonly RegisterCommandListProvider registerCommandListProvider;
-        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
+        private readonly StandardKernel container;
 
         private ReplyKeyboardMarkup CreateStartKeyboard()
         {
@@ -36,16 +36,14 @@ namespace View
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider,
-            AddingLinkCommandListProvider addingLinkCommandListProvider)
+            StandardKernel container)
         {
             this.messageHandler = messageHandler;
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
             this.groupProvider = groupProvider;
-            this.registerCommandListProvider = registerCommandListProvider;
-            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
+            this.container = container;
         }
 
         public ReplyKeyboardMarkup GetKeyboard()
@@ -64,7 +62,7 @@ namespace View
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
                             peopleParser.EvaluateState(user.UserId);
-                            var updatedState = new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
+                            var updatedState = container.Get<RegisterTG>();//new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else

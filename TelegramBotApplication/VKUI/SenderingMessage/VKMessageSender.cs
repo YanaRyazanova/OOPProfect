@@ -7,7 +7,7 @@ using VkNet.Model.RequestParams;
 
 namespace View
 {
-    public class VKMessageSender : IVkMessageSender
+    public class VKMessageSender 
     {
         private readonly VkApi api;
         private readonly Random rnd = new Random();

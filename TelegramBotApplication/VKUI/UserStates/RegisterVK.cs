@@ -5,16 +5,17 @@ using Application;
 using Infrastructure;
 using VkNet.Enums.SafetyEnums;
 using VkNet.Model.Keyboard;
+using Ninject;
 
 namespace View
 {
     public class RegisterVK : CommandVK
     {
+        private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
-        private readonly IVkMessageSender vkMessageSender;
+        private readonly VKMessageSender vkMessageSender;
         private readonly VKUnknownMessageProcessor vkUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
-        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
         private readonly IPeopleParser peopleParser;
         private static MessageKeyboard CreateKeyboard()
         {
@@ -86,19 +87,19 @@ namespace View
         }
 
         public RegisterVK(
+            StandardKernel container,
             MessageHandler messageHandler,
-            IVkMessageSender vkMessageSender,
+            VKMessageSender vkMessageSender,
             VKUnknownMessageProcessor vkUnknownMessageProcessor,
             IPeopleParser peopleParser,
-            RegisterCommandListProvider registerCommandListProvider,
-            AddingLinkCommandListProvider addingLinkCommandListProvider)
+            RegisterCommandListProvider registerCommandListProvider)
         {
+            this.container = container;
             this.messageHandler = messageHandler;
             this.vkMessageSender = vkMessageSender;
             this.vkUnknownMessageProcessor = vkUnknownMessageProcessor;
             this.peopleParser = peopleParser;
             this.registerCommandListProvider = registerCommandListProvider;
-            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
         }
 
         public MessageKeyboard GetKeyboard()
@@ -108,15 +109,6 @@ namespace View
 
         public void ProcessMessage(string messageText, BotUser user)
         {
-            //if (messageText.Contains("http"))
-            //{
-            //    var splittedMessage = messageText.Split(": ");
-            //    var name = splittedMessage[0];
-            //    var link = splittedMessage[1];
-            //    messageHandler.AddLink(user, name, link);
-            //    return;
-            //}
-
             switch (messageText)
             {
                 case "расписание на сегодня":
@@ -143,7 +135,7 @@ namespace View
                 }
                 case "добавить ссылку на чат":
                 {
-                    var newUserState = new AddingLinkVK(messageHandler, peopleParser, vkMessageSender, addingLinkCommandListProvider, vkUnknownMessageProcessor, registerCommandListProvider);
+                    var newUserState = container.Get<AddingLinkVK>(); 
                     peopleParser.ChangeState(user.UserId, "3");
                     vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;

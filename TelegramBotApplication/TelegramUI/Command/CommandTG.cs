@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Application;
+﻿using Application;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace View

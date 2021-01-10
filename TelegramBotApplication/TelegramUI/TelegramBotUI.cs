@@ -37,7 +37,6 @@ namespace View
         private void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)
         {
             var message = messageEventArgs.Message;
-            Console.WriteLine(message);
             var user = new BotUser(message.Chat.Id.ToString(), "tg");
             var messageText = message.Text.ToLower();
             if (message?.Type != MessageType.Text) return;
@@ -100,6 +99,8 @@ namespace View
 
         private static string GetReply(ScheduleReply reply)
         {
+            if (reply.lessons.Length == 0)
+                return "Сегодня пар больше нет :-)";
             var scheduleNextDay = new StringBuilder();
             foreach (var item in reply.lessons)
             {

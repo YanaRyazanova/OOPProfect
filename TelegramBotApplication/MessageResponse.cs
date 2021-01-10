@@ -30,7 +30,7 @@ namespace View
         public static readonly Dictionary<ResponseType, string> dict = new Dictionary<ResponseType, string>();
         static DictOfEnumsAndResponses()
         {
-            dict.Add(ResponseType.Error, "К сожалению, бот не умеет обрабатывать такую команду :-( Отправьте сообщение 'help' или 'помощь', чтобы увидеть все команды бота./n P.S. Если вы пытались добавить новую ссылку, то она должна быть корректной :-)");
+            dict.Add(ResponseType.Error, "К сожалению, бот не умеет обрабатывать такую команду :-( Отправьте сообщение 'help' или 'помощь', чтобы увидеть все команды бота :-)");
             dict.Add(ResponseType.DiningRoom, "Сейчас в столовой находится вот столько посетителей: ");
             dict.Add(ResponseType.Help, File.ReadAllText("help.txt"));
             dict.Add(ResponseType.StartError, "Начните с команды: \"/start\" ");
