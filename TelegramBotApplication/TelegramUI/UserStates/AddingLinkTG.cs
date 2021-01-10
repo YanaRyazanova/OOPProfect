@@ -53,8 +53,7 @@ namespace View.TelegramUI.UserStates
         {
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
-                var newUserState = container.Get<RegisterTG>();//new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor,
-                    //registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
+                var newUserState = container.Get<RegisterTG>();
                 peopleParser.ChangeState(user.UserId, "2");
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, newUserState.GetKeyboard());
             }
@@ -72,7 +71,7 @@ namespace View.TelegramUI.UserStates
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
                 peopleParser.ChangeState(user.UserId, "2");
-                var newUserState = container.Get<RegisterTG>();//new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
+                var newUserState = container.Get<RegisterTG>();
                 tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
                     newUserState.GetKeyboard());
                 

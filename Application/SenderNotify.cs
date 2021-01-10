@@ -66,7 +66,7 @@ namespace Application
                     Console.Write(lesson + user.UserId);
                     var info = new Tuple<string, int>(lesson.LessonName, lesson.TimeToStart);
                     var result = new LessonReply(info);
-                    OnReply?.Invoke(user, result);
+                    OnReply(user, result);
                 }
             }
             catch (Exception e)

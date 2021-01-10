@@ -49,13 +49,13 @@ namespace Application
         public void GetScheduleForToday(BotUser user)
         {
             var schedule = SheduleModify(0, user);
-            OnReply?.Invoke(user, schedule);
+            OnReply(user, schedule);
         }
 
         public void GetScheduleForNextDay(BotUser user)
         {
             var scheduleNextDay = SheduleModify(1, user);
-            OnReply?.Invoke(user, scheduleNextDay);
+            OnReply(user, scheduleNextDay);
         }
 
         public int GetDiningRoom(BotUser user)
@@ -89,7 +89,7 @@ namespace Application
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            OnReply?.Invoke(user, new LinksReply(links));
+            OnReply(user, new LinksReply(links));
         }
 
         private Reply SheduleModify(int days, BotUser user)

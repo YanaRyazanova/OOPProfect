@@ -91,7 +91,7 @@ namespace Infrastructure.SQL
                 }
             }
         }
-        public void AddNewUser(string id, string state = "0", string platform = "tg")
+        public void AddNewUser(string id, string platform, string state = "0")
         {
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))

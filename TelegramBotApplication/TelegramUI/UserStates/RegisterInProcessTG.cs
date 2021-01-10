@@ -62,7 +62,7 @@ namespace View
                         if (messageHandler.SaveGroup(messageText.ToUpper(), user))
                         {
                             peopleParser.EvaluateState(user.UserId);
-                            var updatedState = container.Get<RegisterTG>();//new RegisterTG(messageHandler, tgMessageSender, tgUnknownMessageProcessor, registerCommandListProvider, peopleParser, addingLinkCommandListProvider);
+                            var updatedState = container.Get<RegisterTG>();
                             tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.SuccessfulRegistration).response, updatedState.GetKeyboard());
                         }
                         else

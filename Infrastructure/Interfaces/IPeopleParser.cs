@@ -9,7 +9,7 @@ namespace Infrastructure
         public string GetPlatformFromId(string id);
         public string GetGroupFromId(string id);
         public string GetStateFromId(string id);
-        public void AddNewUser(string id, string state = "0", string platform="tg");
+        public void AddNewUser(string id, string platform, string state = "0");
         public void ChangeGroup(string id, string group);
         public void EvaluateState(string id);
         public void ChangeState(string id, string newState);
