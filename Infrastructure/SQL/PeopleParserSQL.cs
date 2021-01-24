@@ -123,14 +123,16 @@ namespace Infrastructure.SQL
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
                 connection.Open();
-                var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection);
-                var reader = command.ExecuteReader();
-                var users = new List<string>();
-                foreach (DbDataRecord record in reader)
+                using (var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection))
                 {
-                    users.Add((string)record["ChatID"]);
+                    var reader = command.ExecuteReader();
+                    var users = new List<string>();
+                    foreach (DbDataRecord record in reader)
+                    {
+                        users.Add((string)record["ChatID"]);
+                    }
+                    return users.ToArray();
                 }
-                return users.ToArray();
             }
         }
     }
