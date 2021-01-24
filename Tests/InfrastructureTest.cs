@@ -15,7 +15,7 @@ namespace Tests
         public void PeopleParserSQLTest()
         {
             var parser = new PeopleParserSql(new DBNameProvider());
-            parser.AddNewUser("test");
+            parser.AddNewUser("test", "tg");
             parser.ChangeGroup("test", "testGroup");
             Assert.AreEqual("testGroup", parser.GetGroupFromId("test"));
             Assert.AreEqual("0", parser.GetStateFromId("test"));
@@ -30,7 +30,7 @@ namespace Tests
         public void PeopleParserCSVTest()
         {
             var parser = new PeopleParserCsv(new DBNameProvider());
-            parser.AddNewUser("test", "0", "vk");
+            parser.AddNewUser("test", "vk", "0");
             parser.ChangeGroup("test", "artemiq rogov");
             Assert.AreEqual("artemiq rogov", parser.GetGroupFromId("test"));
             Assert.AreEqual("0", parser.GetStateFromId("test"));
