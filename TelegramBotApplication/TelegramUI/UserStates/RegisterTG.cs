@@ -91,7 +91,7 @@ namespace View
                 }
                 case "добавить ссылку на чат":
                 {
-                    peopleParser.ChangeState(user.UserId, "3");
+                    peopleParser.ChangeState(user.UserId, UserStates.AddingLink);
                     var newUserState = container.Get<AddingLinkTG>();
                     tgMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;

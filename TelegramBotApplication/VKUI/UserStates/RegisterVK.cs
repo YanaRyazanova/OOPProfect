@@ -136,7 +136,7 @@ namespace View
                 case "добавить ссылку на чат":
                 {
                     var newUserState = container.Get<AddingLinkVK>(); 
-                    peopleParser.ChangeState(user.UserId, "3");
+                    peopleParser.ChangeState(user.UserId, UserStates.AddingLink);
                     vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksMessage).response, newUserState.GetKeyboard());
                     break;
                     }

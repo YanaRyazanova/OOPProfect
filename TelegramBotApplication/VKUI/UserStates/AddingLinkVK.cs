@@ -62,27 +62,28 @@ namespace View
         public void ProcessMessage(string messageText, BotUser user)
         {
             var httpConstant = "http";
+            var colonConstant = ":";
             if (addingLinkCommandListProvider.GetCommands().Contains(messageText))
             {
                 var newUserState = container.Get<RegisterVK>();
-                peopleParser.ChangeState(user.UserId, "2");
+                peopleParser.ChangeState(user.UserId, UserStates.Register);
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinkCancel).response, newUserState.GetKeyboard());
             }
 
-            else if (!messageText.Contains(httpConstant) && !messageText.Contains(":"))
+            else if (!messageText.Contains(httpConstant) && !messageText.Contains(colonConstant))
             {
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.LinksError).response,
                     GetKeyboard());
             }
 
-            else if (messageText.Contains(httpConstant) && messageText.Contains(":"))
+            else if (messageText.Contains(httpConstant) && messageText.Contains(colonConstant))
             {
                 var splittedMessage = messageText.Split(": ");
                 var name = splittedMessage[0];
                 var link = splittedMessage[1];
                 messageHandler.AddLink(user, name, link);
                 var newUserState = container.Get<RegisterVK>();
-                peopleParser.ChangeState(user.UserId, "2");
+                peopleParser.ChangeState(user.UserId, UserStates.Register);
                 vkMessageSender.SendNotification(user, new MessageResponse(ResponseType.SucessfulLinks).response,
                     newUserState.GetKeyboard());
             }

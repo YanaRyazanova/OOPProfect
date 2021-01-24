@@ -64,9 +64,19 @@ namespace Infrastructure.SQL
                 command.ExecuteNonQuery();
             }
         }
-
+        private int DefineStateFromEnum(UserStates enumState)
+        {
+            var statesDict = new Dictionary<UserStates, int>
+            {
+                [UserStates.NotRegister] = 0,
+                [UserStates.RegisterInProcess] = 1,
+                [UserStates.Register] = 2,
+                [UserStates.AddingLink] = 3
+            };
+            return statesDict[enumState];
+        }
         public void ChangeGroup(string id, string group) => ChangeThing(id, group, "GROUP_");
-        public void ChangeState(string id, string newState) => ChangeThing(id, newState, "State");
+        public void ChangeState(string id, UserStates newState) => ChangeThing(id, DefineStateFromEnum(newState).ToString(), "State");
 
         private string GetThingFromId(string id, string thingToGet)
         {
@@ -91,8 +101,17 @@ namespace Infrastructure.SQL
                 }
             }
         }
-        public void AddNewUser(string id, string platform, string state = "0")
+
+        public void AddNewUser(string id, string platform, UserStates stateEnum = UserStates.NotRegister)
         {
+            var statesDict = new Dictionary<UserStates, int>
+            {
+                [UserStates.NotRegister] = 0,
+                [UserStates.RegisterInProcess] = 1,
+                [UserStates.Register] = 2,
+                [UserStates.AddingLink] = 3
+            };
+            var state = statesDict[stateEnum];
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups");
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
@@ -123,16 +142,14 @@ namespace Infrastructure.SQL
             using (var connection = new SQLiteConnection(string.Format("Data Source={0};", dbName)))
             {
                 connection.Open();
-                using (var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection))
+                var command = new SQLiteCommand("SELECT ChatID FROM PeopleAndGroups", connection);
+                var reader = command.ExecuteReader();
+                var users = new List<string>();
+                foreach (DbDataRecord record in reader)
                 {
-                    var reader = command.ExecuteReader();
-                    var users = new List<string>();
-                    foreach (DbDataRecord record in reader)
-                    {
-                        users.Add((string)record["ChatID"]);
-                    }
-                    return users.ToArray();
+                    users.Add((string)record["ChatID"]);
                 }
+                return users.ToArray();
             }
         }
     }
