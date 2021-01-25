@@ -11,7 +11,7 @@ namespace View
     public class NotRegisterTG : CommandTG
     {
         private readonly StandardKernel container;
-        private readonly ITGMessageSender tgMessageSender;
+        private readonly TGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly MessageHandler messageHandler;
@@ -31,7 +31,7 @@ namespace View
             return keyboard;
         }
 
-        public NotRegisterTG(ITGMessageSender tgMessageSender,
+        public NotRegisterTG(TGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             MessageHandler messageHandler,

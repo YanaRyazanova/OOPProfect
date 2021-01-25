@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Domain;
 using Domain.Functions;
 using Infrastructure;
-using Infrastructure.Csv;
-using Infrastructure.SQL;
 
 namespace Application
 {
@@ -57,17 +54,19 @@ namespace Application
                     }
                     var group = peopleParser.GetGroupFromId(user.UserId);
                     var lesson = LessonReminderHandler(group);
-                    var lastNotifyDifferense = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
-                                               usersLastNotify[user].Hour;
-                    if (lesson == null ||  lastNotifyDifferense//40
-                        > 3 && !flag)
-                        continue;
-                    usersLastNotify[user] = DateTime.Now;
+                    lock (lockObj)
+                    {
+                        var lastNotifyDifference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
+                                                   usersLastNotify[user].Hour;
+                        if (lesson == null || lastNotifyDifference//40
+                            > 3 && !flag)
+                            continue;
+                        usersLastNotify[user] = DateTime.Now;
+                    }
                     Console.Write(lesson + user.UserId);
-                    //var text = $"{message.LessonName} через {message.TimeToStart} минут";
                     var info = new Tuple<string, int>(lesson.LessonName, lesson.TimeToStart);
                     var result = new LessonReply(info);
-                    OnReply(user, result);
+                    OnReply?.Invoke(user, result);
                 }
             }
             catch (Exception e)

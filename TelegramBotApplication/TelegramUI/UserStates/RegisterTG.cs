@@ -13,7 +13,7 @@ namespace View
     {
         private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
-        private readonly ITGMessageSender tgMessageSender;
+        private readonly TGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly RegisterCommandListProvider registerCommandListProvider;
         private readonly IPeopleParser peopleParser;
@@ -45,7 +45,7 @@ namespace View
 
         public RegisterTG(StandardKernel container,
             MessageHandler messageHandler,
-            ITGMessageSender tgMessageSender,
+            TGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
             RegisterCommandListProvider registerCommandListProvider,
             IPeopleParser peopleParser)

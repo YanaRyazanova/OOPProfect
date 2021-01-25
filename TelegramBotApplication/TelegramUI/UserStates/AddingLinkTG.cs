@@ -13,7 +13,7 @@ namespace View.TelegramUI.UserStates
         private readonly StandardKernel container;
         private readonly MessageHandler messageHandler;
         private readonly IPeopleParser peopleParser;
-        private readonly ITGMessageSender tgMessageSender;
+        private readonly TGMessageSender tgMessageSender;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
         private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
@@ -37,7 +37,7 @@ namespace View.TelegramUI.UserStates
         public AddingLinkTG(StandardKernel container,
             MessageHandler messageHandler,
             IPeopleParser peopleParser,
-            ITGMessageSender tgMessageSender,
+            TGMessageSender tgMessageSender,
             TGUnknownMessageProcessor tgUnknownMessageProcessor, 
             AddingLinkCommandListProvider addingLinkCommandListProvider)
         {

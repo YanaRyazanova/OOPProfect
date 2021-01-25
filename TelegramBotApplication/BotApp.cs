@@ -48,7 +48,7 @@ namespace View
             container.Bind<TelegramBotUI>().ToSelf();
             container.Bind<VkBotUI>().ToSelf();
 
-            container.Bind<ITGMessageSender>().To<TGMessageSender>().InSingletonScope();
+            container.Bind<TGMessageSender>().ToSelf().InSingletonScope();
             container.Bind<VKMessageSender>().ToSelf().InSingletonScope();
 
             container.Bind<TGUnknownMessageProcessor>().ToSelf();
