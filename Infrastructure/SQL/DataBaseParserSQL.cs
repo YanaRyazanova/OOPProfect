@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Infrastructure.SQL
 {
-    public class DataBaseParserSql : IDataBase, IDataBaseParser
+    public class DataBaseParserSql : IDataBaseParser
     {
         private readonly DBNameProvider dbNameProvider;
         public Lesson[] ParseTimeTable(string timetable, DateTime day) => new ParseMethods().ParseTimeTable(timetable, day);

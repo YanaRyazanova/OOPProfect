@@ -18,11 +18,11 @@ namespace Tests
             parser.AddNewUser("test", "tg");
             parser.ChangeGroup("test", "testGroup");
             Assert.AreEqual("testGroup", parser.GetGroupFromId("test"));
-            Assert.AreEqual("0", parser.GetStateFromId("test"));
+            Assert.AreEqual(UserStates.NotRegister, parser.GetStateFromId("test"));
             parser.EvaluateState("test");
-            Assert.AreEqual("1", parser.GetStateFromId("test"));
-            parser.ChangeState("test", "4");
-            Assert.AreEqual("4", parser.GetStateFromId("test"));
+            Assert.AreEqual(UserStates.RegisterInProcess, parser.GetStateFromId("test"));
+            parser.ChangeState("test", UserStates.AddingLink);
+            Assert.AreEqual(UserStates.AddingLink, parser.GetStateFromId("test"));
             Assert.AreEqual("tg", parser.GetPlatformFromId("test"));
         }
 
@@ -30,14 +30,14 @@ namespace Tests
         public void PeopleParserCSVTest()
         {
             var parser = new PeopleParserCsv(new DBNameProvider());
-            parser.AddNewUser("test", "vk", "0");
+            parser.AddNewUser("test", "vk", UserStates.NotRegister);
             parser.ChangeGroup("test", "artemiq rogov");
             Assert.AreEqual("artemiq rogov", parser.GetGroupFromId("test"));
-            Assert.AreEqual("0", parser.GetStateFromId("test"));
+            Assert.AreEqual(UserStates.NotRegister, parser.GetStateFromId("test"));
             parser.EvaluateState("test");
-            Assert.AreEqual("1", parser.GetStateFromId("test"));
-            parser.ChangeState("test", "150");
-            Assert.AreEqual("150", parser.GetStateFromId("test"));
+            Assert.AreEqual(UserStates.RegisterInProcess, parser.GetStateFromId("test"));
+            parser.ChangeState("test", UserStates.RegisterInProcess);
+            Assert.AreEqual(UserStates.RegisterInProcess, parser.GetStateFromId("test"));
             Assert.AreEqual("vk", parser.GetPlatformFromId("test"));
         }
     }
