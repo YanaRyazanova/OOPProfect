@@ -10,6 +10,13 @@ namespace Infrastructure.Csv
 {
     public class PeopleParserCsv : IPeopleParser
     {
+        private readonly Dictionary<UserStates, int> statesDict = new Dictionary<UserStates, int>
+        {
+            [UserStates.NotRegister] = 0,
+            [UserStates.RegisterInProcess] = 1,
+            [UserStates.Register] = 2,
+            [UserStates.AddingLink] = 3
+        };
         private readonly DBNameProvider dbNameProvider;
         public PeopleParserCsv(DBNameProvider dbNameProvider)
         {
@@ -41,8 +48,9 @@ namespace Infrastructure.Csv
             RewriteFields(id, group, prevState, platform, dbName);
         }
 
-        public void ChangeState(string id, string newState)
+        public void ChangeState(string id, UserStates newStateEnum)
         {
+            var newState = statesDict[newStateEnum].ToString();
             var group = GetGroupFromId(id);
             var platform = GetPlatformFromId(id);
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
@@ -92,8 +100,16 @@ namespace Infrastructure.Csv
             }
             return "";
         }
-        public void AddNewUser(string id, string state = "0", string platform = "tg")
+        public void AddNewUser(string id, string platform, UserStates stateEnum = UserStates.NotRegister)
         {
+            var statesDict = new Dictionary<UserStates, int>
+            {
+                [UserStates.NotRegister] = 0,
+                [UserStates.RegisterInProcess] = 1,
+                [UserStates.Register] = 2,
+                [UserStates.AddingLink] = 3
+            };
+            var state = statesDict[stateEnum];
             var dbName = dbNameProvider.GetDBName("PeopleAndGroups", "csv");
             using (TextFieldParser parser = new TextFieldParser(dbName))
             {

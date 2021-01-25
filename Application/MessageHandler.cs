@@ -89,7 +89,7 @@ namespace Application
         {
             var group = peopleParser.GetGroupFromId(user.UserId);
             var links = linkParser.GetActualLinksForGroup(group);
-            OnReply?.Invoke(user, new LinksReply(links));
+            OnReply(user, new LinksReply(links));
         }
 
         private Reply SсheduleModify(int days, BotUser user)

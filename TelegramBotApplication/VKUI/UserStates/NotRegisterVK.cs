@@ -61,7 +61,7 @@ namespace View
                 case "начать":
                     {
                         var text = new MessageResponse(ResponseType.Start).response;
-                        peopleParser.AddNewUser(user.UserId, "0","vk");
+                        peopleParser.AddNewUser(user.UserId, "vk");
                         peopleParser.EvaluateState(user.UserId);
                         var updatedState = container.Get<RegisterInProcessVK>();
                         vkMessageSender.SendNotification(user, text, updatedState.GetKeyboard());

@@ -114,7 +114,6 @@ namespace View
             {
                 if (message.Type == MessageType.Sended) continue;
                 user = new BotUser(message.FromId.Value.ToString(), "vk");
-                Console.Beep();
                 Answer(message.Text);
             }
         }
@@ -230,7 +229,7 @@ namespace View
             if (lessonReply == null)
                 return null;
             var reply = $"{lessonReply.LessonInfo.Item1} через {lessonReply.LessonInfo.Item2} минут";
-            var text = new MessageResponse(ResponseType.NextLesson);
+            var text = new MessageResponse(ResponseType.NextLesson).response;
             return text + reply;
         }
 

@@ -63,9 +63,9 @@ namespace View
                 case "начать":
                 {
                     var text = new MessageResponse(ResponseType.Start).response;
-                    peopleParser.AddNewUser(user.UserId);
+                    peopleParser.AddNewUser(user.UserId, "tg");
                     peopleParser.EvaluateState(user.UserId);
-                    var updatedState = container.Get<RegisterInProcessTG>();//new RegisterInProcessTG(messageHandler, tgMessageSender, peopleParser, tgUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
+                    var updatedState = container.Get<RegisterInProcessTG>();
                     tgMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                     break;
                 }

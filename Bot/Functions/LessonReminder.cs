@@ -9,7 +9,7 @@ namespace Domain.Functions
 {
     public class LessonReminder
     {
-        private static int GetDifference(DateTime startTime)
+        private int GetDifference(DateTime startTime)
         {
             var difference = startTime.Minute + startTime.Hour * 60
                              - DateTime.Now.Minute - DateTime.Now.Hour * 60;

@@ -93,7 +93,7 @@ namespace View
             if (lessonReply == null)
                 return null;
             var reply = $"{lessonReply.LessonInfo.Item1} через {lessonReply.LessonInfo.Item2} минут";
-            var text = new MessageResponse(ResponseType.NextLesson);
+            var text = new MessageResponse(ResponseType.NextLesson).response;
             return text + reply;
         }
 
