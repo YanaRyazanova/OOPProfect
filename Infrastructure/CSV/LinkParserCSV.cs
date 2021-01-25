@@ -20,7 +20,7 @@ namespace Infrastructure.Csv
         public Link[] GetActualLinksForGroup(string group)
         {
             var dbName = dbNameProvider.GetDBName("link", extension);
-            using (TextFieldParser parser = new TextFieldParser(dbName))
+            using (var parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(",");
                 while (!parser.EndOfData)

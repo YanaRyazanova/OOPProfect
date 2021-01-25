@@ -17,13 +17,11 @@ namespace Domain.Functions
         {
             lock (lockObj)
             {
-                if (!users.ContainsKey(id))
-                {
-                    users.Add(id, DateTime.Now);
-                    VisitorsCount++;
-                    Console.WriteLine("Increment for " + id);
-                    Console.WriteLine(users.Keys + users.Values.ToString());
-                }
+                if (users.ContainsKey(id)) return;
+                users.Add(id, DateTime.Now);
+                VisitorsCount++;
+                Console.WriteLine("Increment for " + id);
+                Console.WriteLine(users.Keys + users.Values.ToString());
             }
         }
 

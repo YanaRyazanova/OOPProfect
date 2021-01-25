@@ -32,7 +32,7 @@ namespace Infrastructure.Csv
                 ["Saturday"] = "Суббота",
                 ["Sunday"] = "Воскресенье"
             };
-            using (TextFieldParser parser = new TextFieldParser(dbName))
+            using (var parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");
                 while (!parser.EndOfData)
