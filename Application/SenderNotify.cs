@@ -58,8 +58,7 @@ namespace Application
                     {
                         var lastNotifyDifference = DateTime.Now.Hour + DateTime.Now.Minute - usersLastNotify[user].Minute -
                                                    usersLastNotify[user].Hour;
-                        if (lesson == null || lastNotifyDifference//40
-                            > 3 && !flag)
+                        if (lesson == null || lastNotifyDifference > 3 && !flag)
                             continue;
                         usersLastNotify[user] = DateTime.Now;
                     }

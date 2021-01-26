@@ -14,10 +14,6 @@ namespace View
         private readonly TGMessageSender tgMessageSender;
         private readonly IPeopleParser peopleParser;
         private readonly TGUnknownMessageProcessor tgUnknownMessageProcessor;
-        private readonly MessageHandler messageHandler;
-        private readonly GroupProvider groupProvider;
-        private readonly RegisterCommandListProvider registerCommandListProvider;
-        private readonly AddingLinkCommandListProvider addingLinkCommandListProvider;
 
         private static ReplyKeyboardMarkup CreatePreStartKeyboard()
         {
@@ -34,18 +30,11 @@ namespace View
         public NotRegisterTG(TGMessageSender tgMessageSender,
             IPeopleParser peopleParser,
             TGUnknownMessageProcessor tgUnknownMessageProcessor,
-            MessageHandler messageHandler,
-            GroupProvider groupProvider,
-            RegisterCommandListProvider registerCommandListProvider,
-            AddingLinkCommandListProvider addingLinkCommandListProvider, StandardKernel container)
+            StandardKernel container)
         {
             this.tgMessageSender = tgMessageSender;
             this.peopleParser = peopleParser;
             this.tgUnknownMessageProcessor = tgUnknownMessageProcessor;
-            this.messageHandler = messageHandler;
-            this.groupProvider = groupProvider;
-            this.registerCommandListProvider = registerCommandListProvider;
-            this.addingLinkCommandListProvider = addingLinkCommandListProvider;
             this.container = container;
         }
 
