@@ -7,7 +7,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace Infrastructure.Csv
 {
-    public class DataBaseParserCsv : IDataBase, IDataBaseParser
+    public class DataBaseParserCsv : IDataBaseParser
     {
         private readonly DBNameProvider dbNameProvider;
         private readonly string extension;
@@ -32,7 +32,7 @@ namespace Infrastructure.Csv
                 ["Saturday"] = "Суббота",
                 ["Sunday"] = "Воскресенье"
             };
-            using (TextFieldParser parser = new TextFieldParser(dbName))
+            using (var parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(";");
                 while (!parser.EndOfData)

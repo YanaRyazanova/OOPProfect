@@ -8,5 +8,6 @@ namespace Infrastructure
     {
         public Lesson[] GetTimetableForGroupForCurrentDay(string groupName, DateTime day);
         public Lesson GetNearestLesson(string groupName);
+        Lesson[] ParseTimeTable(string groupName, DateTime day);
     }
 }

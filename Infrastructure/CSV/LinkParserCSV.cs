@@ -20,18 +20,15 @@ namespace Infrastructure.Csv
         public Link[] GetActualLinksForGroup(string group)
         {
             var dbName = dbNameProvider.GetDBName("link", extension);
-            var notParsedLinks = "";
-            using (TextFieldParser parser = new TextFieldParser(dbName))
+            using (var parser = new TextFieldParser(dbName))
             {
                 parser.SetDelimiters(",");
                 while (!parser.EndOfData)
                 {
                     var fields = parser.ReadFields();
-                    if (fields[0] == group)
-                    {
-                        notParsedLinks = fields[1];
-                        return new ParseMethods().ParseLinks(notParsedLinks.Replace(@"\n", "\n"));
-                    }
+                    if (fields[0] != @group) continue;
+                    var notParsedLinks = fields[1];
+                    return new ParseMethods().ParseLinks(notParsedLinks.Replace(@"\n", "\n"));
                 }
             }
             
@@ -50,8 +47,8 @@ namespace Infrastructure.Csv
             }
             using (var Writer = new StreamWriter(dbName, false))
             {
-                for (int i = 0; i < values.Length; i++)
-                    Writer.WriteLine(values[i]);
+                for (var i = 0; i < values.Length; i++)
+                    Writer.WriteLine(i);
             }
         }
     }

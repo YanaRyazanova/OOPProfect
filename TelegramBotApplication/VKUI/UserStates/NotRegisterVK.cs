@@ -63,7 +63,7 @@ namespace View
                         var text = new MessageResponse(ResponseType.Start).response;
                         peopleParser.AddNewUser(user.UserId, "vk");
                         peopleParser.EvaluateState(user.UserId);
-                        var updatedState = container.Get<RegisterInProcessVK>();//new RegisterInProcessVK(messageHandler, vkMessageSender, peopleParser, vkUnknownMessageProcessor, groupProvider, registerCommandListProvider, addingLinkCommandListProvider);
+                        var updatedState = container.Get<RegisterInProcessVK>();
                         vkMessageSender.SendNotification(user, text, updatedState.GetKeyboard());
                         break;
                     }

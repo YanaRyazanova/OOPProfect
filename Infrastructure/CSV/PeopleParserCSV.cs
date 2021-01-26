@@ -66,9 +66,9 @@ namespace Infrastructure.Csv
                 if (line[0] == id)
                     values[i] = $"{id},{group},{state},{platform}";
             }
-            using (StreamWriter Writer = new StreamWriter(dbName, false))
+            using (var Writer = new StreamWriter(dbName, false))
             {
-                for (int i = 0; i < values.Length; i++)
+                for (var i = 0; i < values.Length; i++)
                 {
                     Writer.WriteLine(values[i]);
                 }
